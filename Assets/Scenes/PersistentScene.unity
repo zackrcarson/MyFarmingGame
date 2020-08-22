@@ -843,6 +843,7 @@ GameObject:
   - component: {fileID: 1408243931}
   - component: {fileID: 312492016965013988}
   - component: {fileID: 1408243932}
+  - component: {fileID: 1408243933}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -901,7 +902,7 @@ SortingGroup:
   m_GameObject: {fileID: 1408243928}
   m_Enabled: 1
   m_SortingLayerID: 1777036017
-  m_SortingLayer: 1
+  m_SortingLayer: 6
   m_SortingOrder: 0
 --- !u!114 &1408243932
 MonoBehaviour:
@@ -942,6 +943,32 @@ MonoBehaviour:
   idleDown: 0
   idleLeft: 0
   idleRight: 0
+--- !u!61 &1408243933
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408243928}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.02, y: 0.06}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.96, y: 0.13}
+  m_EdgeRadius: 0
 --- !u!1 &1505307128
 GameObject:
   m_ObjectHideFlags: 0
