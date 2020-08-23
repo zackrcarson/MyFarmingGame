@@ -5825,6 +5825,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6617894729356824152, guid: 5d09f2282aa210c4caf48d1767ccc6e7,
+        type: 3}
+      propertyPath: _itemCode
+      value: 10007
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d09f2282aa210c4caf48d1767ccc6e7, type: 3}
 --- !u!1001 &568909587
@@ -66526,6 +66531,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Parsnip (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 1029023145006616859, guid: 5d09f2282aa210c4caf48d1767ccc6e7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4312488167855149835, guid: 5d09f2282aa210c4caf48d1767ccc6e7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -66580,6 +66590,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6617894729356824152, guid: 5d09f2282aa210c4caf48d1767ccc6e7,
+        type: 3}
+      propertyPath: _itemCode
+      value: 10007
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d09f2282aa210c4caf48d1767ccc6e7, type: 3}
