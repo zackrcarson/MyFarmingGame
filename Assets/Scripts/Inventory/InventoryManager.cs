@@ -8,8 +8,12 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
     [SerializeField] private SO_ItemList itemList = null;
 
-    private void Start()
+    // Awake will run before start! This way this class and Item don't have to fight over accessing this dictionary. If this goes in Start() instead, 
+    // We get a null reference exception
+    protected override void Awake()
     {
+        base.Awake();
+
         // Create item details dictionary
         CreateItemDetailsDictionary();
     }

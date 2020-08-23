@@ -273,7 +273,7 @@ MonoBehaviour:
     canBeDropped: 1
     canBeEaten: 0
     canBeCarried: 1
-  - itemCode: 20021
+  - itemCode: 10021
     itemSprite: {fileID: 21300000, guid: 37e09848a493a0a4b89a743f73f75963, type: 3}
     itemType: 8
     itemDescription: Prickly Cactus
