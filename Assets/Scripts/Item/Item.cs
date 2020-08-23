@@ -2,6 +2,8 @@
 
 public class Item : MonoBehaviour
 {
+    
+    [ItemCodeDescriptionAttribute]
     [SerializeField]
     private int _itemCode;
 
