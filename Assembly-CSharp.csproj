@@ -55,7 +55,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
+     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
+     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
+     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
+     <Compile Include="Assets\Scripts\Item\Item.cs" />
+     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
+     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
+     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
+     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
+     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
+     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
      <Compile Include="Assets\Scripts\Misc\SingletonMonobehaviour.cs" />
+     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
+     <Compile Include="Assets\Scripts\Player\ItemPickup.cs" />
+     <Compile Include="Assets\Scripts\Player\Player.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerAnimationTest.cs" />
+     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Property Drawers\ItemCodeDescriptionAttribute.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>/home/zack/Documents/GameDev/FarmingCourse/MyFarmingGame/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
