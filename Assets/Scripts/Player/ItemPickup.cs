@@ -16,8 +16,12 @@ public class ItemPickup : MonoBehaviour
             // The GetItemDetails is a method that returns the item details object given an item code
             ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(item.ItemCode);
 
-            // Print the item description to console
-            Debug.Log(itemDetails.itemDescription);
+            // Add the item to the players inventory, if the item can be picked up (pass in the players inventory location, the item in question, and the game object for destroying)
+            if (itemDetails.canBePickedUp == true)
+            {
+                InventoryManager.Instance.AddItem(InventoryLocation.player, item, collision.gameObject);
+            }
+
         }
 
     }
