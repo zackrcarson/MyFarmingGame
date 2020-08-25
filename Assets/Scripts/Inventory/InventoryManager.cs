@@ -115,7 +115,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         inventoryList.Add(inventoryItem);
 
         // Print out the entire inventory
-        DebugPrintInventoryList(inventoryList);
+        // DebugPrintInventoryList(inventoryList);
     }
 
 
@@ -136,7 +136,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         inventoryList[position] = inventoryItem;
 
         // Print out the entire inventory
-        DebugPrintInventoryList(inventoryList);
+        // DebugPrintInventoryList(inventoryList);
     }
 
 
@@ -180,14 +180,14 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         }
     }
 
-    private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
-    {
-        // Loop through the passed in inventoryList, and print out the item details from GetItemDetails method, with the inventoryItem struct item code, 
-        // and print out the quantity in the struct 
-        foreach (InventoryItem inventoryItem in inventoryList)
-        {
-            Debug.Log("Item Description: " + InventoryManager.Instance.GetItemDetails(inventoryItem.itemCode).itemDescription + "    Item Quantity: " + inventoryItem.itemQuantity);
-        }
-        Debug.Log("**********************************************************************************");
-    }
+    // private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
+    // {
+    //     // Loop through the passed in inventoryList, and print out the item details from GetItemDetails method, with the inventoryItem struct item code, 
+    //     // and print out the quantity in the struct 
+    //     foreach (InventoryItem inventoryItem in inventoryList)
+    //     {
+    //         Debug.Log("Item Description: " + InventoryManager.Instance.GetItemDetails(inventoryItem.itemCode).itemDescription + "    Item Quantity: " + inventoryItem.itemQuantity);
+    //     }
+    //     Debug.Log("**********************************************************************************");
+    // }
 }
