@@ -30,11 +30,15 @@ public class Player : SingletonMonobehaviour<Player>
     public bool idleDown;
     public bool idleLeft;
     public bool idleRight;
+
+    private Camera mainCamera;
     
     private Rigidbody2D rigidBody2D;
+
 #pragma warning disable 414
     private Direction playerDirection;
 #pragma warning restore 414
+
     private float movementSpeed;
 
     private bool _playerInputIsDisabled = false;
@@ -46,7 +50,11 @@ public class Player : SingletonMonobehaviour<Player>
         base.Awake();
 
         rigidBody2D = GetComponent<Rigidbody2D>();
+
+        // Get reference to the main camera
+        mainCamera = Camera.main;
     }
+
 
     private void Update()
     {
@@ -73,12 +81,14 @@ public class Player : SingletonMonobehaviour<Player>
         #endregion
     }
 
+
     // Fixed update is for physics systems
     private void FixedUpdate()
     {   
         // Physically move the player!
         PlayerMovement();
     }
+
 
     private void PlayerMovement()
     {   
@@ -87,6 +97,7 @@ public class Player : SingletonMonobehaviour<Player>
 
         rigidBody2D.MovePosition(rigidBody2D.position + move);
     }
+
 
     private void ResetAnimationTriggers()
     {
@@ -108,6 +119,7 @@ public class Player : SingletonMonobehaviour<Player>
         isSwingingToolDown = false;
         toolEffect = ToolEffect.none;
     }
+
 
     private void PlayerMovementInput()
     {   
@@ -156,6 +168,7 @@ public class Player : SingletonMonobehaviour<Player>
 
     }
 
+
     private void PlayerWalkInput()
     {
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
@@ -172,5 +185,13 @@ public class Player : SingletonMonobehaviour<Player>
             isIdle = false;
             movementSpeed = Settings.runningSpeed;
         }
+    }
+
+
+    public Vector3 GetPlayerViewportPosition()
+    {
+        // Vector3 viewport position for player ((0, 0) is viewport bottom left, and (1,1) is viewport top right)
+        // This is the position of the player in the cameras field of view, so the UI bar can tell if the player is near the bottom
+        return mainCamera.WorldToViewportPoint(transform.position);
     }
 }
