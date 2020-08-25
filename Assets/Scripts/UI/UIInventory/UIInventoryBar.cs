@@ -4,22 +4,95 @@ using UnityEngine;
 
 public class UIInventoryBar : MonoBehaviour
 {
+    [SerializeField] private Sprite blank16x16sprite = null;
+    [SerializeField] private UIInventorySlot[] inventorySlot = null; // This is populated in-editor with the 12 inventory slot UI gameObjects
+
     private RectTransform rectTransform;
 
     private bool _isInventoryBarPositionBottom = true;
 
     public bool IsInventoryBarPositionBottom {get => _isInventoryBarPositionBottom; set => _isInventoryBarPositionBottom = value;}
 
+
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
     }
+
+
+    private void OnDisable()
+    {
+        // When this item is disabled, we will unsubscribe to the InventoryUpdatedEvent
+        EventHandler.InventoryUpdatedEvent -= InventoryUpdated;
+    }
+
+
+    private void OnEnable()
+    {
+        // When this item is enabled, we will subscribe to the InventoryUpdatedEvent so we will catch it every time it is triggered
+        EventHandler.InventoryUpdatedEvent += InventoryUpdated;
+    }
+
+
+    private void ClearInventorySlots()
+    {
+        if (inventorySlot.Length > 0)
+        {
+            // Loop through the inventory slots and update with the blank sprite empty string, null item details, and 0 quantity
+            for (int i = 0; i < inventorySlot.Length; i++)
+            {
+                inventorySlot[i].inventorySlotImage.sprite = blank16x16sprite;
+                inventorySlot[i].textMeshProUGUI.text = "";
+                inventorySlot[i].itemDetails = null;
+                inventorySlot[i].itemQuantity = 0;
+            }
+        }
+    }
+
+
+    private void InventoryUpdated(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
+    {
+        if (inventoryLocation == InventoryLocation.player)
+        {
+            ClearInventorySlots();
+
+            // If the inventorySlot list (populated in the editor with the 12 UI inventory slot gameObjects) is greater than 0, and there are items in the inventory list,
+            if (inventorySlot.Length > 0 && inventoryList.Count > 0)
+            {
+                // Loop through inventory slots and update with corresponding inventory list item, as long as the current slot is less than the total items in the inventory list
+                for (int i = 0; i < inventorySlot.Length; i++)
+                {
+                    if (i < inventoryList.Count)
+                    {
+                        int itemCode = inventoryList[i].itemCode;
+
+                        ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(itemCode);
+
+                        if (itemDetails != null)
+                        {
+                            // Add the image, text, details, and quantity to the inventory item slot
+                            inventorySlot[i].inventorySlotImage.sprite = itemDetails.itemSprite;
+                            inventorySlot[i].textMeshProUGUI.text = inventoryList[i].itemQuantity.ToString();
+                            inventorySlot[i].itemDetails = itemDetails;
+                            inventorySlot[i].itemQuantity = inventoryList[i].itemQuantity;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
     private void Update()
     {
         // Switch the inventory bar position depending on the players position
         SwitchInventoryBarPosition();
     }
+
 
     private void SwitchInventoryBarPosition()
     {
