@@ -60,23 +60,26 @@ public class Player : SingletonMonobehaviour<Player>
     {
         #region Player Input 
 
-        // Reset all the animation triggers to default to make sure
-        ResetAnimationTriggers();
+        if (!PlayerInputIsDisabled)
+        {
+            // Reset all the animation triggers to default to make sure
+            ResetAnimationTriggers();
 
-        // Take the keyboard input and occupy (xInput, yInput) with it, and determine player direction 
-        PlayerMovementInput();
+            // Take the keyboard input and occupy (xInput, yInput) with it, and determine player direction 
+            PlayerMovementInput();
 
-        // Check whether the player is walking (shift) or running
-        PlayerWalkInput();
+            // Check whether the player is walking (shift) or running
+            PlayerWalkInput();
 
-        // From above two calls, we have xInput, yInput, movementSpeed, and isRunning, isWalking, and isIdle.
-        // Now, send event info to delegate so any listeners will recieve player movement input
-        EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect, 
-            isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown, 
-            isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown, 
-            isPickingLeft, isPickingRight, isPickingUp, isPickingDown, 
-            isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown, 
-            false, false, false, false);
+            // From above two calls, we have xInput, yInput, movementSpeed, and isRunning, isWalking, and isIdle.
+            // Now, send event info to delegate so any listeners will recieve player movement input
+            EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect, 
+                isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown, 
+                isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown, 
+                isPickingLeft, isPickingRight, isPickingUp, isPickingDown, 
+                isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown, 
+                false, false, false, false);
+        }
 
         #endregion
     }
@@ -185,6 +188,44 @@ public class Player : SingletonMonobehaviour<Player>
             isIdle = false;
             movementSpeed = Settings.runningSpeed;
         }
+    }
+
+
+    private void ResetMovement()
+    {
+        // Reset the players movement
+        xInput = 0f;
+        yInput = 0f;
+        isRunning = false;
+        isWalking = false;
+        isIdle = true;
+    }
+
+
+    public void DisablePlayerInputAndResetMovement()
+    {
+        DisablePlayerInput();
+        ResetMovement();
+
+        // Send event to any listeners for movement input, with reset, stationary values 
+        EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect, 
+            isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown, 
+            isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown, 
+            isPickingLeft, isPickingRight, isPickingUp, isPickingDown, 
+            isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown, 
+            false, false, false, false);
+    }
+
+
+    public void DisablePlayerInput()
+    {
+        PlayerInputIsDisabled = true;
+    }
+
+
+    public void EnablePlayerInput()
+    {
+        PlayerInputIsDisabled = false;
     }
 
 
