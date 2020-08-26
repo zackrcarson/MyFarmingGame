@@ -233,6 +233,8 @@ MonoBehaviour:
   - {fileID: 1585963316}
   - {fileID: 1788073798}
   - {fileID: 471688404}
+  inventoryBarDraggedItem: {fileID: 5929860863227626550, guid: 2a81413a8dcd2e1aaa2adb49d27927b9,
+    type: 3}
 --- !u!1001 &34591201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -345,6 +347,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -626,6 +633,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -892,6 +904,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1173,6 +1190,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1340,6 +1362,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1983,6 +2010,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2574,6 +2606,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2741,6 +2778,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3091,6 +3133,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3258,6 +3305,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3572,6 +3624,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3783,6 +3840,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 2225916}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name

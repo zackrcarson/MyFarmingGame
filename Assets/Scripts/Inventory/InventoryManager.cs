@@ -180,6 +180,50 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         }
     }
 
+
+    /// <summary>
+    /// Remove an item from the inventory, and create a gameObject at the position it was dropped at
+    /// </summary>
+    public void RemoveItem(InventoryLocation inventoryLocation, int itemCode)
+    {
+        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
+
+        // Check if the inventory already contains the item (returns -1 if it isn't there!)
+        int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
+
+        // If it does exist, remove the item at that position
+        if (itemPosition != -1)
+        {
+            RemoveItemAtPosition(inventoryList, itemCode, itemPosition);
+        }
+
+        // Send event that inventory has been updated for subscribers to update with
+        EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
+    }
+
+
+    private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int position)
+    {
+        // Inventory item is a struct containing the item code and quantity
+        InventoryItem inventoryItem = new InventoryItem();
+
+        // The new quantity after removing one of them
+        int quantity = inventoryList[position].itemQuantity - 1;
+
+        // If there still are some left, adjust the quantity. If not, remove it entirely from the inventory
+        if (quantity > 0)
+        {
+            inventoryItem.itemQuantity = quantity;
+            inventoryItem.itemCode = itemCode;
+            inventoryList[position] = inventoryItem;
+        }
+        else
+        {
+            inventoryList.RemoveAt(position);
+        }
+    }
+
+
     // private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
     // {
     //     // Loop through the passed in inventoryList, and print out the item details from GetItemDetails method, with the inventoryItem struct item code, 

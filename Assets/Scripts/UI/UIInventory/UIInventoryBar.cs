@@ -6,6 +6,7 @@ public class UIInventoryBar : MonoBehaviour
 {
     [SerializeField] private Sprite blank16x16sprite = null;
     [SerializeField] private UIInventorySlot[] inventorySlot = null; // This is populated in-editor with the 12 inventory slot UI gameObjects
+    public GameObject inventoryBarDraggedItem;
 
     private RectTransform rectTransform;
 
