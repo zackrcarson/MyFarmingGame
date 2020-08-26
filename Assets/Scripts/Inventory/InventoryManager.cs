@@ -141,6 +141,29 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
 
     /// <summary>
+    /// Swap item at fromItem index with item at toItem index in inventoryLocation inventory list
+    /// </summary>
+    public void SwapInventoryItems(InventoryLocation inventoryLocation, int fromItem, int toItem)
+    {
+        // If fromItem index and toItem index are within the bounds of the list (so if we have two items, we can't place it at slot > 3!), 
+        // and are not the same, and are greater to or equal to zero
+        if (fromItem < inventoryLists[(int)inventoryLocation].Count && toItem < inventoryLists[(int)inventoryLocation].Count && fromItem != toItem && fromItem >= 0 && toItem >= 0)
+        {
+            // InventoryItem is a struct containing the item code and quantity. Here we set the current from and to items to the structs at those positions
+            InventoryItem fromInventoryItem = inventoryLists[(int)inventoryLocation][fromItem];
+            InventoryItem toInventoryItem = inventoryLists[(int)inventoryLocation][toItem];
+
+            // And then we set the from to the to, and the to to the from
+            inventoryLists[(int)inventoryLocation][toItem] = fromInventoryItem;
+            inventoryLists[(int)inventoryLocation][fromItem] = toInventoryItem;
+
+            // Finally, send an event to the event handler that the inventory has been updated, which will alert the subscriber at UIInventoryBar to update the UI
+            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
+        }
+    }
+
+
+    /// <summary>
     /// Find if an itemCode is already in the inventory.static Returns the item position
     /// in the inventory list, or -1 if the item is not in the inventory
     /// </summary>

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+// Each inventory slot has a UIInventorySlot object, populated in the editor with the slot highlight, image, text, blank item prefab, and its slot number
 public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Camera mainCamera;
@@ -18,6 +19,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     [HideInInspector] public ItemDetails itemDetails;
     [HideInInspector] public int itemQuantity;
+
+    [SerializeField] private int slotNumber = 0;
 
     private void Start()
     {
@@ -87,7 +90,12 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             // If the drag ends over the inventory bar, get the item that was dragged over, and swap them
             if (eventData.pointerCurrentRaycast.gameObject != null && eventData.pointerCurrentRaycast.gameObject.GetComponent<UIInventorySlot>() != null)
             {
-                // Do nothing now. Later add functionality to swap them
+                // Get the slot number corresponding to where the drag ended. 
+                // PointerRayCast gets the object below your mouse, and we are getting the UIInventory slot component, which has a slotNumber variable (populated in editor)
+                int toSlotNumber = eventData.pointerCurrentRaycast.gameObject.GetComponent<UIInventorySlot>().slotNumber;
+
+                // Swap the inventory items in the inventory list from current slot number to final slot number
+                InventoryManager.Instance.SwapInventoryItems(InventoryLocation.player, slotNumber, toSlotNumber);
             } 
             // else attempt the item if it can be dropped
             else
