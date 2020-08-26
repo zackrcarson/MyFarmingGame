@@ -352,6 +352,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -638,6 +643,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -909,6 +919,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1195,6 +1210,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1367,6 +1387,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2015,6 +2040,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2611,6 +2641,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2783,6 +2818,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3138,6 +3178,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3310,6 +3355,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3629,6 +3679,11 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: slotNumber
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
