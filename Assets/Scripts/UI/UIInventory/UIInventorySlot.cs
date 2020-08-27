@@ -4,9 +4,16 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // Each inventory slot has a UIInventorySlot object, populated in the editor with the slot highlight, image, text, blank item prefab, and its slot number
-public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+// IBeginDragHandler, IDragHandler, and IEndDragHandler interfaces are Unity classes that manage when dragging begins, during dragging, and when dragging ends,
+// with the OnBeginDrag(), OnDrag(), and OnEndDrag() methods
+// IPointerEnterHandler, and IPointerExitHandler are triggered when the pointer enters and exits a game object
+// with the OnPointerEnter() and OnPointerExit() methods
+public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     private Camera mainCamera;
+
+    private Canvas parentCanvas;
+
     private Transform parentItem;
     private GameObject draggedItem;
 
@@ -17,10 +24,20 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     [SerializeField] private UIInventoryBar inventoryBar = null;
     [SerializeField] private GameObject itemPrefab = null;
 
+    [SerializeField] private GameObject inventoryTextBoxPrefab = null;
+
     [HideInInspector] public ItemDetails itemDetails;
     [HideInInspector] public int itemQuantity;
 
     [SerializeField] private int slotNumber = 0;
+
+
+    private void Awake()
+    {
+        // For when we create our textbox gameObject, we will parent it under this parent canvas to the inventory slot (which is the UIInventoryBar gameObject)
+        parentCanvas = GetComponentInParent<Canvas>();
+    }
+
 
     private void Start()
     {
@@ -96,6 +113,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
                 // Swap the inventory items in the inventory list from current slot number to final slot number
                 InventoryManager.Instance.SwapInventoryItems(InventoryLocation.player, slotNumber, toSlotNumber);
+
+                // Destroy the inventory text box!
+                DestroyInventoryTextBox();
             } 
             // else attempt the item if it can be dropped
             else
@@ -108,6 +128,57 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
             // Re-enable the player input
             Player.Instance.EnablePlayerInput();
+        }
+    }
+
+    // This method will be triggered when the users pointer enters the game object this script is on (inventorySlots 0...11)
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        // Populate the text box with the item details, as long as there is an actual item there (i.e. if itemQuantity is not 0)
+        if (itemQuantity != 0)
+        {
+            // Instantiate the inventoryBar's inventoryTextBoxGameObject with the text box prefab, parented to the same parent all the slot UIs live under!
+            inventoryBar.inventoryTextBoxGameObject = Instantiate(inventoryTextBoxPrefab, transform.position, Quaternion.identity);
+            inventoryBar.inventoryTextBoxGameObject.transform.SetParent(parentCanvas.transform, false);
+
+            UIInventoryTextBox inventoryTextBox = inventoryBar.inventoryTextBoxGameObject.GetComponent<UIInventoryTextBox>();
+
+            // Set the item type description
+            string itemTypeDescription = InventoryManager.Instance.GetItemTypeDescription(itemDetails.itemType);
+
+            // Populate the text box with the method in UIInventoryTextBox, taking in top1, top2, top3, bottom1, bottom2, bottom3
+            inventoryTextBox.SetTextBoxText(itemDetails.itemDescription, itemTypeDescription, "", itemDetails.itemLongDescription, "", "");
+
+            // Set text box position according to inventory bar position
+            if (inventoryBar.IsInventoryBarPositionBottom)
+            {
+                // If the inventory bar is at the bottom, set the pivot to the bottom of the text box, and 50 pixels above the inventory bar
+                inventoryBar.inventoryTextBoxGameObject.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 0f);
+                inventoryBar.inventoryTextBoxGameObject.transform.position = new Vector3(transform.position.x, transform.position.y + 50f, transform.position.z);
+            }
+            else
+            {
+                // If the inventory bar is at the top, set the pivot to the top of the text box, and 50 pixels below the inventory bar
+                inventoryBar.inventoryTextBoxGameObject.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 1f);
+                inventoryBar.inventoryTextBoxGameObject.transform.position = new Vector3(transform.position.x, transform.position.y - 50f, transform.position.z);
+            }
+        }
+    }
+
+
+    // This method will be triggered when the users pointer exits the game object this script is on (inventorySlots 0...11)
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        // Destroy the created text box once the mouse leaves!
+        DestroyInventoryTextBox();
+    }
+
+
+    public void DestroyInventoryTextBox()
+    {
+        if (inventoryBar.inventoryTextBoxGameObject != null)
+        {
+            Destroy(inventoryBar.inventoryTextBoxGameObject);
         }
     }
 }

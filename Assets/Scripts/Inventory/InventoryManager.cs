@@ -205,6 +205,50 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
 
     /// <summary>
+    /// Get the item type description for a given itemType (enum with all item types) - returns the item type description as a string for a given itemType
+    /// </summary>
+    public string GetItemTypeDescription(ItemType itemType)
+    {
+        string itemTypeDescription;
+
+        // Check which ItemType enum option the given item type is, and return the item type description. The tools have overridden descriptions
+        // in the Settings class, while the other options (e.g. seed, commodity, ...) are explicitly described in the ItemType enum 
+        switch (itemType)
+        {
+            case ItemType.Breaking_tool:
+                itemTypeDescription = Settings.BreakingTool;
+                break;
+            
+            case ItemType.Chopping_tool:
+                itemTypeDescription = Settings.ChoppingTool;
+                break;
+
+            case ItemType.Hoeing_tool:
+                itemTypeDescription = Settings.HoeingTool;
+                break;
+
+            case ItemType.Reaping_tool:
+                itemTypeDescription = Settings.ReapingTool;
+                break;
+
+            case ItemType.Watering_tool:
+                itemTypeDescription = Settings.WateringTool;
+                break;
+
+            case ItemType.Collecting_tool:
+                itemTypeDescription = Settings.CollectingTool;
+                break;
+
+            default:
+                itemTypeDescription = itemType.ToString();
+                break;
+        }
+
+        return itemTypeDescription;
+    }
+
+
+    /// <summary>
     /// Remove an item from the inventory, and create a gameObject at the position it was dropped at
     /// </summary>
     public void RemoveItem(InventoryLocation inventoryLocation, int itemCode)

@@ -8,6 +8,8 @@ public class UIInventoryBar : MonoBehaviour
     [SerializeField] private UIInventorySlot[] inventorySlot = null; // This is populated in-editor with the 12 inventory slot UI gameObjects
     public GameObject inventoryBarDraggedItem;
 
+    [HideInInspector] public GameObject inventoryTextBoxGameObject;
+
     private RectTransform rectTransform;
 
     private bool _isInventoryBarPositionBottom = true;

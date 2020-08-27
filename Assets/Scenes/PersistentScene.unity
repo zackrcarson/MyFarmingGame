@@ -235,6 +235,7 @@ MonoBehaviour:
   - {fileID: 471688404}
   inventoryBarDraggedItem: {fileID: 5929860863227626550, guid: 2a81413a8dcd2e1aaa2adb49d27927b9,
     type: 3}
+  inventoryTextBoxGameObject: {fileID: 0}
 --- !u!1001 &34591201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -357,6 +358,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -648,6 +655,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -924,6 +937,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1215,6 +1234,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -1392,6 +1417,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2045,6 +2076,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2646,6 +2683,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -2823,6 +2866,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3183,6 +3232,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3360,6 +3415,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3684,6 +3745,12 @@ PrefabInstance:
       propertyPath: slotNumber
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
@@ -3900,6 +3967,12 @@ PrefabInstance:
       propertyPath: inventoryBar
       value: 
       objectReference: {fileID: 2225916}
+    - target: {fileID: 3980268039808976499, guid: ef91f93d1a979e86196cd4b4aa8a7354,
+        type: 3}
+      propertyPath: inventoryTextBoxPrefab
+      value: 
+      objectReference: {fileID: 7766119957420438491, guid: 88e1b85c58c95a2e6ba914f58be452f9,
+        type: 3}
     - target: {fileID: 4502527320334523679, guid: ef91f93d1a979e86196cd4b4aa8a7354,
         type: 3}
       propertyPath: m_Name
