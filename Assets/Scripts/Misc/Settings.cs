@@ -44,6 +44,14 @@ public static class Settings
     public static int idleLeft;
     public static int idleRight;
 
+    // Tools categories
+    public const string HoeingTool = "Hoe";
+    public const string ChoppingTool = "Axe";
+    public const string BreakingTool = "Pickaxe";
+    public const string ReapingTool = "Scythe";
+    public const string WateringTool = "WateringCan";
+    public const string CollectingTool = "Basket";
+
     // Static constructor
     static Settings()
     {
