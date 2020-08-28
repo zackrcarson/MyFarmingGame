@@ -8,7 +8,8 @@ using UnityEngine.UI;
 // with the OnBeginDrag(), OnDrag(), and OnEndDrag() methods
 // IPointerEnterHandler, and IPointerExitHandler are triggered when the pointer enters and exits a game object
 // with the OnPointerEnter() and OnPointerExit() methods
-public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+// IPointerClickHandler is triggered when the user clicks on the game object (an inventory slot) with the OnPointerClic method
+public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private Camera mainCamera;
 
@@ -25,6 +26,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     [SerializeField] private GameObject itemPrefab = null;
 
     [SerializeField] private GameObject inventoryTextBoxPrefab = null;
+
+    [HideInInspector] public bool isSelected = false;
 
     [HideInInspector] public ItemDetails itemDetails;
     [HideInInspector] public int itemQuantity;
@@ -47,11 +50,43 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
 
     /// <summary>
+    /// Sets this inventorySlot item to be selected
+    /// </summary>
+    private void SetSelectedItem()
+    {
+        // clear the currently highlighted items
+        inventoryBar.ClearHighlightOnInventorySlots();
+
+        // Highlight the item on the inventory bar
+        isSelected = true;
+
+        // Set highlighted inventory slots
+        inventoryBar.SetHighlightedInventorySlots();
+
+        // Set item selected in inventory list
+        InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.player, itemDetails.itemCode);
+    }
+
+
+    private void ClearSelectedItem()
+    {
+        // Clear the currently highlighted items
+        inventoryBar.ClearHighlightOnInventorySlots();
+
+        isSelected = false;
+
+        // Set no item selected in the inventory list
+        InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.player);
+    }
+
+
+    /// <summary>
     /// Drops the item (if selected) at the current mouse position, called by the DropItem event 
     /// </summary>
     private void DropSelectedItemAtMousePosition()
     {
-        if (itemDetails != null)
+        // Only drop the item if it exists, and if it is selected!
+        if (itemDetails != null && isSelected)
         {
             // Vector to mouse position in the world coordinates, as converted from the screen viewport coordinates 
             // (the cameras position is at "-10" z position. We want the item to be created at the opposite!)
@@ -65,6 +100,12 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
             // Remove the item from the players inventory
             InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
+
+            // If we are dropping the last item in a stack, clear the selected highlight
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
+            {
+                ClearSelectedItem();
+            }
         }
     }
 
@@ -83,6 +124,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             // Set the currently null image to the image for the dragged item we want
             Image draggedItemImage = draggedItem.GetComponentInChildren<Image>();
             draggedItemImage.sprite = inventorySlotImage.sprite;
+
+            // Set the item to be selected
+            SetSelectedItem();
         }
     }
 
@@ -116,6 +160,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
                 // Destroy the inventory text box!
                 DestroyInventoryTextBox();
+
+                // Clear the selected item if we've swapped!
+                ClearSelectedItem();
             } 
             // else attempt the item if it can be dropped
             else
@@ -130,6 +177,30 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             Player.Instance.EnablePlayerInput();
         }
     }
+
+
+    // This method is triggered then the player clicks on the GameObject (the inventory slot)
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // If left click
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // If inventory slot currently selected, then deselect. If it isn't, then select it
+            if (isSelected == true)
+            {
+                ClearSelectedItem();
+            }
+            else
+            {
+                // Only if there is an item in that inventory slot!
+                if (itemQuantity > 0)
+                {
+                    SetSelectedItem();
+                }
+            }
+        }
+    }
+
 
     // This method will be triggered when the users pointer enters the game object this script is on (inventorySlots 0...11)
     public void OnPointerEnter(PointerEventData eventData)
