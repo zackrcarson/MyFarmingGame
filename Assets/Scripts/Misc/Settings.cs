@@ -49,7 +49,7 @@ public static class Settings
     public const string ChoppingTool = "Axe";
     public const string BreakingTool = "Pickaxe";
     public const string ReapingTool = "Scythe";
-    public const string WateringTool = "WateringCan";
+    public const string WateringTool = "Watering Can";
     public const string CollectingTool = "Basket";
 
     // Static constructor

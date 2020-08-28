@@ -228,7 +228,7 @@ MonoBehaviour:
   - itemCode: 10017
     itemSprite: {fileID: 21300506, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
     itemType: 6
-    itemDescription: A Basic Scythe For Reaping
+    itemDescription: A Basic Scythe
     itemLongDescription: A sharp, basic scythe - great for cutting grass
     itemUseGridRadius: 2
     itemUseRadius: 1.5
