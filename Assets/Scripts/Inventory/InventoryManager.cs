@@ -6,6 +6,9 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     // Create a dictionary for inventory, with itemCode : itemDetails. This will be fast to access
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
 
+    // The index of the array is the inventory list location (player, chest), and the value is the item code of the selected item (so they can still swap)
+    private int[] selectedInventoryItem;
+
     // InventoryItem is a struct that stores the item code, and the number held
     public List<InventoryItem>[] inventoryLists;
 
@@ -26,6 +29,14 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
         // Create item details dictionary
         CreateItemDetailsDictionary();
+
+        // Initialize the selected inventory item array, of size equal to the number of inventory lcations (player, chest), and each item at -1 (not selected)
+        selectedInventoryItem = new int[(int)InventoryLocation.count];
+
+        for (int i = 0; i < selectedInventoryItem.Length; i++)
+        {
+            selectedInventoryItem[i] = -1;
+        }
     }
 
 
@@ -164,6 +175,15 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
 
     /// <summary>
+    /// Clear the selected inventory item for inventoryLocation
+    /// </summary>
+    public void ClearSelectedInventoryItem(InventoryLocation inventoryLocation)
+    {
+        selectedInventoryItem[(int)inventoryLocation] = -1;
+    }
+
+
+    /// <summary>
     /// Find if an itemCode is already in the inventory.static Returns the item position
     /// in the inventory list, or -1 if the item is not in the inventory
     /// </summary>
@@ -288,6 +308,15 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         {
             inventoryList.RemoveAt(position);
         }
+    }
+
+
+    /// <summary>
+    /// Set the selected inventory item for inventoryLocation to itemCode
+    /// </summary>
+    public void SetSelectedInventoryItem(InventoryLocation inventoryLocation, int itemCode)
+    {
+        selectedInventoryItem[(int)inventoryLocation] = itemCode;
     }
 
 
