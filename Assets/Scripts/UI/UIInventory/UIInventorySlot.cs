@@ -65,6 +65,16 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         // Set item selected in inventory list
         InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.player, itemDetails.itemCode);
+
+        if (itemDetails.canBeCarried == true)
+        {
+            // Show the player carrying the item
+            Player.Instance.ShowCarriedItem(itemDetails.itemCode);
+        }
+        else // Show the player carrying nothing
+        {
+            Player.Instance.ClearCarriedItem();
+        }
     }
 
 
@@ -77,6 +87,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         // Set no item selected in the inventory list
         InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.player);
+
+        // Clear the player carrying the item
+        Player.Instance.ClearCarriedItem();
     }
 
 
