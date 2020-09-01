@@ -1,7 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
+    // This will hold our animation overrides
+    private AnimationOverrides animationOverrides;
+
     // Movement Parameters
     public float xInput;
     public float yInput;
@@ -39,7 +43,18 @@ public class Player : SingletonMonobehaviour<Player>
     private Direction playerDirection;
 #pragma warning restore 414
 
+    // List for characterAttribute Structs that we want to swap animations for. This is what we pass into the AnimationOverride
+    private List<CharacterAttribute> characterAttributeCustomisationList;
+
     private float movementSpeed;
+
+    // Serialized field which we will populate with a prefab to show equipped item above a players head.
+    [Tooltip("Should be populated in the prefab with the equipped item sprite rendered")]
+    [SerializeField] private SpriteRenderer equippedItemSpriteRenderer = null;
+
+    // Player attributes that can be swapped
+    private CharacterAttribute armsCharacterAttribute;
+    private CharacterAttribute toolCharacterAttribute;
 
     private bool _playerInputIsDisabled = false;
 
@@ -50,6 +65,15 @@ public class Player : SingletonMonobehaviour<Player>
         base.Awake();
 
         rigidBody2D = GetComponent<Rigidbody2D>();
+
+        // This will get all of the AnimationOverrides found in the children of player (arm, leg, etc)
+        animationOverrides = GetComponentInChildren<AnimationOverrides>();
+
+        // initialize our swappable character attributes (a struct) from the enums for the body part, the color, and the type
+        armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.arms, PartVariantColor.none, PartVariantType.none);
+
+        // Initialize the list of character attributes
+        characterAttributeCustomisationList = new List<CharacterAttribute>();
 
         // Get reference to the main camera
         mainCamera = Camera.main;
@@ -226,6 +250,54 @@ public class Player : SingletonMonobehaviour<Player>
     public void EnablePlayerInput()
     {
         PlayerInputIsDisabled = false;
+    }
+
+
+    public void ClearCarriedItem()
+    {
+        // Set the equipped item sprite to null, with a not visible color
+        equippedItemSpriteRenderer.sprite = null;
+        equippedItemSpriteRenderer.color = new Color(1f, 1f, 1f, 0f);
+
+        // Apply the base character arms customization to none
+        armsCharacterAttribute.partVariantType = PartVariantType.none;
+
+        // Clear the list and add the none characterAttribute struct to it
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(armsCharacterAttribute);
+
+        // This method builds an animation ovveride list, and applies it to the arms animator. Now the type is none so nothing will be overriden!
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+        
+        // Set the flag so the player is not carrying the item
+        isCarrying = false;
+    }
+
+
+    public void ShowCarriedItem(int itemCode)
+    {
+        // Extract the item codes item detailsd
+        ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(itemCode);
+
+        if (itemDetails != null)
+        {
+            // Set the equipped item sprite to the one applied in the item details, with a visible color (default is not visible..)
+            equippedItemSpriteRenderer.sprite = itemDetails.itemSprite;
+            equippedItemSpriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+
+            // Apply the 'carry' character arms customization
+            armsCharacterAttribute.partVariantType = PartVariantType.carry;
+
+            // Clear the list and add the arms character attribute struct to it
+            characterAttributeCustomisationList.Clear();
+            characterAttributeCustomisationList.Add(armsCharacterAttribute);
+
+            // This method builds an animation ovveride list, and applies it to the arms animator
+            animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+            
+            // Set the flag so the player is carrying the item
+            isCarrying = true;
+        }
     }
 
 
