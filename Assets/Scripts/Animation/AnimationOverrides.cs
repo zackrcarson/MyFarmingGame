@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class AnimationOverrides : MonoBehaviour
 {
-    // These serialized fields will let us in the editor populate the player GameObject, and the SO with an array of animation type overrides
+    // These serialized fields will let us in the editor populate the player GameObject, and the SO with an array of animation type overrides, 
+    // each as an SO containing the SO_AnimationType SO
     [SerializeField] private GameObject character = null;
     [SerializeField] private SO_AnimationType[] soAnimationTypeArray = null;
 
