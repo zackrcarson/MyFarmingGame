@@ -95,6 +95,9 @@ public class Player : SingletonMonobehaviour<Player>
             // Check whether the player is walking (shift) or running
             PlayerWalkInput();
 
+            // Check if the testing keys for advancing game time have been pressed!
+            PlayerTestInput();
+
             // From above two calls, we have xInput, yInput, movementSpeed, and isRunning, isWalking, and isIdle.
             // Now, send event info to delegate so any listeners will recieve player movement input
             EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect, 
@@ -211,6 +214,26 @@ public class Player : SingletonMonobehaviour<Player>
             isWalking = false;
             isIdle = false;
             movementSpeed = Settings.runningSpeed;
+        }
+    }
+
+
+    // TODO: Remove
+    /// <summary>
+    /// Temporary routine for test input to advance the game clock quickly
+    /// </summary>
+    private void PlayerTestInput()
+    {
+        // Trigger advance minute (will continue to be called if held down)
+        if (Input.GetKey(KeyCode.T))
+        {
+            TimeManager.Instance.TestAdvanceGameMinute();
+        }
+
+        // Trigger advance day (will only be called once every time held down)
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            TimeManager.Instance.TestAdvanceGameDay();
         }
     }
 

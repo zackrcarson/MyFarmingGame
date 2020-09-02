@@ -91,6 +91,12 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>
 
                             gameYear++;
 
+                            // Reset the game year to 1 if it reaches 10,000 - we can't display 5 digits!
+                            if (gameYear > 9999)
+                            {
+                                gameYear = 1;
+                            }
+
                             EventHandler.CallAdvanceGameYearEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
                         }
 
@@ -106,9 +112,9 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>
             }
 
             EventHandler.CallAdvanceGameMinuteEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
-
-            Debug.Log("Game Year: " + gameYear + ",  Game Season: " + gameSeason + ",  Game Day: " + gameDay + ",  Game Day of Week: " + gameDayOfWeek + ",  Game Hour: " + gameHour + ",  Game Minute: " + gameMinute + ",  Game Second: " + gameSecond + ".");
         }
+
+        // Call to update the game second here if desired!
     }
 
 
@@ -147,6 +153,36 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>
             
             default:
                 return "";
+        }
+    }
+
+
+    //TODO:Remove
+    /// <summary>
+    /// Advance 1 game minute automatically
+    /// </summary>
+    public void TestAdvanceGameMinute()
+    {
+        // This just simply loops through 60 game seconds, and updates the game seconds each time so time passes much more quickly.
+        // this will still allow all of the triggering higher-order time increments, etc to still work
+        for (int i = 0; i < 60; i++)
+        {
+            UpdateGameSecond();
+        }
+    }
+
+
+    //TODO:Remove
+    /// <summary>
+    /// Advance 1 game day automatically
+    /// </summary>
+    public void TestAdvanceGameDay()
+    {
+        // This just simply loops through 1 day of game seconds, and updates the game seconds each time so time passes much more quickly.
+        // this will still allow all of the triggering higher-order time increments, etc to still work
+        for (int i = 0; i < 86400; i++)
+        {
+            UpdateGameSecond();
         }
     }
 }
