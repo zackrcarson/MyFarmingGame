@@ -24,6 +24,7 @@ public static class EventHandler
         }
     }
 
+
     // Movement Event
     public static event MovementDelegate MovementEvent;
 
@@ -47,6 +48,7 @@ public static class EventHandler
     }
 
 
+
     // Time events. Every time the game minute, hour, day, year, or season is updated, we will send out an event to any subscribers to use as they will
 
     // Game minute advanced
@@ -60,6 +62,7 @@ public static class EventHandler
         }
     }
 
+
     // Game hour advanced
     public static event Action<int, Season, int, string, int, int, int> AdvanceGameHourEvent;
 
@@ -70,6 +73,7 @@ public static class EventHandler
             AdvanceGameHourEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
         }
     }
+
 
     // Game day advanced
     public static event Action<int, Season, int, string, int, int, int> AdvanceGameDayEvent;
@@ -82,6 +86,7 @@ public static class EventHandler
         }
     }
 
+
     // Game season advanced
     public static event Action<int, Season, int, string, int, int, int> AdvanceGameSeasonEvent;
 
@@ -93,6 +98,7 @@ public static class EventHandler
         }
     }
 
+
     // Game year advanced
     public static event Action<int, Season, int, string, int, int, int> AdvanceGameYearEvent;
 
@@ -101,6 +107,56 @@ public static class EventHandler
         if (AdvanceGameYearEvent != null)
         {
             AdvanceGameYearEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
+        }
+    }
+
+
+    // Scene Load Events - in the order they happen!
+
+    // Before Scene Unload FadeOut Event - called right before the fade out before unloading the current scene
+    public static event Action BeforeSceneUnloadFadeOutEvent;
+
+    public static void CallBeforeSceneUnloadFadeOutEvent()
+    {
+        if (BeforeSceneUnloadFadeOutEvent != null)
+        {
+            BeforeSceneUnloadFadeOutEvent();
+        }
+    }
+
+
+    // Before Scene Unload Event - called right after the fade out before unloading the current scene
+    public static event Action BeforeSceneUnloadEvent;
+
+    public static void CallBeforeSceneUnloadEvent()
+    {
+        if (BeforeSceneUnloadEvent != null)
+        {
+            BeforeSceneUnloadEvent();
+        }
+    }
+
+
+    // After Scene Loaded Event - called right after loading the new scene, before fading back in
+    public static event Action AfterSceneLoadEvent;
+
+    public static void CallAfterSceneLoadEvent()
+    {
+        if (AfterSceneLoadEvent != null)
+        {
+            AfterSceneLoadEvent();
+        }
+    }
+
+
+    // After Scene Load Fade In Event - called right fading in with the new scene
+    public static event Action AfterSceneLoadFadeInEvent;
+
+    public static void CallAfterSceneLoadFadeInEvent()
+    {
+        if (AfterSceneLoadFadeInEvent != null)
+        {
+            AfterSceneLoadFadeInEvent();
         }
     }
 }

@@ -42,10 +42,22 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     }
 
 
+    // Subscribe to the event that is called every time a scene is fully loaded
+    private void OnEnable()
+    {
+        EventHandler.AfterSceneLoadEvent += SceneLoaded;
+    }
+
+
+    private void OnDisable()
+    {
+        EventHandler.AfterSceneLoadEvent -= SceneLoaded;
+    }
+
+
     private void Start()
     {
         mainCamera = Camera.main;
-        parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
     }
 
 
@@ -264,5 +276,14 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             Destroy(inventoryBar.inventoryTextBoxGameObject);
         }
+    }
+
+
+    // This is called whenever a new scene is fully loaded.
+    // Here we find the gameObject with the correct tag, to use as a parent item to any created items dragged to the scene from the inventory.
+    // We do this here instead of in Start() because the scene load coroutine is additive and this will not be able to find it until the scene is fully loaded
+    public void SceneLoaded()
+    {
+        parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
     }
 }

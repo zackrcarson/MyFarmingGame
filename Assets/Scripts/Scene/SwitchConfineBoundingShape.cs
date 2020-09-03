@@ -3,14 +3,23 @@ using Cinemachine;
 
 public class SwitchConfineBoundingShape : MonoBehaviour
 {
-    // Start is called before the first frame update. This will then switch the boundsConfiner component to the polygon collider
-    void Start()
+    // Subscribe to the event that is called every time a scene is fully loaded
+    private void OnEnable()
     {
-        SwitchBoundingShape();
+        EventHandler.AfterSceneLoadEvent += SwitchBoundingShape;
+    }
+
+
+    private void OnDisable()
+    {
+        EventHandler.AfterSceneLoadEvent -= SwitchBoundingShape;
     }
 
     /// <summary>
-    /// Switch in the collider that cinemachine uses to define the edges of the screen
+    /// Switch in the collider that cinemachine uses to define the edges of the screen. 
+    /// This is called whenever a new scene is fully loaded.
+    /// Here we find the gameObject with the correct tag, to get the bounds confiner polygon collider
+    /// We do this here instead of in Start() because the scene load coroutine is additive and this will not be able to find it until the scene is fully loaded
     /// </summary>
 
     private void SwitchBoundingShape()
