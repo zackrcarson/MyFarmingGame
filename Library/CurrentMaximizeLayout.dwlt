@@ -26,7 +26,7 @@ MonoBehaviour:
   m_MinSize: {x: 906, y: 321}
   m_MaxSize: {x: 22001, y: 10000}
   vertical: 0
-  controlID: 18178
+  controlID: 18618
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_MinSize: {x: 201, y: 321}
   m_MaxSize: {x: 4001, y: 8021}
   vertical: 1
-  controlID: 18154
+  controlID: 18619
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -826,10 +826,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_AssetTreeState:
-    scrollPos: {x: 0, y: 60}
+    scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff00000000203d0000aa510000d4510000d6510000d8510000de510000c26a0000786b0000a06b0000aa6e0000103d0600
+    m_ExpandedIDs: ffffffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
