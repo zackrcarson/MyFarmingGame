@@ -117,19 +117,30 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             // (the cameras position is at "-10" z position. We want the item to be created at the opposite!)
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
 
-            // Create the item from prefab at the mouse position (itemPrefab was populated in the editor with the draggedItem Prefab)
-            GameObject itemGameObject = Instantiate(itemPrefab, worldPosition, Quaternion.identity, parentItem);
-            // Get the item details from the item in question, so we can set the item code
-            Item item = itemGameObject.GetComponent<Item>();
-            item.ItemCode = itemDetails.itemCode;
+            // Check if we are allowed to drop an item here! 
+            // This will convert the worldPosition into a cellPosition on the tilemap
+            Vector3Int gridPosition = GridPropertiesManager.Instance.grid.WorldToCell(worldPosition);
+            // This will return the gridPropertyDetails object at the selected location (with things like coordinate, bool values, planting ints, etc)
+            GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
 
-            // Remove the item from the players inventory
-            InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
-
-            // If we are dropping the last item in a stack, clear the selected highlight
-            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
+            // Only drop the item if it can be dropped according to the returned gridPropertyDetails. Also can't drop if there's nothing painted there!
+            if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
             {
-                ClearSelectedItem();
+                // Create the item from prefab at the mouse position (itemPrefab was populated in the editor with the draggedItem Prefab). Subtract half of the grid cell size to get
+                // it at the proper location
+                GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
+                // Get the item details from the item in question, so we can set the item code
+                Item item = itemGameObject.GetComponent<Item>();
+                item.ItemCode = itemDetails.itemCode;
+
+                // Remove the item from the players inventory
+                InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
+
+                // If we are dropping the last item in a stack, clear the selected highlight
+                if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
+                {
+                    ClearSelectedItem();
+                }
             }
         }
     }

@@ -121,14 +121,14 @@ public class SceneItemsManager : SingletonMonobehaviour<SceneItemsManager>, ISav
         // First see if the GameObjectSave dictionary has an entry for this scene, sceneName : (sceneSave dictionary)
         if (GameObjectSave.sceneData.TryGetValue(sceneName, out SceneSave sceneSave))
         {
-            // Then see if the item is not null, and if the ListItemdictionary has a dict item with "sceneItemList" : sceneItemList
-            if (sceneSave.listSceneItemDictionary != null && sceneSave.listSceneItemDictionary.TryGetValue("sceneItemList", out List<SceneItem> sceneItemList))
+            // Then see if the item is not null, and if the ListSceneItem has entries in it
+            if (sceneSave.listSceneItem != null)
             {
                 // Scene list items  have been found!! destroy the existing items in the scene
                 DestroySceneItems();
 
                 // Now instantiate the list of scene items in the list
-                InstantiateSceneItems(sceneItemList);
+                InstantiateSceneItems(sceneSave.listSceneItem);
             }
         }
     }
@@ -156,11 +156,11 @@ public class SceneItemsManager : SingletonMonobehaviour<SceneItemsManager>, ISav
             sceneItemList.Add(sceneItem);
         }
 
-        // Create the list scene items dictionary in the scene save and add to it
+        // Create the list of scene items in the scene save and add to it to the sceneItemsList
         SceneSave sceneSave = new SceneSave();
-        sceneSave.listSceneItemDictionary = new Dictionary<string, List<SceneItem>>();
-        // Add this sceneItemList with all saveable items in the scene to the ItemDictionary, keyed by a string so we can keep track of it.
-        sceneSave.listSceneItemDictionary.Add("sceneItemList", sceneItemList);
+
+        // Add this sceneItemList with all saveable items in the scene to the Item list
+        sceneSave.listSceneItem = sceneItemList;
 
         // Add scene save to gameObjectSave a dictionary of sceneName: dict"sceneItemList" : list of saveable items)
         GameObjectSave.sceneData.Add(sceneName, sceneSave);
