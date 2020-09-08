@@ -3,8 +3,10 @@
 [System.Serializable]
 public class SceneSave
 {
-    // String key is an identifier name that we choose for the given list (value)
-    // So, every item in our scene will have a SceneItem instance with code, name, and position,
-    // And they will all get added to the list as a value, for some unique identifier key.
-    public Dictionary<string, List<SceneItem>> listSceneItemDictionary;
+    // Every item in our scene will have a SceneItem instance with code, name, and position,
+    // And they will all get added to the list of sceneItems to save
+    public List<SceneItem> listSceneItem;
+
+    // Dictionary storing the bool values on the grid Property Bool maps, keyed by the coordinate, with a value of bool property and value
+    public Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary;
 }

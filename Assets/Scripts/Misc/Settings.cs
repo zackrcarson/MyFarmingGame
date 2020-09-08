@@ -7,6 +7,9 @@ public static class Settings
     public const float fadeOutSeconds = 0.35f;
     public const float targetAlpha = 0.45f;
 
+    // Tilemape
+    public const float gridCellSize = 1f; // grid cell size in unity units
+
     // Player Movement
     public const float runningSpeed = 5.333f;
     public const float walkingSpeed = 2.666f;
