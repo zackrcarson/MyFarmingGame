@@ -455,6 +455,10 @@ public class Player : SingletonMonobehaviour<Player>
         // Set the grid property to dug with the above modified details (now that the ground is dug, we won't be able to dig again - red cursor)
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
+        // Display the dug grid tiles
+        GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails);
+
+
         // Wait again for the tool animation pause for enabling input again, so we don't have to rapid of animations occuring
         yield return afterUseToolAnimationPause;
 

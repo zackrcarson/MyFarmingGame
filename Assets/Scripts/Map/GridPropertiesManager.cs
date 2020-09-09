@@ -1,11 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 // This class (singleton! and interfaces with ISaveable!) will manage the gridProtertyDetails
 [RequireComponent(typeof(GenerateGUID))]
 public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManager>, ISaveable
 {
-    public Grid grid;
+    private Tilemap groundDecoration1; // Dug ground tiles
+    private Tilemap groundDecoration2; // Watered ground tiles
+    
+    // dug ground tile set as populated in the editor, so we can place various dug ground tiles as we hoe
+    [SerializeField] private Tile[] dugGround = null;
+
+    private Grid grid;
 
     // This is the dictionary storing our gridPropertyDetails for every square, keyed by a string of the coordinates, and value
     // GridPropertyDetails, which contains the coordinates, all the bool values, and planting-related ints
@@ -57,6 +64,221 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     private void Start()
     {
         InitialiseGridProperties();
+    }
+
+
+    // Remove all of the ground decorations (i.e. dug tiles (GD1) and watered tiles (GD2))
+    private void ClearDisplayGroundDecorations()
+    {
+        groundDecoration1.ClearAllTiles();
+        groundDecoration2.ClearAllTiles();
+    }
+
+
+    // This will display all visual grid property details (dug tiles, watered tiles, crops, etc.)
+    private void ClearDisplayGridPropertyDetails()
+    {
+        ClearDisplayGroundDecorations();
+    }
+
+
+    public void DisplayDugGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Check to see if the current square passed in has been dug (o or more days since dug)
+        if (gridPropertyDetails.daysSinceDug > -1)
+        {
+            ConnectDugGround(gridPropertyDetails);
+        }
+    }
+
+
+    // Based on the passed in gridPropertyDetails about the square we are about to dig, this will determine what tile to place 
+    // on the currently dug tile, and the four surrounding tiles
+    private void ConnectDugGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Select tile based on surrounding dug tiles
+
+        // Begin by setting the currently dug tile to what it needs to be based on the 4 surrounding tiles, as determined
+        // by SetDugTile, which takes in the coordinates of the tile you want to dig, and returns the tile to use
+        Tile dugTile0 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+        groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), dugTile0);
+
+        // Set 4 tiles if dug surrounding the current tile - up, down, left, right now that this central tile has been dug
+        // With the proper tile
+
+        GridPropertyDetails adjacentGridPropertyDetails;
+
+        // Check the up tile (y+1), by getting the GridPropertyDetails there,and if it isn't null and it has been dug, use
+        // The SetDugTile() method to determine what THAT tile should be based on ITS four neighbors, and so on and so forth..
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        {
+            Tile dugTile1 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1, 0), dugTile1);
+        }
+
+        // Check the down tile (y-1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        {
+            Tile dugTile2 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1, 0), dugTile2);
+        }
+
+        // Check the left tile (x-1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        {
+            Tile dugTile3 = SetDugTile(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY, 0), dugTile3);
+        }
+
+        // Check the right tile (x+1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        {
+            Tile dugTile4 = SetDugTile(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), dugTile4);
+        }
+    }
+
+    // This method, given the coordinates of a tile, checks it's 4 neighbors and determines which tile to place in the center.
+    private Tile SetDugTile(int xGrid, int yGrid)
+    {
+        // Get whether the surrounding tiles (up, down, left, and right) are dug or not
+        // The IsGridSquareDug(x,y) method simply checks if the given grid square is dug or not
+        bool upDug = IsGridSquareDug(xGrid, yGrid + 1);
+        bool downDug = IsGridSquareDug(xGrid, yGrid - 1);
+        bool leftDug = IsGridSquareDug(xGrid - 1, yGrid);
+        bool rightDug = IsGridSquareDug(xGrid + 1, yGrid);
+
+        #region Set the appropriate tile based on whether the surrounding tiles are dug or not
+
+        if (!upDug && !downDug && !rightDug && !leftDug)
+        {
+            // If all of the surrounding tiles are not dug, return the 1st element of the tile list populated in editor, which is a single tile not connected to anything
+            return dugGround[0];
+        }
+
+        else if (!upDug && downDug && rightDug && !leftDug)
+        {
+            // and so on and so forth for all 16 combinations...
+            return dugGround[1];
+        }
+
+        else if (!upDug && downDug && rightDug && leftDug)
+        {
+            return dugGround[2];
+        }
+
+        else if (!upDug && downDug && !rightDug && leftDug)
+        {
+            return dugGround[3];
+        }
+
+        else if (!upDug && downDug && !rightDug && !leftDug)
+        {
+            return dugGround[4];
+        }
+
+        else if (upDug && downDug && rightDug && !leftDug)
+        {
+            return dugGround[5];
+        }
+
+        else if (upDug && downDug && rightDug && leftDug)
+        {
+            return dugGround[6];
+        }
+
+        else if (upDug && downDug && !rightDug && leftDug)
+        {
+            return dugGround[7];
+        }
+
+        else if (upDug && downDug && !rightDug && !leftDug)
+        {
+            return dugGround[8];
+        }
+
+        else if (upDug && !downDug && rightDug && !leftDug)
+        {
+            return dugGround[9];
+        }
+
+        else if (upDug && !downDug && rightDug && leftDug)
+        {
+            return dugGround[10];
+        }
+
+        else if (upDug && !downDug && !rightDug && leftDug)
+        {
+            return dugGround[11];
+        }
+
+        else if (upDug && !downDug && !rightDug && !leftDug)
+        {
+            return dugGround[12];
+        }
+
+        else if (!upDug && !downDug && rightDug && !leftDug)
+        {
+            return dugGround[13];
+        }
+
+        else if (!upDug && !downDug && rightDug && leftDug)
+        {
+            return dugGround[14];
+        }
+
+        else if (!upDug && !downDug && !rightDug && leftDug)
+        {
+            return dugGround[15];
+        }
+
+        // return null if none of the cases are reached..
+        return null;
+
+        #endregion Set the appropriate tile based on whether the surrounding tiles are dug or not
+    }
+
+
+    // This method just checks if the given grid square has been dug or not, returning a bool
+    private bool IsGridSquareDug(int xGrid, int yGrid)
+    {
+        // Get the gridPropertyDetails for that grid square
+        GridPropertyDetails gridPropertyDetails = GetGridPropertyDetails(xGrid, yGrid);
+
+        // If theres nothing there, just return false
+        if (gridPropertyDetails == null)
+        {
+            return false;
+        }
+
+        // If it has been dug, return true
+        else if (gridPropertyDetails.daysSinceDug > -1)
+        {
+            return true;
+        }
+
+        // Any other situation, return false
+        else
+        {
+            return false;
+        }
+    }
+
+
+    // Called from the ISaveableRestoreScene method, to display all of the dug grid squares
+    private void DisplayGridPropertyDetails()
+    {
+        // Loop through all of the grid items in the gridproperty dictionary, and displaying the dug ground tile as determined in DisplayDugGround()
+        foreach (KeyValuePair<string, GridPropertyDetails> item in gridPropertyDictionary)
+        {
+            GridPropertyDetails gridPropertyDetails = item.Value;
+
+            DisplayDugGround(gridPropertyDetails);
+        }
     }
 
 
@@ -140,6 +362,10 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     {
         // Get the grid! Tilemaps always have a grid component
         grid = GameObject.FindObjectOfType<Grid>();
+
+        // Get the tilemaps for ground decoration (watered tiles, dug tiles), which can only be grabbed once the scene is loaded
+        groundDecoration1 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration1).GetComponent<Tilemap>(); // Dug ground
+        groundDecoration2 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2).GetComponent<Tilemap>(); // Watered ground
     }
 
 
@@ -202,6 +428,16 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             if (sceneSave.gridPropertyDetailsDictionary != null)
             {
                 gridPropertyDictionary = sceneSave.gridPropertyDetailsDictionary;
+            }
+
+            // Check if grid properties exist
+            if (gridPropertyDictionary.Count > 0)
+            {
+                // GridPropertyDetails found for the current scene, destroy the existing ground decoration (dug tiles, watered tiles)
+                ClearDisplayGridPropertyDetails();
+
+                // Instantiate the grid property details for the current scene 
+                DisplayGridPropertyDetails();
             }
         }
     }

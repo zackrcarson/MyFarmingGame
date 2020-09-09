@@ -6,6 +6,8 @@ TagManager:
   tags:
   - BoundsConfiner
   - ItemsParentTransform
+  - GroundDecoration1
+  - GroundDecoration2
   layers:
   - Default
   - TransparentFX
