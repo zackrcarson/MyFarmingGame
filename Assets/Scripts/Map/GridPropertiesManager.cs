@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,8 +10,9 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     private Tilemap groundDecoration1; // Dug ground tiles
     private Tilemap groundDecoration2; // Watered ground tiles
     
-    // dug ground tile set as populated in the editor, so we can place various dug ground tiles as we hoe
+    // dug ground tile set, and watered ground tile set as populated in the editor, so we can place various dug/watered ground tiles as we hoe/water
     [SerializeField] private Tile[] dugGround = null;
+    [SerializeField] private Tile[] wateredGround = null;
 
     private Grid grid;
 
@@ -46,7 +48,11 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     {
         ISaveableRegister();
 
+        // This event will notify us when a new scene is loaded, so that we can grab the applicable gamObjects (grids, tilemaps, etc)
         EventHandler.AfterSceneLoadEvent += AfterSceneLoaded;
+
+        // Subscribe to the Advance day event, so that the AdvanceDay() method can remove all of the water from any watered tiles!
+        EventHandler.AdvanceGameDayEvent += AdvanceDay;
     }
 
 
@@ -56,6 +62,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         ISaveableDeregister();
 
         EventHandler.AfterSceneLoadEvent -= AfterSceneLoaded;
+        EventHandler.AdvanceGameDayEvent -= AdvanceDay;
     }
 
     
@@ -82,12 +89,28 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
 
+    // This method will call the ConnectDugGround method, which will set the correct dug tile, and surrounding tiles
     public void DisplayDugGround(GridPropertyDetails gridPropertyDetails)
     {
-        // Check to see if the current square passed in has been dug (o or more days since dug)
+        // Check to see if the current square passed in has been dug (0 or more days since dug)
         if (gridPropertyDetails.daysSinceDug > -1)
         {
+            // This method will set the center (currently dug) tile in response to what the surrounding 4 tiles are, and then update the 
+            // surrounding tiles corresponding to what was just laid
             ConnectDugGround(gridPropertyDetails);
+        }
+    }
+
+
+    // This method will call the ConnectWateredGround method, which will set the correct watered tile, and surrounding tiles
+    public void DisplayWateredGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Check to see if the current square passed in has been watered (0 or more days since watered)
+        if (gridPropertyDetails.daysSinceWatered > -1)
+        {   
+            // This method will set the center (currently watered) tile in response to what the surrounding 4 tiles are, and then update the 
+            // surrounding tiles corresponding to what was just laid
+            ConnectWateredGround(gridPropertyDetails);
         }
     }
 
@@ -141,6 +164,58 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), dugTile4);
         }
     }
+
+
+    // Based on the passed in gridPropertyDetails about the square we are about to water, this will determine what tile to place 
+    // on the currently watered tile, and the four surrounding tiles
+    private void ConnectWateredGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Select tile based on surrounding watered tiles
+
+        // Begin by setting the currently watered tile to what it needs to be based on the 4 surrounding tiles, as determined
+        // by SetWateredTile, which takes in the coordinates of the tile you want to water, and returns the proper tile to use
+        Tile wateredTile0 = SetWateredTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+        groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), wateredTile0);
+
+        // Set 4 tiles if watered surrounding the current tile - up, down, left, right now that this central tile has been watered
+        // With the proper tile
+
+        GridPropertyDetails adjacentGridPropertyDetails;
+
+        // Check the up tile (y+1), by getting the GridPropertyDetails there,and if it isn't null and it has been watered, use
+        // The SetWateredTile() method to determine what THAT tile should be based on ITS four neighbors, and so on and so forth..
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceWatered > -1)
+        {
+            Tile wateredTile1 = SetWateredTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+            groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1, 0), wateredTile1);
+        }
+
+        // Check the down tile (y-1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceWatered > -1)
+        {
+            Tile wateredTile2 = SetWateredTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+            groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1, 0), wateredTile2);
+        }
+
+        // Check the left tile (x-1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceWatered > -1)
+        {
+            Tile wateredTile3 = SetWateredTile(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+            groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY, 0), wateredTile3);
+        }
+
+        // Check the right tile (x+1) in the same way
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceWatered > -1)
+        {
+            Tile wateredTile4 = SetWateredTile(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+            groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), wateredTile4);
+        }
+    }
+
 
     // This method, given the coordinates of a tile, checks it's 4 neighbors and determines which tile to place in the center.
     private Tile SetDugTile(int xGrid, int yGrid)
@@ -243,6 +318,107 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
 
+    // This method, given the coordinates of a tile, checks it's 4 neighbors and determines which tile to place in the center.
+    private Tile SetWateredTile(int xGrid, int yGrid)
+    {
+        // Get whether the surrounding tiles (up, down, left, and right) are watered or not
+        // The IsGridSquareWatered(x,y) method simply checks if the given grid square is watered or not
+        bool upWatered = IsGridSquareWatered(xGrid, yGrid + 1);
+        bool downWatered = IsGridSquareWatered(xGrid, yGrid - 1);
+        bool leftWatered = IsGridSquareWatered(xGrid - 1, yGrid);
+        bool rightWatered = IsGridSquareWatered(xGrid + 1, yGrid);
+
+        #region Set the appropriate tile based on whether the surrounding tiles are Watered or not
+
+        if (!upWatered && !downWatered && !rightWatered && !leftWatered)
+        {
+            // If all of the surrounding tiles are not Watered, return the 1st element of the tile list populated in editor, which is a single tile not connected to anything
+            return wateredGround[0];
+        }
+
+        else if (!upWatered && downWatered && rightWatered && !leftWatered)
+        {
+            // and so on and so forth for all 16 combinations...
+            return wateredGround[1];
+        }
+
+        else if (!upWatered && downWatered && rightWatered && leftWatered)
+        {
+            return wateredGround[2];
+        }
+
+        else if (!upWatered && downWatered && !rightWatered && leftWatered)
+        {
+            return wateredGround[3];
+        }
+
+        else if (!upWatered && downWatered && !rightWatered && !leftWatered)
+        {
+            return wateredGround[4];
+        }
+
+        else if (upWatered && downWatered && rightWatered && !leftWatered)
+        {
+            return wateredGround[5];
+        }
+
+        else if (upWatered && downWatered && rightWatered && leftWatered)
+        {
+            return wateredGround[6];
+        }
+
+        else if (upWatered && downWatered && !rightWatered && leftWatered)
+        {
+            return wateredGround[7];
+        }
+
+        else if (upWatered && downWatered && !rightWatered && !leftWatered)
+        {
+            return wateredGround[8];
+        }
+
+        else if (upWatered && !downWatered && rightWatered && !leftWatered)
+        {
+            return wateredGround[9];
+        }
+
+        else if (upWatered && !downWatered && rightWatered && leftWatered)
+        {
+            return wateredGround[10];
+        }
+
+        else if (upWatered && !downWatered && !rightWatered && leftWatered)
+        {
+            return wateredGround[11];
+        }
+
+        else if (upWatered && !downWatered && !rightWatered && !leftWatered)
+        {
+            return wateredGround[12];
+        }
+
+        else if (!upWatered && !downWatered && rightWatered && !leftWatered)
+        {
+            return wateredGround[13];
+        }
+
+        else if (!upWatered && !downWatered && rightWatered && leftWatered)
+        {
+            return wateredGround[14];
+        }
+
+        else if (!upWatered && !downWatered && !rightWatered && leftWatered)
+        {
+            return wateredGround[15];
+        }
+
+        // return null if none of the cases are reached..
+        return null;
+
+        #endregion Set the appropriate tile based on whether the surrounding tiles are watered or not
+    }
+
+
     // This method just checks if the given grid square has been dug or not, returning a bool
     private bool IsGridSquareDug(int xGrid, int yGrid)
     {
@@ -269,6 +445,32 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
 
+    // This method just checks if the given grid square has been watered or not, returning a bool
+    private bool IsGridSquareWatered(int xGrid, int yGrid)
+    {
+        // Get the gridPropertyDetails for that grid square
+        GridPropertyDetails gridPropertyDetails = GetGridPropertyDetails(xGrid, yGrid);
+
+        // If theres nothing there, just return false
+        if (gridPropertyDetails == null)
+        {
+            return false;
+        }
+
+        // If it has been watered, return true
+        else if (gridPropertyDetails.daysSinceWatered > -1)
+        {
+            return true;
+        }
+
+        // Any other situation, return false
+        else
+        {
+            return false;
+        }
+    }
+
+
     // Called from the ISaveableRestoreScene method, to display all of the dug grid squares
     private void DisplayGridPropertyDetails()
     {
@@ -278,6 +480,8 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             GridPropertyDetails gridPropertyDetails = item.Value;
 
             DisplayDugGround(gridPropertyDetails);
+
+            DisplayWateredGround(gridPropertyDetails);
         }
     }
 
@@ -482,4 +686,50 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         gridPropertyDictionary[key] = gridPropertyDetails;
     }
 
+
+    // This method is subscribed to the advnaceGameDay event, so when a day passes, this will be called and it will loop through the sceneSave dictionaries
+    // Saved for each scene, and then loop through all of the gridSquares in each of those sceneSave dictionaries, updating the properties that 
+    // respond to advanced gameDays, such as removing watered tiles, crop growth, etc
+    private void AdvanceDay(int gameYear, Season gameSeason, int gameDay, string gameDayOfWeek, int gameHour, int gameMinute, int gameSecond)
+    {
+        // Clear the display on all grid property details (dug, watered, etc.) so we can update them
+        ClearDisplayGridPropertyDetails();
+
+        // Loop through all of the scenes by looping through all of the gridProperties in the array
+        foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
+        {
+            // Get the gridPropertyDetails dictionary (in the sceneSave) for the iterated scene
+            if (GameObjectSave.sceneData.TryGetValue(so_GridProperties.sceneName.ToString(), out SceneSave sceneSave))
+            {
+                if (sceneSave.gridPropertyDetailsDictionary != null)
+                {
+                    // If the dictionary exists, loop through all of the gridProperties in it
+                    for (int i = sceneSave.gridPropertyDetailsDictionary.Count - 1; i >= 0; i--)
+                    {
+                        // This will retrieve the element in the dictionary at position i
+                        KeyValuePair<string, GridPropertyDetails> item = sceneSave.gridPropertyDetailsDictionary.ElementAt(i);
+
+                        // Populate the gridPropertyDetails, which has things like daysSinceWatered, etc..
+                        GridPropertyDetails gridPropertyDetails = item.Value;
+
+                        #region Update all of the grid properties that reflect the advance in the day (i.e. watered squares, crop growth, etc.)
+                        
+                        // If the ground is wated, then clear out the water
+                        if (gridPropertyDetails.daysSinceWatered > -1)
+                        {
+                            gridPropertyDetails.daysSinceWatered = -1;
+                        }
+
+                        // Set the new gridPropertyDetails
+                        SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails, sceneSave.gridPropertyDetailsDictionary);
+
+                        #endregion Update all of the grid properties that reflect the advance in the day (i.e. watered squares, crop growth, etc.)
+                    }
+                }
+            }
+        }
+        // Once we've looped through each scene, and looped through all of the grid Squares in each sceneSave dictionary, updating the tiles that respond to gameDayAdvanced,
+        // updated the DisplayGridPropertyDetails to reflect the changed values (i.e. removing watered ground tiles!)
+        DisplayGridPropertyDetails();
+    }
 }

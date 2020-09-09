@@ -3622,6 +3622,23 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e9fae070ea448056895762b667e8d8d7, type: 2}
   - {fileID: 11400000, guid: f9d4a5918a5758fb1b706fc61e06a158, type: 2}
   - {fileID: 11400000, guid: e1e9eb7473c033e009ac8d91a0835da9, type: 2}
+  wateredGround:
+  - {fileID: 11400000, guid: 33e5e0727ffccfb189d7cbf794146ac9, type: 2}
+  - {fileID: 11400000, guid: 85e75e50a9e4c89fba0cbe1297d483eb, type: 2}
+  - {fileID: 11400000, guid: 1c561dd1827975a43ae6813f650406f2, type: 2}
+  - {fileID: 11400000, guid: 140a5b60db4e40b428c40cd3c2509de4, type: 2}
+  - {fileID: 11400000, guid: b6349016cb80c5847ba1712c62ac7043, type: 2}
+  - {fileID: 11400000, guid: 8ce77e782ec66d5b9a28ff25bd4b47ec, type: 2}
+  - {fileID: 11400000, guid: 734a242a6b8bd2e79a1e8845579b67fd, type: 2}
+  - {fileID: 11400000, guid: f68d8d30b87865630a69c38bdcf511a6, type: 2}
+  - {fileID: 11400000, guid: e18450c9f2bdd0f7790c54b013da44e8, type: 2}
+  - {fileID: 11400000, guid: 479d20a2b2f11559599d43c27ebf2056, type: 2}
+  - {fileID: 11400000, guid: 087f95b8cf2296ea3a12e9846d5d1aa4, type: 2}
+  - {fileID: 11400000, guid: d29500fde45b646fcb2e4f33185aea66, type: 2}
+  - {fileID: 11400000, guid: c75f33d00b9b72c2591b465d4a184b99, type: 2}
+  - {fileID: 11400000, guid: 5323f87ef3e50d0bc9f66844d0376341, type: 2}
+  - {fileID: 11400000, guid: bb1d87575295042609064355feb9dc95, type: 2}
+  - {fileID: 11400000, guid: abb8b87fdb7292c1b8bbb80a221e833f, type: 2}
   so_gridPropertiesArray:
   - {fileID: 11400000, guid: 297b476a26586745590ef1233442bec7, type: 2}
   - {fileID: 11400000, guid: 21ffecb07b068ff9582216e1046d6751, type: 2}
