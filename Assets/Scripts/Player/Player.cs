@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
+    // The pause after using the tool animation before we can use the tool again
+    private WaitForSeconds afterUseToolAnimationPause;
+
     // This will hold our animation overrides
     private AnimationOverrides animationOverrides;
 
@@ -16,7 +20,6 @@ public class Player : SingletonMonobehaviour<Player>
     public bool isRunning;
     public bool isIdle;
     public bool isCarrying = false;
-    public ToolEffect toolEffect = ToolEffect.none;
     public bool isUsingToolRight;
     public bool isUsingToolLeft;
     public bool isUsingToolUp;
@@ -37,10 +40,17 @@ public class Player : SingletonMonobehaviour<Player>
     public bool idleDown;
     public bool idleLeft;
     public bool idleRight;
+    private ToolEffect toolEffect = ToolEffect.none;
 
     private Camera mainCamera;
-    
+
+    // Bool is enabled while the tool is in motion, so we can't do other stuff
+    private bool playerToolUseDisabled = false;
+
     private Rigidbody2D rigidBody2D;
+
+    // The pause while using the tool animation before we can use the tool again
+    private WaitForSeconds useToolAnimationPause;
 
 #pragma warning disable 414
     private Direction playerDirection;
@@ -86,7 +96,12 @@ public class Player : SingletonMonobehaviour<Player>
     // Populate the gridCursor variable with the game object found in fame!
     private void Start()
     {
+        // Populates the gridcursor member variable
         gridCursor = FindObjectOfType<GridCursor>();
+
+        // Populated the tool animation pauses using the settings file members
+        useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
+        afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
     }
 
 
@@ -235,25 +250,43 @@ public class Player : SingletonMonobehaviour<Player>
     // See if the left mouse button is clicked. If so, if the gridCursor is currently enabled (i.e. an item is selected), we will process the input
     private void PlayerClickInput()
     {
-        if (Input.GetMouseButton(0))
+        // Can't do click inputs (like using tool again) if the tool use is disabled! Wait for the enimation pause to be over before it's enabled again
+        if (!playerToolUseDisabled)
         {
-            if (gridCursor.CursorIsEnabled)
+            if (Input.GetMouseButton(0))
             {
-                ProcessPlayerClickInput();
+                if (gridCursor.CursorIsEnabled)
+                {                 
+                    // Get the cursor grid position
+                    Vector3Int cursorGridPosition = gridCursor.GetGridPositionForCursor();
+
+                    // Get the player's grid position
+                    Vector3Int playerGridPosition = gridCursor.GetGridPositionForPlayer();
+
+                    ProcessPlayerClickInput(cursorGridPosition, playerGridPosition);
+                }
             }
         }
     }
 
 
-    private void ProcessPlayerClickInput()
+    // Process the players click input - whether it be dropping a seed/colmmodity, using a tool, etc. For tools, we need to calculate the direction we want to use it in for the
+    // proper animation
+    private void ProcessPlayerClickInput(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
     {   
         // Reset the players movement
         ResetMovement();
 
+        // Find the direction the player needs to face to click on the given cursor location
+        Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
+
+        // Get the GridPropertyDetails at the cursor position (the GridCursor validation routine ensures that the grid property details are not null)
+        GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
+
         // Get the selected items ItemDetails
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
 
-        // If the itemDetails aren't null (i.e. nothing selected), check the itemType for Seed, Commodity, or none/count.
+        // If the itemDetails aren't null (i.e. nothing selected), check the itemType for Seed, Commodity, hoeing_tool, or none/count.
         if (itemDetails != null)
         {
             switch (itemDetails.itemType)
@@ -274,6 +307,16 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
+                // If it's a hoeing tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool (like here), and if the cursor position
+                // is valid, we will execute the player use hoe sequence - which runs the hoeing animation in the correct player direction, marks the ground gridPropertyDetails as dug,
+                // updates the soil sprite to dug, etc.
+                case ItemType.Hoeing_tool:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
+                    }
+                    break;
+
                 case ItemType.none:
                     break;
 
@@ -283,6 +326,31 @@ public class Player : SingletonMonobehaviour<Player>
                 default:
                     break;
             }
+        }
+    }
+
+
+    // Given the cursor grid position and the player's grid position, calculate which direction the player needs to use the tool in.
+    private Vector3Int GetPlayerClickDirection(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
+    {
+        if (cursorGridPosition.x > playerGridPosition.x)
+        {
+            return Vector3Int.right;
+        }
+
+        else if (cursorGridPosition.x < playerGridPosition.x)
+        {
+            return Vector3Int.left;
+        }
+
+        else if (cursorGridPosition.y > playerGridPosition.y)
+        {
+            return Vector3Int.up;
+        }
+
+        else
+        {
+            return Vector3Int.down;
         }
     }
 
@@ -306,6 +374,93 @@ public class Player : SingletonMonobehaviour<Player>
             // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
             EventHandler.CallDropSelectedItemEvent();
         }
+    }
+
+
+    // This will process the players click input for all tools. We check which kind of tool it is, and do the corresponding action for that tool
+    private void ProcessPlayerClickInputTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        // Switch on tool to check for which tool is actually being used - only hoeing_tools for now
+        switch (itemDetails.itemType)
+        {
+            case ItemType.Hoeing_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    // If it's a hoeing tool, and the cursor position is valid, initiate the HoeGround sequence (play the hoeing animation in the correct player direction, mark the
+                    // soil as dug, update the ground sprite to dug, etc.)
+                    HoeGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
+            
+            default:
+                break;
+        }
+    }
+
+
+    // This method just initiates the coroutine that enables the hoeing coroutine to initiate the animation, and update the GridPropertyDetails at the square
+    private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+    {
+        // Trigger the animation as a coroutine to run over several frames
+        StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
+    }
+
+
+    // This coroutine initiates the hoeing animation, and updates the GridPropertyDetails at the square in question to be dug
+    private IEnumerator HoeGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
+    {
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set the tool animation to hoe in the override animations. First, apply the 'hoe' part variant type, for the attribute we want swapped
+        toolCharacterAttribute.partVariantType = PartVariantType.hoe;
+        // Next, clear the list and add the tool character attribute struct to it. This list is used as an override to the animations
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        // This method builds an animation ovveride list, and applies it to the tool animator
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+
+        // Set the proper isUsingToolDirection bool for the player animation parameter.
+        // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) to hoe in the right direction
+        if (playerDirection == Vector3Int.right)
+        {
+            isUsingToolRight = true;
+        }
+
+        else if (playerDirection == Vector3Int.left)
+        {
+            isUsingToolLeft = true;
+        }
+
+        else if (playerDirection == Vector3Int.up)
+        {
+            isUsingToolUp = true;
+        }
+
+        else if (playerDirection == Vector3Int.down)
+        {
+            isUsingToolDown = true;
+        }
+
+        // Wait for useToolAnimationPause seconds (while animation goes with the animators!) before starting the next phase of the coroutine
+        yield return useToolAnimationPause;
+
+        // Set the Grid property details for the time since the ground was dug here
+        if (gridPropertyDetails.daysSinceDug == -1)
+        {
+            gridPropertyDetails.daysSinceDug = 0;
+        }
+
+        // Set the grid property to dug with the above modified details (now that the ground is dug, we won't be able to dig again - red cursor)
+        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+
+        // Wait again for the tool animation pause for enabling input again, so we don't have to rapid of animations occuring
+        yield return afterUseToolAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
     }
 
 
