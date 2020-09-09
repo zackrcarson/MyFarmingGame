@@ -18,6 +18,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Transform parentItem;
     private GameObject draggedItem;
 
+    private GridCursor gridCursor;
+
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
     public TextMeshProUGUI textMeshProUGUI;
@@ -58,6 +60,18 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private void Start()
     {
         mainCamera = Camera.main;
+        gridCursor = FindObjectOfType<GridCursor>();
+    }
+
+
+    // This will disable the cursor and set the selected item type to none
+    private void ClearCursors()
+    {
+        // Disable the cursor
+        gridCursor.DisableCursor();
+
+        // Set Item Type to none
+        gridCursor.SelectedItemType = ItemType.none;
     }
 
 
@@ -74,6 +88,22 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         // Set highlighted inventory slots
         inventoryBar.SetHighlightedInventorySlots();
+
+        // Set the use radius for cursors in GridCursor
+        gridCursor.ItemUseGridRadius = itemDetails.itemUseGridRadius;
+
+        // If the item requires a grid cursor (useRadius > 0), then enable it. Else, diable it
+        if (itemDetails.itemUseGridRadius > 0)
+        {
+            gridCursor.EnableCursor();
+        }
+        else
+        {
+            gridCursor.DisableCursor();
+        }
+
+        // Set the item type
+        gridCursor.SelectedItemType = itemDetails.itemType;
 
         // Set item selected in inventory list
         InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.player, itemDetails.itemCode);
@@ -92,6 +122,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private void ClearSelectedItem()
     {
+        // Clear out the current cursors
+        ClearCursors();
+
         // Clear the currently highlighted items
         inventoryBar.ClearHighlightOnInventorySlots();
 
@@ -113,19 +146,15 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // Only drop the item if it exists, and if it is selected!
         if (itemDetails != null && isSelected)
         {
-            // Vector to mouse position in the world coordinates, as converted from the screen viewport coordinates 
-            // (the cameras position is at "-10" z position. We want the item to be created at the opposite!)
-            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
 
-            // Check if we are allowed to drop an item here! 
-            // This will convert the worldPosition into a cellPosition on the tilemap
-            Vector3Int gridPosition = GridPropertiesManager.Instance.grid.WorldToCell(worldPosition);
-            // This will return the gridPropertyDetails object at the selected location (with things like coordinate, bool values, planting ints, etc)
-            GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
 
-            // Only drop the item if it can be dropped according to the returned gridPropertyDetails. Also can't drop if there's nothing painted there!
-            if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
+            // If we have a valid cursor position, then we can instantiate a new item at the dropped location
+            if (gridCursor.CursorPositionIsValid)
             {
+                // Vector to mouse position in the world coordinates, as converted from the screen viewport coordinates 
+                // (the cameras position is at "-10" z position. We want the item to be created at the opposite!)
+                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
+                
                 // Create the item from prefab at the mouse position (itemPrefab was populated in the editor with the draggedItem Prefab). Subtract half of the grid cell size to get
                 // it at the proper location
                 GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
