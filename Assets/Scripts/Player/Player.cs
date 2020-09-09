@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
-    // The pause after using the tool animation before we can use the tool again
+    // The pause after using the tool/lifting tool animation before we can use the tool or walk again
     private WaitForSeconds afterUseToolAnimationPause;
+    private WaitForSeconds afterLiftToolAnimationPause;
+
+    // The pause while using the tool/ lifting tool animation before we can use the tool or walk again, which corresponds to the animation time of using the tools
+    private WaitForSeconds useToolAnimationPause;
+    private WaitForSeconds liftToolAnimationPause;
 
     // This will hold our animation overrides
     private AnimationOverrides animationOverrides;
@@ -48,9 +53,6 @@ public class Player : SingletonMonobehaviour<Player>
     private bool playerToolUseDisabled = false;
 
     private Rigidbody2D rigidBody2D;
-
-    // The pause while using the tool animation before we can use the tool again
-    private WaitForSeconds useToolAnimationPause;
 
 #pragma warning disable 414
     private Direction playerDirection;
@@ -99,9 +101,12 @@ public class Player : SingletonMonobehaviour<Player>
         // Populates the gridcursor member variable
         gridCursor = FindObjectOfType<GridCursor>();
 
-        // Populated the tool animation pauses using the settings file members
+        // Populated the tool/ lifting tool animation pauses using the settings file members
         useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
+        liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
+
         afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
+        afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
     }
 
 
@@ -286,7 +291,7 @@ public class Player : SingletonMonobehaviour<Player>
         // Get the selected items ItemDetails
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
 
-        // If the itemDetails aren't null (i.e. nothing selected), check the itemType for Seed, Commodity, hoeing_tool, or none/count.
+        // If the itemDetails aren't null (i.e. nothing selected), check the itemType for Seed, Commodity, hoeing_tool, watering_tool, or none/count.
         if (itemDetails != null)
         {
             switch (itemDetails.itemType)
@@ -307,9 +312,10 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
-                // If it's a hoeing tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool (like here), and if the cursor position
-                // is valid, we will execute the player use hoe sequence - which runs the hoeing animation in the correct player direction, marks the ground gridPropertyDetails as dug,
-                // updates the soil sprite to dug, etc.
+                // If it's a hoeing/watering tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool/watering_tool and if 
+                // the cursor position is valid, we will execute the player use hoe/water sequence - which runs the hoeing/watering animation in the correct player direction, marks 
+                // the ground gridPropertyDetails as dug/watered, updates the soil sprite to dug/watered, etc.
+                case ItemType.Watering_tool:
                 case ItemType.Hoeing_tool:
                     if (Input.GetMouseButtonDown(0))
                     {
@@ -391,6 +397,15 @@ public class Player : SingletonMonobehaviour<Player>
                     HoeGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
                 break;
+
+            case ItemType.Watering_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    // If it's a watering tool, and the cursor position is valid, initiate the WaterGround sequence (play the watering animation in the correct player direction, mark the
+                    // soil as watered, update the ground sprite to watered, etc.)
+                    WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
             
             default:
                 break;
@@ -398,7 +413,7 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
-    // This method just initiates the coroutine that enables the hoeing coroutine to initiate the animation, and update the GridPropertyDetails at the square
+    // This method just initiates the coroutine that enables the hoeing coroutine to initiate the animation, and update the GridPropertyDetails to dug at the square
     private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
         // Trigger the animation as a coroutine to run over several frames
@@ -461,6 +476,76 @@ public class Player : SingletonMonobehaviour<Player>
 
         // Wait again for the tool animation pause for enabling input again, so we don't have to rapid of animations occuring
         yield return afterUseToolAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+
+    // This method just initiates the coroutine that enables the watering coroutine to initiate the animation, and update the GridPropertyDetails to watered at the square
+    private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+    {
+        // Trigger the animation as a coroutine to run over several frames
+        StartCoroutine(WaterGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
+    }
+
+
+    // This coroutine initiates the watering animation, and updates the GridPropertyDetails at the square in question to be watered
+    private IEnumerator WaterGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
+    {
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set the tool animation to wateringcan in the override animations. First, apply the 'wateringcan' part variant type, for the attribute we want swapped
+        toolCharacterAttribute.partVariantType = PartVariantType.wateringCan;
+        // Next, clear the list and add the tool character attribute struct to it. This list is used as an override to the animations
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        // This method builds an animation ovveride list, and applies it to the tool animator
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+
+        // TODO: If there is water in the watering can!
+        // Add the watering tool effect to the animation parameters, which shows water pouring out
+        toolEffect = ToolEffect.watering;
+
+        // Set the proper isLiftingToolDirection bool for the player animation parameter.
+        // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) to water in the right direction
+        if (playerDirection == Vector3Int.right)
+        {
+            isLiftingToolRight = true;
+        }
+
+        else if (playerDirection == Vector3Int.left)
+        {
+            isLiftingToolLeft = true;
+        }
+
+        else if (playerDirection == Vector3Int.up)
+        {
+            isLiftingToolUp = true;
+        }
+
+        else if (playerDirection == Vector3Int.down)
+        {
+            isLiftingToolDown = true;
+        }
+
+        // Wait for liftToolAnimationPause seconds (while animation goes with the animators!) before starting the next phase of the coroutine
+        yield return liftToolAnimationPause;
+
+        // Set the Grid property details for the time since the ground was watered here
+        if (gridPropertyDetails.daysSinceWatered == -1)
+        {
+            gridPropertyDetails.daysSinceWatered = 0;
+        }
+
+        // Set the grid property to watered with the above modified details (now that the ground is watered, we won't be able to water again - red cursor)
+        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+
+        // Wait again for the tool animation pause for enabling input again, so we don't have to rapid of animations occuring
+        yield return afterLiftToolAnimationPause;
 
         // Enable player input and tool use so we can walk away or use a tool again
         PlayerInputIsDisabled = false;

@@ -58,7 +58,7 @@ MonoBehaviour:
     itemDescription: A Basic Watering Can
     itemLongDescription: The humble watering can - an essential tool for any budding
       farmer
-    itemUseGridRadius: 0
+    itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
