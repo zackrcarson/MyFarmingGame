@@ -151,7 +151,8 @@ public class GridCursor : MonoBehaviour
                     }
                     break;
 
-                // Same thing for the Hoeing tool
+                // Same thing for the Hoeing and Watering tools
+                case ItemType.Watering_tool:
                 case ItemType.Hoeing_tool:
                     if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
                     {
@@ -273,6 +274,18 @@ public class GridCursor : MonoBehaviour
                 else
                 {
                     // This is if the ground square isn't diggable or has been dug - return a false so we can't dig
+                    return false;
+                }
+
+            // Now, check if it's a watering tool
+            case ItemType.Watering_tool:
+                // Check if it's been dug, and not watered
+                if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1)
+                {
+                    return true;
+                }
+                else
+                {
                     return false;
                 }
 
