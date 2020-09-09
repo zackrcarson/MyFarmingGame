@@ -544,6 +544,9 @@ public class Player : SingletonMonobehaviour<Player>
         // Set the grid property to watered with the above modified details (now that the ground is watered, we won't be able to water again - red cursor)
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
+        // Display the grid tiles to reflect they've been watered
+        GridPropertiesManager.Instance.DisplayWateredGround(gridPropertyDetails);
+
         // Wait again for the tool animation pause for enabling input again, so we don't have to rapid of animations occuring
         yield return afterLiftToolAnimationPause;
 
