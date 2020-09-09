@@ -58,7 +58,7 @@ MonoBehaviour:
     itemDescription: A Basic Watering Can
     itemLongDescription: The humble watering can - an essential tool for any budding
       farmer
-    itemUseGridRadius: 1
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
@@ -71,7 +71,7 @@ MonoBehaviour:
     itemDescription: A Basic Hoe
     itemLongDescription: A strong, sturdy basic hoe - great for breaking up the soil
       ready for planting
-    itemUseGridRadius: 1
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
@@ -83,7 +83,7 @@ MonoBehaviour:
     itemType: 4
     itemDescription: A Basic Axe
     itemLongDescription: A sharp, sturdy basic axe - great for chopping down trees
-    itemUseGridRadius: 1
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
@@ -170,7 +170,7 @@ MonoBehaviour:
     itemType: 7
     itemDescription: Wicker Basket
     itemLongDescription: A wicker basket for harvesting produce you have grown
-    itemUseGridRadius: 1
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
@@ -182,7 +182,7 @@ MonoBehaviour:
     itemType: 5
     itemDescription: A Basic Pickaxe
     itemLongDescription: A strong, sturdy pickaxe - great for breaking rocks
-    itemUseGridRadius: 1
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1
@@ -230,7 +230,7 @@ MonoBehaviour:
     itemType: 6
     itemDescription: A Basic Scythe
     itemLongDescription: A sharp, basic scythe - great for cutting grass
-    itemUseGridRadius: 2
+    itemUseGridRadius: 0
     itemUseRadius: 1.5
     isStartingItem: 1
     canBePickedUp: 1

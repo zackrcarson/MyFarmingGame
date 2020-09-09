@@ -6,6 +6,9 @@ public class Player : SingletonMonobehaviour<Player>
     // This will hold our animation overrides
     private AnimationOverrides animationOverrides;
 
+    // This is the grid cursor for valid/invalid item drops
+    private GridCursor gridCursor;
+
     // Movement Parameters
     public float xInput;
     public float yInput;
@@ -80,6 +83,13 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
+    // Populate the gridCursor variable with the game object found in fame!
+    private void Start()
+    {
+        gridCursor = FindObjectOfType<GridCursor>();
+    }
+
+
     private void Update()
     {
         #region Player Input 
@@ -94,9 +104,13 @@ public class Player : SingletonMonobehaviour<Player>
 
             // Check whether the player is walking (shift) or running
             PlayerWalkInput();
+            
+            // Player click to drop items
+            PlayerClickInput();
 
             // Check if the testing keys for advancing game time have been pressed!
             PlayerTestInput();
+
 
             // From above two calls, we have xInput, yInput, movementSpeed, and isRunning, isWalking, and isIdle.
             // Now, send event info to delegate so any listeners will recieve player movement input
@@ -214,6 +228,83 @@ public class Player : SingletonMonobehaviour<Player>
             isWalking = false;
             isIdle = false;
             movementSpeed = Settings.runningSpeed;
+        }
+    }
+
+
+    // See if the left mouse button is clicked. If so, if the gridCursor is currently enabled (i.e. an item is selected), we will process the input
+    private void PlayerClickInput()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            if (gridCursor.CursorIsEnabled)
+            {
+                ProcessPlayerClickInput();
+            }
+        }
+    }
+
+
+    private void ProcessPlayerClickInput()
+    {   
+        // Reset the players movement
+        ResetMovement();
+
+        // Get the selected items ItemDetails
+        ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
+
+        // If the itemDetails aren't null (i.e. nothing selected), check the itemType for Seed, Commodity, or none/count.
+        if (itemDetails != null)
+        {
+            switch (itemDetails.itemType)
+            {   
+                // If it's a seed, check if it can be dropped, and if the current cursor position is valid. If so, publish an event so subscribers can see it
+                case ItemType.Seed:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        ProcessPlayerClickInputSeed(itemDetails);
+                    }
+                    break;
+                
+                // Same for commodities
+                case ItemType.Commodity:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        ProcessPlayerClickInputCommodity(itemDetails);
+                    }
+                    break;
+
+                case ItemType.none:
+                    break;
+
+                case ItemType.count:
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    // Check if the selected seed item can be dropped, and if the current cursor position is valid (from distance from player, bool tilemap, etc.)
+    private void ProcessPlayerClickInputSeed(ItemDetails itemDetails)
+    {
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        {   
+            // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
+            EventHandler.CallDropSelectedItemEvent();
+        }
+    }
+
+
+    // Check if the selected commodity item can be dropped, and if the current cursor position is valid (from distance from player, bool tilemap, etc.)
+    private void ProcessPlayerClickInputCommodity(ItemDetails itemDetails)
+    {
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        {   
+            // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
+            EventHandler.CallDropSelectedItemEvent();
         }
     }
 

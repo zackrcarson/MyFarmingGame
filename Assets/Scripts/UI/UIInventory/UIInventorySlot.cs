@@ -44,16 +44,21 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     }
 
 
-    // Subscribe to the event that is called every time a scene is fully loaded
     private void OnEnable()
     {
+        // Subscribe to the event that is called every time a scene is fully loaded
         EventHandler.AfterSceneLoadEvent += SceneLoaded;
+
+        // Subscribe the DropSelectedItemAtMousePosition method to the DropSelectedItemEvent, so whenever that is published, we will drop the selected item at the mouse position
+        EventHandler.DropSelectedItemEvent += DropSelectedItemAtMousePosition;
     }
 
 
     private void OnDisable()
     {
         EventHandler.AfterSceneLoadEvent -= SceneLoaded;
+
+        EventHandler.DropSelectedItemEvent -= DropSelectedItemAtMousePosition;
     }
 
 
