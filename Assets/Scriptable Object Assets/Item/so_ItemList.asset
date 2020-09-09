@@ -71,7 +71,7 @@ MonoBehaviour:
     itemDescription: A Basic Hoe
     itemLongDescription: A strong, sturdy basic hoe - great for breaking up the soil
       ready for planting
-    itemUseGridRadius: 0
+    itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1

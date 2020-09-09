@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GridCursor : MonoBehaviour
@@ -150,6 +151,15 @@ public class GridCursor : MonoBehaviour
                     }
                     break;
 
+                // Same thing for the Hoeing tool
+                case ItemType.Hoeing_tool:
+                    if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
+                    {
+                        SetCursorToInvalid();
+                        return;
+                    }
+                    break;
+
                 // If it's none, count, or other, just exit out, leaving it as valid!
                 case ItemType.none:
                     break;
@@ -190,7 +200,7 @@ public class GridCursor : MonoBehaviour
 
 
     /// <summary>
-    /// Test cursor validity for a commodity for the given gridPropertyDetails. Returns true if it's valid, and false if it's invalis
+    /// Test cursor validity for a commodity for the given gridPropertyDetails. Returns true if it's valid, and false if it's invalid
     /// </summary>
     private bool IsCursorValidForCommodity(GridPropertyDetails gridPropertyDetails)
     {
@@ -199,11 +209,77 @@ public class GridCursor : MonoBehaviour
 
 
     /// <summary>
-    /// Test cursor validity for a seed for the given gridPropertyDetails. Returns true if it's valid, and false if it's invalis
+    /// Test cursor validity for a seed for the given gridPropertyDetails. Returns true if it's valid, and false if it's invalid
     /// </summary>
     private bool IsCursorValidForSeed(GridPropertyDetails gridPropertyDetails)
     {
         return gridPropertyDetails.canDropItem;
+    }
+
+
+    /// <summary>
+    /// Set's the cursor as either valid or invalid for the tool for the target gridPropertyDetails. Returns true if valid, and false if invalid
+    /// </summary>
+    private bool IsCursorValidForTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+    {
+        // Switch on tool type, to test for the cases for different tools
+        switch (itemDetails.itemType)
+        {   
+            // First, check if it's a hoeing tool
+            case ItemType.Hoeing_tool:
+
+                // First, the gridSquare in question needs to be diggable, and hasn't been dug yet (daysSinceDug = -1), if not, return false so it's an invalid cursor
+                if (gridPropertyDetails.isDiggable == true && gridPropertyDetails.daysSinceDug == -1)
+                {
+                    #region Need to get any items at location so we can check if they are reapable
+
+                    // Get the world position for the cursor (add half a unity unit in each direction to get the center)
+                    Vector3 cursorWorldPosition = new Vector3(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+
+                    // Get a list of the items at the cursor location
+                    List<Item> itemList = new List<Item>();
+
+                    // This helper method will look through the box passed on at the cursor position, and return true if items of type Item are found, false if not.
+                    // The out parameter itemList is a list of all Items found in that box
+                    HelperMethods.GetComponentsAtBoxLocation<Item>(out itemList, cursorWorldPosition, Settings.cursorSize, 0f);
+
+                    #endregion
+
+                    // Loop through the items in the itemList found to see if any are of reapable type - we are not going to let the player dig where there are reapable scenary items! 
+                    // Need to scythe them first to dig
+                    bool foundReapable = false;
+
+                    foreach (Item item in itemList)
+                    {
+                        // Check if the itemType in the itemDetails is of type ReapableScenary
+                        if (InventoryManager.Instance.GetItemDetails(item.ItemCode).itemType == ItemType.Reapable_scenary)
+                        {
+                            // If we've found even one, we can just break the loop and say we can't dig here.
+                            foundReapable = true;
+                            break;
+                        }
+                    }
+
+                    // If there is a reapable item, return false so we can't dig there (red cursor), else return true
+                    if (foundReapable)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    // This is if the ground square isn't diggable or has been dug - return a false so we can't dig
+                    return false;
+                }
+
+            // All other tools will default to false for now, so invalid cursor position
+            default:
+                return false;
+        }
     }
 
 
@@ -236,6 +312,14 @@ public class GridCursor : MonoBehaviour
 
         // WorldToCell will return the cell location on the grid given the actual worldPosition
         return grid.WorldToCell(worldPosition);
+    }
+
+
+    // Simply returns the current cursors world position, using the grid position from the GetGridPositionForCursor method
+    public Vector3 GetWorldPositionForCursor()
+    {   
+        // Getting this from the gridPosition instead of directly allows us to get it from the origin at the bottom-left corner of the map
+        return grid.CellToWorld(GetGridPositionForCursor());
     }
 
 
