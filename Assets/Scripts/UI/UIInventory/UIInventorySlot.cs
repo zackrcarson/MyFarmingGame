@@ -19,6 +19,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private GameObject draggedItem;
 
     private GridCursor gridCursor;
+    private Cursor cursor;
 
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
@@ -65,18 +66,23 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private void Start()
     {
         mainCamera = Camera.main;
+
+        // Populate both the gridcursor and cursors
         gridCursor = FindObjectOfType<GridCursor>();
+        cursor = FindObjectOfType<Cursor>();
     }
 
 
     // This will disable the cursor and set the selected item type to none
     private void ClearCursors()
     {
-        // Disable the cursor
+        // Disable the gridCursor and the cursor
         gridCursor.DisableCursor();
+        cursor.DisableCursor();
 
-        // Set Item Type to none
+        // Set Item Type to none for both cursors
         gridCursor.SelectedItemType = ItemType.none;
+        cursor.SelectedItemType = ItemType.none;
     }
 
 
@@ -94,8 +100,9 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // Set highlighted inventory slots
         inventoryBar.SetHighlightedInventorySlots();
 
-        // Set the use radius for cursors in GridCursor
+        // Set the use gridradius and radius for the cursors in GridCursor and Cursor
         gridCursor.ItemUseGridRadius = itemDetails.itemUseGridRadius;
+        cursor.ItemUseRadius = itemDetails.itemUseRadius;
 
         // If the item requires a grid cursor (useRadius > 0), then enable it. Else, diable it
         if (itemDetails.itemUseGridRadius > 0)
@@ -107,8 +114,19 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             gridCursor.DisableCursor();
         }
 
-        // Set the item type
+        // If the item requires a cursor (useRadius > 0), then enable it. Else, diable it
+        if (itemDetails.itemUseRadius > 0)
+        {
+            cursor.EnableCursor();
+        }
+        else
+        {
+            cursor.DisableCursor();
+        }
+
+        // Set the item type for both cursors
         gridCursor.SelectedItemType = itemDetails.itemType;
+        cursor.SelectedItemType = itemDetails.itemType;
 
         // Set item selected in inventory list
         InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.player, itemDetails.itemCode);

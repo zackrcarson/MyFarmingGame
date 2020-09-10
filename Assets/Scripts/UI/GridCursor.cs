@@ -151,9 +151,13 @@ public class GridCursor : MonoBehaviour
                     }
                     break;
 
-                // Same thing for the Hoeing and Watering tools
+                // Same thing for the all of the different tools
                 case ItemType.Watering_tool:
+                case ItemType.Breaking_tool:
+                case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
+                case ItemType.Reaping_tool:
+                case ItemType.Collecting_tool:
                     if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
