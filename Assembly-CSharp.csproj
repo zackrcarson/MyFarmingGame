@@ -55,9 +55,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Animation\AnimationOverrides.cs" />
+     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
      <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
+     <Compile Include="Assets\Scripts\Animation\SO_AnimationType.cs" />
      <Compile Include="Assets\Scripts\Enums\Enums.cs" />
      <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
+     <Compile Include="Assets\Scripts\HelperClasses\HelperMethods.cs" />
      <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
      <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
      <Compile Include="Assets\Scripts\Item\Item.cs" />
@@ -66,13 +70,33 @@
      <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
      <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
      <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
+     <Compile Include="Assets\Scripts\Map\GridCoordinate.cs" />
+     <Compile Include="Assets\Scripts\Map\GridPropertiesManager.cs" />
+     <Compile Include="Assets\Scripts\Map\GridProperty.cs" />
+     <Compile Include="Assets\Scripts\Map\GridPropertyDetails.cs" />
+     <Compile Include="Assets\Scripts\Map\SO_GridProperties.cs" />
+     <Compile Include="Assets\Scripts\Map\TilemapGridProperties.cs" />
      <Compile Include="Assets\Scripts\Misc\Settings.cs" />
      <Compile Include="Assets\Scripts\Misc\SingletonMonobehaviour.cs" />
      <Compile Include="Assets\Scripts\Misc\Tags.cs" />
+     <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />
      <Compile Include="Assets\Scripts\Player\ItemPickup.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerAnimationTest.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\GenerateGUID.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\ISaveable.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
+     <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
+     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
+     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
      <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
+     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
+     <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
+     <Compile Include="Assets\Scripts\UI\Cursor.cs" />
+     <Compile Include="Assets\Scripts\UI\GridCursor.cs" />
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryTextBox.cs" />

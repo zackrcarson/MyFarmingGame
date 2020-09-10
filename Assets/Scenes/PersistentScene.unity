@@ -419,7 +419,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99270c271e6da4d6bb173b2b898712b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
 --- !u!1 &39225691
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,8 +492,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 39225691}
   m_CullTransparentMesh: 0
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
 --- !u!1 &72853000
 GameObject:
   m_ObjectHideFlags: 0
@@ -4949,10 +4946,7 @@ GameObject:
   - component: {fileID: 2051217553}
   - component: {fileID: 2051217552}
   - component: {fileID: 2051217551}
-<<<<<<< HEAD
   - component: {fileID: 2051217555}
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
   m_Layer: 0
   m_Name: UIPanel
   m_TagString: Untagged
@@ -4972,10 +4966,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 738574822}
-<<<<<<< HEAD
   - {fileID: 39225692}
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
   m_Father: {fileID: 810692328}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5048,7 +5039,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2051217549}
   m_CullTransparentMesh: 0
-<<<<<<< HEAD
 --- !u!114 &2051217555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5067,8 +5057,6 @@ MonoBehaviour:
   transparentCursorSprite: {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344,
     type: 3}
   gridCursor: {fileID: 2051217551}
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
 --- !u!1001 &2069434410
 PrefabInstance:
   m_ObjectHideFlags: 0
