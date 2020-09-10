@@ -731,8 +731,12 @@ public class Player : SingletonMonobehaviour<Player>
                     // Destroy the item gameObject if it's reapable
                     if (InventoryManager.Instance.GetItemDetails(itemArray[i].ItemCode).itemType == ItemType.Reapable_scenary)
                     {
-                        // Effect position for the cutting effect
+                        // Effect position to display the cutting effect at
                         Vector3 effectPosition = new Vector3(itemArray[i].transform.position.x, itemArray[i].transform.position.y + Settings.gridCellSize / 2f, itemArray[i].transform.position.z);
+
+                        // Publish the Harvest Action Event, which will be picked up by the VFXManager to trigger the reaping particle 
+                        // effect at the location that the reapable Scenary was found
+                        EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
 
                         Destroy(itemArray[i].gameObject);
 

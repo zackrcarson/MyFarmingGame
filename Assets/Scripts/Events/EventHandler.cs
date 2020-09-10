@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public delegate void MovementDelegate(float xInput, float yInput, bool isWalking, bool isRunning, bool isIdle, bool isCarrying, ToolEffect toolEffect, 
     bool isUsingToolRight, bool isUsingToolLeft, bool isUsingToolUp, bool isUsingToolDown, 
@@ -19,6 +20,21 @@ public static class EventHandler
         if (DropSelectedItemEvent != null)
         {
             DropSelectedItemEvent();
+        }
+    }
+
+
+    // Harvest Action Effect Event
+    public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
+
+    // Event that get's published when the player harvests something (rock, wood, reapable scenary) - subscribers will use this to emitt particle effects for the given harvest effect 
+    // i.e. chopping, leaves falling, breaking, reaping
+    public static void CallHarvestActionEffectEvent(Vector3 effectPosition, HarvestActionEffect harvestActionEffect)
+    {
+        // Check if there are any subscribers - or else do nothing!
+        if (HarvestActionEffectEvent != null)
+        {
+            HarvestActionEffectEvent(effectPosition, harvestActionEffect);
         }
     }
 
