@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
+    // Prefab for the tree used to test the pool manager
+    // public GameObject canyonOakTreePrefab;
+
     // The pause after using the tool/lifting tool animation before we can use the tool or walk again
     private WaitForSeconds afterUseToolAnimationPause;
     private WaitForSeconds afterLiftToolAnimationPause;
@@ -769,6 +772,15 @@ public class Player : SingletonMonobehaviour<Player>
         {
             SceneControllerManager.Instance.FadeAndLoadScene(SceneName.Scene1_Farm.ToString(), transform.position);
         }
+
+        // Test object pool!
+        // if (Input.GetMouseButtonDown(1))
+        // {
+        //     GameObject tree = PoolManager.Instance.ReuseObject(canyonOakTreePrefab, mainCamera.ScreenToWorldPoint(
+        //         new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z)), Quaternion.identity);
+
+        //         tree.SetActive(true);
+        // }
     }
 
 
