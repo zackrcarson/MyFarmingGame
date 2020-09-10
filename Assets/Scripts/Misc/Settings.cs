@@ -65,6 +65,10 @@ public static class Settings
     public const string WateringTool = "Watering Can";
     public const string CollectingTool = "Basket";
 
+    // Reaping
+    public const int maxCollidersToTestPerReapSwing = 15;
+    public const int maxTargetComponentsPerReapSwing = 2;
+
     // Time system
     public const float secondsPerGameSecond = 0.012f;
 

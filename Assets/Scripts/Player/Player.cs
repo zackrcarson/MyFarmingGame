@@ -15,8 +15,10 @@ public class Player : SingletonMonobehaviour<Player>
     // This will hold our animation overrides
     private AnimationOverrides animationOverrides;
 
-    // This is the grid cursor for valid/invalid item drops
+    // This is the grid cursor and cursor for valid/invalid item drops
     private GridCursor gridCursor;
+    private Cursor cursor;
+
 
     // Movement Parameters
     public float xInput;
@@ -84,8 +86,10 @@ public class Player : SingletonMonobehaviour<Player>
         // This will get all of the AnimationOverrides found in the children of player (arm, leg, etc)
         animationOverrides = GetComponentInChildren<AnimationOverrides>();
 
-        // initialize our swappable character attributes (a struct) from the enums for the body part, the color, and the type
+        // initialize our swappable character attributes (a struct) from the enums for the body part, the color, and the type. Do this for the arms 
+        // animation override, and the hoe
         armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.arms, PartVariantColor.none, PartVariantType.none);
+        toolCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.tool, PartVariantColor.none, PartVariantType.hoe);
 
         // Initialize the list of character attributes
         characterAttributeCustomisationList = new List<CharacterAttribute>();
@@ -95,11 +99,29 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
+    // Subscribe the DisablePlayerInputAndResetMovement method to the BeforeSceneUnloadFadeOutEvent, so that before the scene starts to fade out,
+    // We will reset the players movement and disable further input so they stay still while moving between scenes. Also subscribe the 
+    // EnablePlayerInput method to the AfterSceneLoadFadeInEvent, so that once the new scene has faded in, we can move again
+    private void OnEnable()
+    {
+        EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
+        EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
+    }
+
+
+    private void OnDisable()
+    {
+        EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
+        EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
+    }
+
+
     // Populate the gridCursor variable with the game object found in fame!
     private void Start()
     {
-        // Populates the gridcursor member variable
+        // Populates the gridcursor and cursor member variables
         gridCursor = FindObjectOfType<GridCursor>();
+        cursor = FindObjectOfType<Cursor>();
 
         // Populated the tool/ lifting tool animation pauses using the settings file members
         useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
@@ -259,8 +281,9 @@ public class Player : SingletonMonobehaviour<Player>
         if (!playerToolUseDisabled)
         {
             if (Input.GetMouseButton(0))
-            {
-                if (gridCursor.CursorIsEnabled)
+            {   
+                // Process the input if either the grid cursor is enabled (things like hoeing, watering squares), or the cursor is enabled (like reaping)
+                if (gridCursor.CursorIsEnabled || cursor.CursorIsEnabled)
                 {                 
                     // Get the cursor grid position
                     Vector3Int cursorGridPosition = gridCursor.GetGridPositionForCursor();
@@ -312,11 +335,12 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
-                // If it's a hoeing/watering tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool/watering_tool and if 
-                // the cursor position is valid, we will execute the player use hoe/water sequence - which runs the hoeing/watering animation in the correct player direction, marks 
-                // the ground gridPropertyDetails as dug/watered, updates the soil sprite to dug/watered, etc.
+                // If it's a hoeing/watering tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool/watering_tool/Reaping_tool and if 
+                // the cursor position is valid, we will execute the player use hoe/water/reap sequence - which runs the hoeing/watering/reaping animation in the correct player direction, marks 
+                // the ground gridPropertyDetails as dug/watered, updates the soil sprite to dug/watered, etc. (or destroys the reapableScenary)
                 case ItemType.Watering_tool:
                 case ItemType.Hoeing_tool:
+                case ItemType.Reaping_tool:
                     if (Input.GetMouseButtonDown(0))
                     {
                         ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
@@ -361,6 +385,47 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
+    // Given the cursor and player position, return the direction the player needs to face to use this tool (scythe)
+    private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
+    {
+        // Check if the cursor is in the box to the right of the player (make sure it's to the right, and also not entirely in the upper/lower boxes)
+        if (
+            cursorPosition.x > playerPosition.x
+            && 
+            cursorPosition.y < (playerPosition.y + cursor.ItemUseRadius / 2f)
+            &&
+            cursorPosition.y > (playerPosition.y - cursor.ItemUseRadius / 2f)
+            )
+        {
+            return Vector3Int.right;
+        }
+
+        // Check if the cursor is in the box to the left of the player (make sure it's to the left, and also not entirely in the upper/lower boxes)
+        else if (
+            cursorPosition.x < playerPosition.x
+            && 
+            cursorPosition.y < (playerPosition.y + cursor.ItemUseRadius / 2f)
+            &&
+            cursorPosition.y > (playerPosition.y - cursor.ItemUseRadius / 2f)
+            )
+        {
+            return Vector3Int.left;
+        }
+
+        // Check if the cursor is in the box above the player
+        else if (cursorPosition.y > playerPosition.y)
+        {
+            return Vector3Int.up;
+        }
+
+        // Check if the cursor is in the box below the player
+        else
+        {
+            return Vector3Int.down;
+        }
+    }
+
+
     // Check if the selected seed item can be dropped, and if the current cursor position is valid (from distance from player, bool tilemap, etc.)
     private void ProcessPlayerClickInputSeed(ItemDetails itemDetails)
     {
@@ -392,7 +457,7 @@ public class Player : SingletonMonobehaviour<Player>
             case ItemType.Hoeing_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    // If it's a hoeing tool, and the cursor position is valid, initiate the HoeGround sequence (play the hoeing animation in the correct player direction, mark the
+                    // If it's a hoeing tool, and the grid cursor position is valid, initiate the HoeGround sequence (play the hoeing animation in the correct player direction, mark the
                     // soil as dug, update the ground sprite to dug, etc.)
                     HoeGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
@@ -401,9 +466,19 @@ public class Player : SingletonMonobehaviour<Player>
             case ItemType.Watering_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    // If it's a watering tool, and the cursor position is valid, initiate the WaterGround sequence (play the watering animation in the correct player direction, mark the
+                    // If it's a watering tool, and the grid cursor position is valid, initiate the WaterGround sequence (play the watering animation in the correct player direction, mark the
                     // soil as watered, update the ground sprite to watered, etc.)
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
+
+            case ItemType.Reaping_tool:
+                if (cursor.CursorPositionIsValid)
+                {
+                    // If it's a reaping tool, and the cursor position is valid, initiate the Reap sequence (play the reaping animation in the correct player direction, 
+                    // Destroy the reapable scenary.  First, get the players direction relative to the cursor (not the grid cursor)
+                    playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCenterPosition());
+                    ReapInPlayerDirectionAtCursor(itemDetails, playerDirection);
                 }
                 break;
             
@@ -553,6 +628,121 @@ public class Player : SingletonMonobehaviour<Player>
         // Enable player input and tool use so we can walk away or use a tool again
         PlayerInputIsDisabled = false;
         playerToolUseDisabled = false;
+    }
+
+
+    // This method just initiates the coroutine that enables the reaping coroutine to initiate the animation, and check/destroy the reapable scenary in the way
+    private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(ReapInPlayerDirectionAtCursorRoutine(itemDetails, playerDirection));
+    }
+
+
+    // This coroutine initiates the reaping animation, and checks for reapable scenary in the way, and destroys the objects
+    private IEnumerator ReapInPlayerDirectionAtCursorRoutine(ItemDetails itemDetails, Vector3Int playerDirection)
+    {   
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set the tool animation to scythe in the override animations. First, apply the 'scythe' part variant type, for the attribute we want swapped
+        toolCharacterAttribute.partVariantType = PartVariantType.scythe;
+        // Next, clear the list and add the tool character attribute struct to it. This list is used as an override to the animations
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        // This method builds an animation ovveride list, and applies it to the tool animator
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+
+        // Reap in the players direction. This method will set up the animation parameters for the correct direction,
+        // find the colliders in the reap path, and destroy some of them
+        UseToolInPlayerDirection(itemDetails, playerDirection);
+
+        // Wait for useToolAnimationPause seconds (while animation goes with the animators!) before starting the next phase of the coroutine
+        yield return useToolAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+
+    // This methd will initiate the tool use sequence for normal cursor tools, like the scythe.
+    // It first sets up the proper animation parameters (i.e. swingDirection) for that tool use animationOverride.
+    // It then finds all of the collider2D objects in a box in the direction the player is facing, loops through them
+    // and deletes up to Settings.maxTargetComponentsToDestroyPerReapSwing ReapableScenary items in that box
+    private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        if (Input.GetMouseButton(0))
+        {   
+            // Check for which tool is being used for this animation. For now, we have only added the scythe
+            switch (equippedItemDetails.itemType)
+            {   
+                // If the tool is the scythe, find the playerFacingDirection and set up the correct animation triggers for the scythe direction, which will be picked up 
+                // with Update method, and the animation override set up previously
+                case ItemType.Reaping_tool:
+                    if (playerDirection == Vector3Int.right)
+                    {
+                        isSwingingToolRight = true;
+                    }
+
+                    else if (playerDirection == Vector3Int.left)
+                    {
+                        isSwingingToolLeft = true;
+                    }
+
+                    else if (playerDirection == Vector3Int.up)
+                    {
+                        isSwingingToolUp = true;
+                    }
+
+                    else if (playerDirection == Vector3Int.down)
+                    {
+                        isSwingingToolDown = true;
+                    }
+                    break;
+            }
+
+            // Define the center point of the square which will be used for collision testing, in the proper playerFacingDirection
+            // Here we are adding a multiple of playerDirection (a unit vector in the up, down, left, right directions), which will give you
+            // (-1, 0, 1), then multiplied by half of the item use radius, to get the center of the box in the direction the player is facing
+            Vector2 point = new Vector2(GetPlayerCenterPosition().x + (playerDirection.x * (equippedItemDetails.itemUseRadius / 2f)), 
+                                            GetPlayerCenterPosition().y + (playerDirection.y * (equippedItemDetails.itemUseRadius / 2f)));
+
+            // Define the size of the square (itemUseRadius for the tool in both dimensions) that will be used for collision testing
+            Vector2 size = new Vector2(equippedItemDetails.itemUseRadius, equippedItemDetails.itemUseRadius);
+
+            // Get the Item components with 2D colliders located in the square at center point and size
+            // The 2D colliders tested are limited to maxCollidersToTestPerReapSwing, to save overhead. This NonAlloc method is also
+            // much more memory efficient, helpful because we will use this a lot, and it simply returns a list of up to
+            // maxCollidersToTestPerReapSwing colliders found in the given box
+            Item[] itemArray = HelperMethods.GetComponentsAtBoxLocationNonAlloc<Item>(Settings.maxCollidersToTestPerReapSwing, point, size, 0f);
+
+            // We only want to actually destroy up to Settings.maxTargetComponentsToDestroyPerReapSwing reapableScenaries per swing, more realistic
+            int reapableItemCount = 0;
+
+            // Loop through all of the items retrieved backwards, and search for reapableItems
+            for (int i = itemArray.Length - 1; i >= 0; i--)
+            {
+                if (itemArray[i] != null)
+                {
+                    // Destroy the item gameObject if it's reapable
+                    if (InventoryManager.Instance.GetItemDetails(itemArray[i].ItemCode).itemType == ItemType.Reapable_scenary)
+                    {
+                        // Effect position for the cutting effect
+                        Vector3 effectPosition = new Vector3(itemArray[i].transform.position.x, itemArray[i].transform.position.y + Settings.gridCellSize / 2f, itemArray[i].transform.position.z);
+
+                        Destroy(itemArray[i].gameObject);
+
+                        // Check if we've reaped the maximum amount per swing, Settings.maxTargetComponentsToDestroyPerReapSwing yet. If so, stop checking
+                        reapableItemCount++;
+                        if (reapableItemCount >= Settings.maxTargetComponentsPerReapSwing)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
