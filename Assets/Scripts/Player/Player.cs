@@ -674,7 +674,6 @@ public class Player : SingletonMonobehaviour<Player>
         // This is the position of the player in the cameras field of view, so the UI bar can tell if the player is near the bottom
         return mainCamera.WorldToViewportPoint(transform.position);
     }
-<<<<<<< HEAD
 
 
     // This will return the world position for the CENTER of the player's GameObject, so we include a y-offset to bring this position up from 
@@ -683,6 +682,4 @@ public class Player : SingletonMonobehaviour<Player>
     {
         return new Vector3(transform.position.x, transform.position.y + Settings.playerCenterYOffset, transform.position.z);
     }
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
 }

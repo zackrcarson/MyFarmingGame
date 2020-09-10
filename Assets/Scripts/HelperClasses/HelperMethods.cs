@@ -3,7 +3,6 @@ using UnityEngine;
 
 public static class HelperMethods
 {
-<<<<<<< HEAD
 
     /// <summary>
     /// Gets the components of type T at positionToCheck. Returns true if at least one is found, and the found components are returned in componentAtPositionList
@@ -54,8 +53,6 @@ public static class HelperMethods
     }
 
 
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
     /// <summary>
     /// Gets the components of type T at the box with center point point, size size, and angle angle. Returns tru if at least one is found, and the found components are returned in the list
     /// </summary>
@@ -101,7 +98,6 @@ public static class HelperMethods
 
         return found;
     }
-<<<<<<< HEAD
 
 
     /// <summary>
@@ -141,6 +137,4 @@ public static class HelperMethods
 
         return componentArray;
     }
-=======
->>>>>>> 06b270bebb0960c9d8506772aa1531ea81c70c95
 }
