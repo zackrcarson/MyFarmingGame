@@ -18,7 +18,7 @@ public class CropDetails
     public bool disableCropCollidersBeforeHarvestedAnimation; // If colliders on the crop should be disabled to avoid the harvested animation affecting any other game objects
     public bool isHarvestedAnimation; // True if harvested animation is to be played on the final growth stage prefab (i.e. hitting tree with axe makes it wobble)
     public bool isHarvestActionEffect = false; // Flag to determine whether there is a harvest action effect (i.e. leaves fall off tree when hit with axe)
-    public bool spawnCropProducedAtPlayerPosition; // Determines if a crop should be spawned at the players position
+    public bool spawnCropProducedAtPlayerPosition; // Determines if a crop should be spawned at the players position, so the player will automatically pick it up
     public HarvestActionEffect harvestActionEffect; // The harvest action effect for the crop that will be played (i.e. leaves fall off tree when hit with axe)
 
     [ItemCodeDescription]
@@ -28,7 +28,7 @@ public class CropDetails
     [ItemCodeDescription] 
     public int[] cropProducedItemCode; // Array of item codes produced for the harvested crop (i.e. cut down tree drops wood, acord, sticks..)
     public int[] cropProducedMinQuantity; // Array of the minimum quantities produced for the harvested crop, in the same order as the cropProducedItemCode array
-    public int[] cropProducedMaxQuantity; // If max quantity > min Quantity, then a random number of crops between the two are produced
+    public int[] cropProducedMaxQuantity; // If max quantity > min Quantity, then a random number of crops between the two are produced. If they are the same, it just produces that many
     public int daysToRegrow; // Days to regrow the next crop, or a -1 if only a single harvest occurs.
 
 
