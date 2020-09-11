@@ -326,7 +326,7 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Seed:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        ProcessPlayerClickInputSeed(itemDetails);
+                        ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
                     }
                     break;
                 
@@ -430,13 +430,37 @@ public class Player : SingletonMonobehaviour<Player>
 
 
     // Check if the selected seed item can be dropped, and if the current cursor position is valid (from distance from player, bool tilemap, etc.)
-    private void ProcessPlayerClickInputSeed(ItemDetails itemDetails)
+    // Also check if the item can be planted! If so, plant the seed at that grid cursor
+    private void ProcessPlayerClickInputSeed(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
-        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        // check if the item can be dropped (we already know it's a seed), and if the gridCursor has a valid position, and if the ground HAS been dug, and 
+        // that there isn't a seed already planted there
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.seedItemCode == -1)
+        {
+            // This method will plant the seed at that gridCursor location
+            PlantSeedAtCursor(gridPropertyDetails, itemDetails);
+        } 
+        // Otherwise, just publish the CallDropSelectedItemEvent, to drop the item on the ground
+        else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
         {   
             // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
             EventHandler.CallDropSelectedItemEvent();
         }
+    }
+
+
+    // This method will plant the selected seed at the grid cursor location, knowing that it's a seed and can be planted there.
+    private void PlantSeedAtCursor(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+    {
+        // Update the gridPropertyDetails with the seed item code, and set the number of days growth to 0
+        gridPropertyDetails.seedItemCode = itemDetails.itemCode;
+        gridPropertyDetails.growthDays = 0;
+
+        // Display the planted crop at the gridPropertyDetails
+        GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
+
+        // Remove the item from the inventory
+        EventHandler.CallRemoveSelectedItemFromInventoryEvent();        
     }
 
 

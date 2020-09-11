@@ -24,6 +24,18 @@ public static class EventHandler
     }
 
 
+    // Removed selected item from inventory on (i.e. when we plant seeds!!)
+    public static event Action RemoveSelectedItemFromInventoryEvent;
+
+    public static void CallRemoveSelectedItemFromInventoryEvent()
+    {
+        if (RemoveSelectedItemFromInventoryEvent != null)
+        {
+            RemoveSelectedItemFromInventoryEvent();
+        }
+    }
+
+
     // Harvest Action Effect Event
     public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
 

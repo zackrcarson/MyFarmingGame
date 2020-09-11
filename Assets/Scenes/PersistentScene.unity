@@ -3805,6 +3805,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5323f87ef3e50d0bc9f66844d0376341, type: 2}
   - {fileID: 11400000, guid: bb1d87575295042609064355feb9dc95, type: 2}
   - {fileID: 11400000, guid: abb8b87fdb7292c1b8bbb80a221e833f, type: 2}
+  so_CropDetailsList: {fileID: 11400000, guid: 0a49f8b62a6d2fb25a3038a7bbf63287, type: 2}
   so_gridPropertiesArray:
   - {fileID: 11400000, guid: 297b476a26586745590ef1233442bec7, type: 2}
   - {fileID: 11400000, guid: 21ffecb07b068ff9582216e1046d6751, type: 2}

@@ -52,6 +52,10 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         // Subscribe the DropSelectedItemAtMousePosition method to the DropSelectedItemEvent, so whenever that is published, we will drop the selected item at the mouse position
         EventHandler.DropSelectedItemEvent += DropSelectedItemAtMousePosition;
+
+        // Subscribe the RemoveSelectedItemFromInventory method to the RemoveSelectedItemFromInventoryEvent event, so when it's called we will
+        // Remove one of the selected items from the inventory whenever the event is published
+        EventHandler.RemoveSelectedItemFromInventoryEvent += RemoveSelectedItemFromInventory;
     }
 
 
@@ -60,6 +64,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         EventHandler.AfterSceneLoadEvent -= SceneLoaded;
 
         EventHandler.DropSelectedItemEvent -= DropSelectedItemAtMousePosition;
+
+        EventHandler.RemoveSelectedItemFromInventoryEvent -= RemoveSelectedItemFromInventory;
     }
 
 
@@ -193,6 +199,27 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 {
                     ClearSelectedItem();
                 }
+            }
+        }
+    }
+
+
+    // This method is subscribed to the RemoveSelectedItemFromInventoryEvent, which is published when we want to remove an item from out inventory
+    // (i.e. seeds when we plant them). When triggered, this will remove one of the selected items from the players inventory
+    private void RemoveSelectedItemFromInventory()
+    {
+        // Make sure an item is selected, and it's not null
+        if (itemDetails != null && isSelected)
+        {
+            int itemCode = itemDetails.itemCode;
+
+            // Remove the item from the players inventory
+            InventoryManager.Instance.RemoveItem(InventoryLocation.player, itemCode);
+
+            // If no more of the items exist in this slot, clear the selected item as usual
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, itemCode) == -1)
+            {
+                ClearSelectedItem();
             }
         }
     }

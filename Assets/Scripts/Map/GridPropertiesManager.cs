@@ -7,6 +7,9 @@ using UnityEngine.Tilemaps;
 [RequireComponent(typeof(GenerateGUID))]
 public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManager>, ISaveable
 {
+    // Parent gameObject used to store all crops
+    private Transform cropParentTransform;
+
     private Tilemap groundDecoration1; // Dug ground tiles
     private Tilemap groundDecoration2; // Watered ground tiles
     
@@ -19,6 +22,9 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     // This is the dictionary storing our gridPropertyDetails for every square, keyed by a string of the coordinates, and value
     // GridPropertyDetails, which contains the coordinates, all the bool values, and planting-related ints
     private Dictionary<string, GridPropertyDetails> gridPropertyDictionary;
+
+    // This is populated in editor with the SO containing a list of CropDetails for every crop we've defined
+    [SerializeField] private SO_CropDetailsList so_CropDetailsList = null;
 
     // This field is populated in the editor, which is an array of the gridProperties SO's from each scene.
     [SerializeField] private SO_GridProperties[] so_gridPropertiesArray = null;
@@ -82,10 +88,26 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
 
+    // Remove all of the planted crops
+    private void ClearDisplayAllPlantedCrops()
+    {
+        // Destroy all of the crops in the scene
+        Crop[] cropArray;
+        cropArray = FindObjectsOfType<Crop>();
+
+        foreach(Crop crop in cropArray)
+        {
+            Destroy(crop.gameObject);
+        }
+    }
+
+
     // This will display all visual grid property details (dug tiles, watered tiles, crops, etc.)
     private void ClearDisplayGridPropertyDetails()
     {
         ClearDisplayGroundDecorations();
+
+        ClearDisplayAllPlantedCrops();
     }
 
 
@@ -474,7 +496,8 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     // Called from the ISaveableRestoreScene method, to display all of the dug grid squares
     private void DisplayGridPropertyDetails()
     {
-        // Loop through all of the grid items in the gridproperty dictionary, and displaying the dug ground tile as determined in DisplayDugGround()
+        // Loop through all of the grid items in the gridproperty dictionary, and displaying the dug ground tile, watered ground tile,
+        // and planted crop tiles as determined in DisplayDugGround(), DisplayWateredGround(), and DisplayPlantedCrop()
         foreach (KeyValuePair<string, GridPropertyDetails> item in gridPropertyDictionary)
         {
             GridPropertyDetails gridPropertyDetails = item.Value;
@@ -482,6 +505,68 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             DisplayDugGround(gridPropertyDetails);
 
             DisplayWateredGround(gridPropertyDetails);
+
+            DisplayPlantedCrop(gridPropertyDetails);
+        }
+    }
+
+
+    /// <summary>
+    /// This method determines which stage of growth the crop is in, and displays that stage's crop prefab and sprite
+    /// </summary>
+    public void DisplayPlantedCrop(GridPropertyDetails gridPropertyDetails)
+    {
+        // If there's no seed on the grid, the seedItemCode will be -1, so no need to display a crop
+        if (gridPropertyDetails.seedItemCode > -1)
+        {
+            // Get the crop details from the SO CropDetailsList, for the given seedItemCode in the current square's gridPropertyDetails
+            CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+
+            // crop prefab to use
+            GameObject cropPrefab;
+
+            // Get the number of stages of growth  this crop has(length of the growthDays array, which defines the number of days for each stage)
+            int growthStages = cropDetails.growthDays.Length;
+
+            // The crop starts off in stage0, and we will count down the total days of growth until it gets to 0
+            int currentGrowthStage = 0;
+            int daysCounter = cropDetails.totalGrowthDays;
+
+            // This for loop is just to determine which growth stage we are in, based on how many days the crop has been growing for
+            // Loop backwards through all of the growthstages
+            for (int i = growthStages -1; i >= 0; i--)
+            {
+                // When the number of days of growth on the crop (found in the gridPropertyDetails) is >= to the days counter
+                // (starting at totalGrowth days, and counting downwards), we have found the currentStage as i
+                if (gridPropertyDetails.growthDays >= daysCounter)
+                {
+                    // Break out of the loop - we have found the stage!
+                    currentGrowthStage = i;
+                    break;
+                }
+                
+                // If we didn't find the currentStage, Decrease the current days counter by the number of growth days in tha current stage before iterating the loop
+                daysCounter = daysCounter - cropDetails.growthDays[i];
+            }
+
+            // Instantiate the crop prefab and sprite at the grid location, with the correct stage!
+            cropPrefab = cropDetails.growthPrefab[currentGrowthStage];
+
+            Sprite growthSprite = cropDetails.growthSprite[currentGrowthStage];
+
+            // Find the world position of this square
+            Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+            // adjust the world position so it's at Bottom center of grid square to look correct
+            worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+
+            // Instantiate the crop!
+            GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
+
+            // Set the proper growthSprite, parent it under our cropParent GameObject, and set the crop grid position in it's Crop class
+            cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
+            cropInstance.transform.SetParent(cropParentTransform);
+            cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
         }
     }
 
@@ -564,6 +649,16 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     // This method will be automatically called when the EventHandler publishes an AfterSceneLoadEvent, and here we will populate grid with the Grid gameobject
     private void AfterSceneLoaded()
     {
+        // Find the CropsParenttransform GameObject by tag, after the scene has loaded
+        if (GameObject.FindGameObjectWithTag(Tags.CropsParentTransform) != null)
+        {
+            cropParentTransform = GameObject.FindGameObjectWithTag(Tags.CropsParentTransform).transform;
+        }
+        else
+        {
+            cropParentTransform = null;
+        }
+
         // Get the grid! Tilemaps always have a grid component
         grid = GameObject.FindObjectOfType<Grid>();
 
@@ -714,6 +809,12 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
                         #region Update all of the grid properties that reflect the advance in the day (i.e. watered squares, crop growth, etc.)
                         
+                        // If a crop has been planted, increase the number of days that crop has been growing for by 1
+                        if (gridPropertyDetails.growthDays > -1)
+                        {
+                            gridPropertyDetails.growthDays += 1;
+                        }
+
                         // If the ground is wated, then clear out the water
                         if (gridPropertyDetails.daysSinceWatered > -1)
                         {
