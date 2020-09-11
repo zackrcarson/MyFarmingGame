@@ -136,7 +136,7 @@ public class GridCursor : MonoBehaviour
             {   
                 // If the item is a seed, test to see if it's a valid cursor for a seed. If false, set cursor to invalid. If true, leave it as valid
                 case ItemType.Seed:
-                    if (!IsCursorValidForSeed(gridPropertyDetails))
+                    if (!IsCursorValidForSeed(gridPropertyDetails) || gridPropertyDetails.seedItemCode != -1) // I added this to become invalid if there is already a seed planted there
                     {
                         SetCursorToInvalid();
                         return;
@@ -145,7 +145,7 @@ public class GridCursor : MonoBehaviour
 
                 // Same thing for commodities
                 case ItemType.Commodity:
-                    if (!IsCursorValidForCommodity(gridPropertyDetails))
+                    if (!IsCursorValidForCommodity(gridPropertyDetails) || gridPropertyDetails.seedItemCode != -1) // I added this to become invalid if there is already a seed planted there
                     {
                         SetCursorToInvalid();
                         return;

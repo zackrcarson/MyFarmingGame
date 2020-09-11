@@ -338,7 +338,7 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Commodity:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        ProcessPlayerClickInputCommodity(itemDetails);
+                        ProcessPlayerClickInputCommodity(gridPropertyDetails, itemDetails);
                     }
                     break;
 
@@ -447,8 +447,8 @@ public class Player : SingletonMonobehaviour<Player>
             PlantSeedAtCursor(gridPropertyDetails, itemDetails);
         } 
         // Otherwise, just publish the CallDropSelectedItemEvent, to drop the item on the ground
-        else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
-        {   
+        else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.seedItemCode == -1) // I added this to become invalid if there is already a seed planted there
+        {    
             // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
             EventHandler.CallDropSelectedItemEvent();
         }
@@ -471,9 +471,9 @@ public class Player : SingletonMonobehaviour<Player>
 
 
     // Check if the selected commodity item can be dropped, and if the current cursor position is valid (from distance from player, bool tilemap, etc.)
-    private void ProcessPlayerClickInputCommodity(ItemDetails itemDetails)
+    private void ProcessPlayerClickInputCommodity(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
-        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.seedItemCode == -1) // I added this to become invalid if there is already a seed planted there
         {   
             // If it's a valid drop, publish this event so subscribers can see it. UIInventorySlot.DropSelectedItemAtMousePosition will subscribe to this, and drop the item
             EventHandler.CallDropSelectedItemEvent();
@@ -510,7 +510,6 @@ public class Player : SingletonMonobehaviour<Player>
                 {
                     // If it's a collecting tool, and the gridcursor position is valid, initiate the pick sequence (play the picking animation in the correct 
                     // player direction, destroy the fully grown crop. First, get the players direction relative to the grid cursor
-                    playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCenterPosition());
                     CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
