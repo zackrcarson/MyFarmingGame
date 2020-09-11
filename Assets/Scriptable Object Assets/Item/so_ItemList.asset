@@ -170,7 +170,7 @@ MonoBehaviour:
     itemType: 7
     itemDescription: Wicker Basket
     itemLongDescription: A wicker basket for harvesting produce you have grown
-    itemUseGridRadius: 0
+    itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1

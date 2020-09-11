@@ -87,6 +87,33 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
 
     /// <summary>
+    /// Add an item of type itemCode to the inventory list for the inventoryLocation
+    /// </summary>
+    public void AddItem(InventoryLocation inventoryLocation, int itemCode)
+    {
+        // Find the inventory list for this inventory location (i.e. player, chest, etc.)
+        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
+
+        // Check if the inventory at this inventoryLocation already contains the item with itemCode (-1 if not)
+        int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
+
+        if (itemPosition != -1)
+        {
+            // If it does exist, add another one to that itemPosition
+            AddItemAtPosition(inventoryList, itemCode, itemPosition);
+        }
+        else
+        {
+            // If it doesn't exist, add this item lone into the next available inventory slot
+            AddItemAtPosition(inventoryList, itemCode);
+        }
+
+        // Send an event that the inventory has been updated - so subscribers to take the update into account
+        EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
+    }
+
+
+    /// <summary>
     /// Add an item to the inventory list for that inventory location. This is an overloaded method!
     /// </summary>
     public void AddItem(InventoryLocation inventoryLocation, Item item)

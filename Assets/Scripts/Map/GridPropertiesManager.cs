@@ -702,6 +702,51 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
 
+    /// <summary>
+    /// Returns the Crop object at the gridX, gridY position, or null if no crop was found
+    /// </summary>
+    public Crop GetCropObjectAtGridLocation(GridPropertyDetails gridPropertyDetails)
+    {
+        // Get the world position from the gridX and gridY positions of the cell in question (stored in gridPropertyDetails)
+        Vector3 worldPosition = grid.GetCellCenterWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+        // This method finds ALL colliders overlapping the world position given in an array
+        Collider2D[] collider2DArray = Physics2D.OverlapPointAll(worldPosition);
+
+        // Loop through all of the found colliders to find a crop gameObject
+        Crop crop = null;
+        for (int i = 0; i < collider2DArray.Length; i++)
+        {
+            // First check all of the parent objects. Get all of the Crop objects, and then check if it exists, and at the same grid position
+            crop = collider2DArray[i].gameObject.GetComponentInParent<Crop>();
+            if (crop != null && crop.cropGridPosition == new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY))
+            {
+                break;
+            }
+
+            // Then check the children objects. Get all of the Crop objects, and then check if it exists, and at the same grid position
+            crop = collider2DArray[i].gameObject.GetComponentInChildren<Crop>();
+            if (crop != null && crop.cropGridPosition == new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY))
+            {
+                break;
+            }
+        }
+        
+        // Return the found crop! If one was found, the above loop will break with a non-null value of crop. If not, the loop will 
+        // finish and crop will still be null, so nnull is returned because no crop was found.
+        return crop;
+    }
+
+
+    /// <summary>
+    /// Returns the cropDetails for the provided seedItemCode
+    /// </summary>
+    public CropDetails GetCropDetails(int seedItemCode)
+    {
+        return so_CropDetailsList.GetCropDetails(seedItemCode);
+    }
+
+
     // Required method in the ISaveable interface. This will deregister the current game object with the SaveLoadManager's iSaveableObject list!
     public void ISaveableDeregister()
     {

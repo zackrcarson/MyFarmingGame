@@ -9,11 +9,12 @@ public class GridCursor : MonoBehaviour
     private Grid grid;
     private Camera mainCamera;
 
-    // cursor image, rectTransform, and sprites are populated in the editor
+    // cursor image, rectTransform, sprites, and the SO with the CropDetails List are populated in the editor
     [SerializeField] private Image cursorImage = null;
     [SerializeField] private RectTransform cursorRectTransform = null;
     [SerializeField] private Sprite greenCursorSprite = null;
     [SerializeField] private Sprite redCursorSprite = null;
+    [SerializeField] private SO_CropDetailsList so_CropDetailsList = null;
 
     // Bool describing if the current cursor location is valid or not
     private bool _cursorPositionIsValid = false;
@@ -292,6 +293,43 @@ public class GridCursor : MonoBehaviour
                 {
                     return false;
                 }
+            
+            // Now check if it's a collecting tool!
+            case ItemType.Collecting_tool:
+                // Check if the item can be harvested with the item selected (basket), also check if the item is fully grown
+
+                // Check if a seed has been planted in this square
+                if (gridPropertyDetails.seedItemCode != -1)
+                {
+                    // Get the cropDetails for the seed we found
+                    CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+
+                    // If we found crop details for that seed (i.e. as long as there is a cropDetails entry in the SO for this seed type):
+                    if (cropDetails != null)
+                    {
+                        // First check if the seed is fully grown (i.e. number days of growth >= the totalGrowthDays for that seed)
+                        if (gridPropertyDetails.growthDays >= cropDetails.totalGrowthDays)
+                        {
+                            // Check if the crop can be harvested with the selected tool (i.e. some crops need a hoe to harvest, etc)
+                            // This method returns true if the tool given in itemDetails can be used to harvest the
+                            // square in cropDetails
+                            if (cropDetails.CanUseToolToHarvestCrop(itemDetails.itemCode))
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return false;
 
             // All other tools will default to false for now, so invalid cursor position
             default:

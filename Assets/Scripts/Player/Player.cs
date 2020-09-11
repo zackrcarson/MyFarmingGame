@@ -7,13 +7,15 @@ public class Player : SingletonMonobehaviour<Player>
     // Prefab for the tree used to test the pool manager
     // public GameObject canyonOakTreePrefab;
 
-    // The pause after using the tool/lifting tool animation before we can use the tool or walk again
+    // The pause after using the tool/lifting tool/picking animation before we can use the tool or walk again
     private WaitForSeconds afterUseToolAnimationPause;
     private WaitForSeconds afterLiftToolAnimationPause;
+    private WaitForSeconds afterPickAnimationPause;
 
-    // The pause while using the tool/ lifting tool animation before we can use the tool or walk again, which corresponds to the animation time of using the tools
+    // The pause while using the tool/lifting tool/picking animation before we can use the tool or walk again, which corresponds to the animation time of using the tools
     private WaitForSeconds useToolAnimationPause;
     private WaitForSeconds liftToolAnimationPause;
+    private WaitForSeconds pickAnimationPause;
 
     // This will hold our animation overrides
     private AnimationOverrides animationOverrides;
@@ -129,9 +131,11 @@ public class Player : SingletonMonobehaviour<Player>
         // Populated the tool/ lifting tool animation pauses using the settings file members
         useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
         liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
+        pickAnimationPause = new WaitForSeconds(Settings.pickAnimationPause);
 
         afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
         afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
+        afterPickAnimationPause = new WaitForSeconds(Settings.afterPickAnimationPause);
     }
 
 
@@ -338,12 +342,14 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
-                // If it's a hoeing/watering tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a hoeing_tool/watering_tool/Reaping_tool and if 
-                // the cursor position is valid, we will execute the player use hoe/water/reap sequence - which runs the hoeing/watering/reaping animation in the correct player direction, marks 
-                // the ground gridPropertyDetails as dug/watered, updates the soil sprite to dug/watered, etc. (or destroys the reapableScenary)
+                // If it's a hoeing/watering/reaping/collecting tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a 
+                // hoeing_tool/watering_tool/Reaping_tool/Collecting_tool and if the cursor position is valid, we will execute the player use hoe/water/reap/pick sequence - 
+                // which runs the hoeing/watering/reaping/picking animation in the correct player direction, marks the ground gridPropertyDetails as dug/watered/reaped/picked, 
+                // updates the soil sprite to dug/watered/collected, etc. (or destroys the reapableScenary)
                 case ItemType.Watering_tool:
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
+                case ItemType.Collecting_tool:
                     if (Input.GetMouseButtonDown(0))
                     {
                         ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
@@ -496,6 +502,16 @@ public class Player : SingletonMonobehaviour<Player>
                     // If it's a watering tool, and the grid cursor position is valid, initiate the WaterGround sequence (play the watering animation in the correct player direction, mark the
                     // soil as watered, update the ground sprite to watered, etc.)
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
+
+            case ItemType.Collecting_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    // If it's a collecting tool, and the gridcursor position is valid, initiate the pick sequence (play the picking animation in the correct 
+                    // player direction, destroy the fully grown crop. First, get the players direction relative to the grid cursor
+                    playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCenterPosition());
+                    CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
 
@@ -658,7 +674,39 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
-    // This method just initiates the coroutine that enables the reaping coroutine to initiate the animation, and check/destroy the reapable scenary in the way
+    // This method just initiates the coroutine that enables the collecting coroutine to initiate the picking animation, 
+    // and destroy the fully grown crop, add it to your inventory
+    private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(CollectInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+
+
+    // This coroutine initiates the picking animation, and checks for fully grown crops, destroys the crop, and adds it to your inventory
+    private IEnumerator CollectInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {  
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // This method will take in the gridPropertyDetails you want to harvest, and the equipped item details you want
+        // to harvest with, and properly processes what happens (like how to harvest it)
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+        
+        // Pause to allow the pick animation to complete
+        yield return pickAnimationPause;
+
+        // extra pause for after the animation is done
+        yield return afterPickAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+
+    // This method just initiates the coroutine that enables the reaping coroutine to initiate the animation, 
+    // and check/destroy the reapable scenary in the way
     private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
     {
         StartCoroutine(ReapInPlayerDirectionAtCursorRoutine(itemDetails, playerDirection));
@@ -772,6 +820,60 @@ public class Player : SingletonMonobehaviour<Player>
                         }
                     }
                 }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Method to process the crop with the equipped item, and the players direction
+    /// </summary>
+    private void ProcessCropWithEquippedItemInPlayerDirection(Vector3Int playerDirection, ItemDetails equippedItemDetails, GridPropertyDetails gridPropertyDetails)
+    {   
+        // Check which tool is being used to harvest the crop (basket, hoe, axe, pickaxe, ...)
+        switch (equippedItemDetails.itemType)
+        {
+            case ItemType.Collecting_tool:
+                // Set the proper isPickingDirection bool for the player animation parameter.
+                // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) 
+                // to pick in the right direction
+                if (playerDirection == Vector3Int.right)
+                {
+                    isPickingRight = true;
+                }
+                else if (playerDirection == Vector3Int.left)
+                {
+                    isPickingLeft = true;
+                }
+                else if (playerDirection == Vector3Int.up)
+                {
+                    isPickingUp = true;
+                }
+                else if (playerDirection == Vector3Int.down)
+                {
+                    isPickingDown = true;
+                }
+                break;
+
+            // If no tool, just break out - nothing happens
+            case ItemType.none:
+                break;
+        }
+
+        // Get the crop at the cursorGridLocation
+        // This method returns the overlapping Crop colliders Crop object at the grid cursors location
+        Crop crop = GridPropertiesManager.Instance.GetCropObjectAtGridLocation(gridPropertyDetails);
+
+        // If we found a crop there, execute the process tool action for the crop!
+        if (crop != null)
+        {
+            // Check what the item type is again (basket, hoe, axe, pickaxe, ...)
+            switch (equippedItemDetails.itemType)
+            {
+                case ItemType.Collecting_tool:
+                    // This method on the Crop object will
+                    crop.ProcessToolAction(equippedItemDetails);
+                    break;
             }
         }
     }
