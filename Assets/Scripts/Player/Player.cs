@@ -458,15 +458,19 @@ public class Player : SingletonMonobehaviour<Player>
     // This method will plant the selected seed at the grid cursor location, knowing that it's a seed and can be planted there.
     private void PlantSeedAtCursor(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
-        // Update the gridPropertyDetails with the seed item code, and set the number of days growth to 0
-        gridPropertyDetails.seedItemCode = itemDetails.itemCode;
-        gridPropertyDetails.growthDays = 0;
+        // Only process the planting sequence if we have a cropDetails for the seed set up in the so_CropDetailsList!
+        if (GridPropertiesManager.Instance.GetCropDetails(itemDetails.itemCode) != null)
+        {        
+            // Update the gridPropertyDetails with the seed item code, and set the number of days growth to 0
+            gridPropertyDetails.seedItemCode = itemDetails.itemCode;
+            gridPropertyDetails.growthDays = 0;
 
-        // Display the planted crop at the gridPropertyDetails
-        GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
+            // Display the planted crop at the gridPropertyDetails
+            GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
 
-        // Remove the item from the inventory
-        EventHandler.CallRemoveSelectedItemFromInventoryEvent();        
+            // Remove the item from the inventory
+            EventHandler.CallRemoveSelectedItemFromInventoryEvent();        
+        }
     }
 
 
@@ -870,8 +874,9 @@ public class Player : SingletonMonobehaviour<Player>
             switch (equippedItemDetails.itemType)
             {
                 case ItemType.Collecting_tool:
-                    // This method on the Crop object will
-                    crop.ProcessToolAction(equippedItemDetails);
+                    // This method will determine if the player has used the correct number of harvest actions, and harvest the crop if so, if not the number of
+                    // actions increases by 1 and we can try again. Once harvested, we harvest it and play the crop harvested animation, in the correct direction
+                    crop.ProcessToolAction(equippedItemDetails, isPickingRight, isPickingLeft, isPickingDown, isPickingUp);
                     break;
             }
         }

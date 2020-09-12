@@ -522,51 +522,55 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             // Get the crop details from the SO CropDetailsList, for the given seedItemCode in the current square's gridPropertyDetails
             CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
 
-            // crop prefab to use
-            GameObject cropPrefab;
-
-            // Get the number of stages of growth  this crop has(length of the growthDays array, which defines the number of days for each stage)
-            int growthStages = cropDetails.growthDays.Length;
-
-            // The crop starts off in stage0, and we will count down the total days of growth until it gets to 0
-            int currentGrowthStage = 0;
-            int daysCounter = cropDetails.totalGrowthDays;
-
-            // This for loop is just to determine which growth stage we are in, based on how many days the crop has been growing for
-            // Loop backwards through all of the growthstages
-            for (int i = growthStages -1; i >= 0; i--)
+            // Only display the crop if it has a cropDetails! These are set up in the SO_CropDetailsList scriptable object - so don't do this if this seed isn't set up
+            if (cropDetails != null)
             {
-                // When the number of days of growth on the crop (found in the gridPropertyDetails) is >= to the days counter
-                // (starting at totalGrowth days, and counting downwards), we have found the currentStage as i
-                if (gridPropertyDetails.growthDays >= daysCounter)
+                // crop prefab to use
+                GameObject cropPrefab;
+
+                // Get the number of stages of growth  this crop has(length of the growthDays array, which defines the number of days for each stage)
+                int growthStages = cropDetails.growthDays.Length;
+
+                // The crop starts off in stage0, and we will count down the total days of growth until it gets to 0
+                int currentGrowthStage = 0;
+                int daysCounter = cropDetails.totalGrowthDays;
+
+                // This for loop is just to determine which growth stage we are in, based on how many days the crop has been growing for
+                // Loop backwards through all of the growthstages
+                for (int i = growthStages -1; i >= 0; i--)
                 {
-                    // Break out of the loop - we have found the stage!
-                    currentGrowthStage = i;
-                    break;
+                    // When the number of days of growth on the crop (found in the gridPropertyDetails) is >= to the days counter
+                    // (starting at totalGrowth days, and counting downwards), we have found the currentStage as i
+                    if (gridPropertyDetails.growthDays >= daysCounter)
+                    {
+                        // Break out of the loop - we have found the stage!
+                        currentGrowthStage = i;
+                        break;
+                    }
+                    
+                    // If we didn't find the currentStage, Decrease the current days counter by the number of growth days in tha current stage before iterating the loop
+                    daysCounter = daysCounter - cropDetails.growthDays[i];
                 }
-                
-                // If we didn't find the currentStage, Decrease the current days counter by the number of growth days in tha current stage before iterating the loop
-                daysCounter = daysCounter - cropDetails.growthDays[i];
+
+                // Instantiate the crop prefab and sprite at the grid location, with the correct stage!
+                cropPrefab = cropDetails.growthPrefab[currentGrowthStage];
+
+                Sprite growthSprite = cropDetails.growthSprite[currentGrowthStage];
+
+                // Find the world position of this square
+                Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+                // adjust the world position so it's at Bottom center of grid square to look correct
+                worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+
+                // Instantiate the crop!
+                GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
+
+                // Set the proper growthSprite, parent it under our cropParent GameObject, and set the crop grid position in it's Crop class
+                cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
+                cropInstance.transform.SetParent(cropParentTransform);
+                cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
             }
-
-            // Instantiate the crop prefab and sprite at the grid location, with the correct stage!
-            cropPrefab = cropDetails.growthPrefab[currentGrowthStage];
-
-            Sprite growthSprite = cropDetails.growthSprite[currentGrowthStage];
-
-            // Find the world position of this square
-            Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
-
-            // adjust the world position so it's at Bottom center of grid square to look correct
-            worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
-
-            // Instantiate the crop!
-            GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
-
-            // Set the proper growthSprite, parent it under our cropParent GameObject, and set the crop grid position in it's Crop class
-            cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
-            cropInstance.transform.SetParent(cropParentTransform);
-            cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
         }
     }
 

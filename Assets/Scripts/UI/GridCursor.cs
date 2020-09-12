@@ -126,6 +126,14 @@ public class GridCursor : MonoBehaviour
         // Get the grid property details (coordinate, diggable, can place item, etc.) at the cursor position
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
 
+        // If we found crop details for that seed (i.e. as long as there is a cropDetails entry in the SO for this seed type):
+        // CropDetails cropDetails = so_CropDetailsList.GetCropDetails(itemDetails.itemCode);
+        // if (itemDetails.itemType == ItemType.Seed && cropDetails == null)
+        // {
+        //     SetCursorToInvalid();
+        //     return;
+        // }
+
         // If there exists grid property details in this square, leave the cursor as valid depending on the itemType, and if it's valid at that location.
         // Else, set it to invalid.
         if (gridPropertyDetails != null)
@@ -136,7 +144,8 @@ public class GridCursor : MonoBehaviour
             {   
                 // If the item is a seed, test to see if it's a valid cursor for a seed. If false, set cursor to invalid. If true, leave it as valid
                 case ItemType.Seed:
-                    if (!IsCursorValidForSeed(gridPropertyDetails) || gridPropertyDetails.seedItemCode != -1) // I added this to become invalid if there is already a seed planted there
+                    CropDetails cropDetails = so_CropDetailsList.GetCropDetails(itemDetails.itemCode); // I added this so we can check if crop details exist
+                    if ((!IsCursorValidForSeed(gridPropertyDetails) || gridPropertyDetails.seedItemCode != -1) || (cropDetails == null && gridPropertyDetails.daysSinceDug != -1)) // I added this to become invalid if there is already a seed planted there, or if the seed doesn't have crop details populated in the so_cropDetailsList
                     {
                         SetCursorToInvalid();
                         return;
