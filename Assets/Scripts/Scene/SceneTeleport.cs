@@ -8,6 +8,8 @@ public class SceneTeleport : MonoBehaviour
     [SerializeField] private SceneName sceneNameGoto = SceneName.Scene1_Farm;
     [SerializeField] private Vector3 scenePositionGoto = new Vector3(); 
 
+    public bool needsClick = false;
+
     private void OnTriggerStay2D(Collider2D collision)
     {
         Player player = collision.GetComponent<Player>();
@@ -25,7 +27,17 @@ public class SceneTeleport : MonoBehaviour
             float zPosition = 0f;
 
             // Teleport to the new scene
-            SceneControllerManager.Instance.FadeAndLoadScene(sceneNameGoto.ToString(), new Vector3(xPosition, yPosition, zPosition));
+            if (needsClick) // I added this check, so that if you want it to be a click-to-teleport (like entering house doors!), in addition to being in the collider trigger, you also need to click 'E' to enter
+            {
+                if (Input.GetKey(KeyCode.E))
+                {
+                    SceneControllerManager.Instance.FadeAndLoadScene(sceneNameGoto.ToString(), new Vector3(xPosition, yPosition, zPosition));
+                }
+            }
+            else
+            {
+                SceneControllerManager.Instance.FadeAndLoadScene(sceneNameGoto.ToString(), new Vector3(xPosition, yPosition, zPosition));
+            }
         }
     }
 }

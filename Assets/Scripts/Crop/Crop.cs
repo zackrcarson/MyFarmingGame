@@ -7,6 +7,11 @@ public class Crop : MonoBehaviour
     // This keeps track of how many actions have been made towards harvest
     private int harvestActionCount = 0;
 
+    // This is the transform position for the harvest action effect (like where the leaves fall from when we chop a tree), populated
+    // in the editor, from the child transform object
+    [Tooltip("This should be populated from the child transform gameObject, showing the harvest effect spawn point.")]
+    [SerializeField] private Transform harvestActionEffectTransform = null;
+
     // This is the SpriteRenderer that the animator will grab and manipulate for the harvest animation (tooltip appears when you hover over it!)
     [Tooltip("This should be populated from the child gameObject.")]
     [SerializeField] private SpriteRenderer cropHarvestedSpriteRenderer = null;
@@ -55,6 +60,14 @@ public class Crop : MonoBehaviour
             {
                 animator.SetTrigger("usetoolleft");
             }
+        }
+
+        // Thigger the harvest partical effect on the crop, if it is marked in the so_cropDetailsList for this crop 
+        if (cropDetails.isHarvestActionEffect)
+        {
+            // Publish this event, which will be picked up by subscribers who will play the effect at the given position (transform populated in editor),
+            // With the harvestActionEffect (ie leaves falling, rocks crumbling, etc) described in the so_cropDetailsList for this crop
+            EventHandler.CallHarvestActionEffectEvent(harvestActionEffectTransform.position, cropDetails.harvestActionEffect);
         }
 
         // Get the required harvest actions for the tool in question, quit out if this tool can't harvest this crop (-1)
