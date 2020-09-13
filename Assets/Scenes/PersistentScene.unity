@@ -2890,6 +2890,8 @@ MonoBehaviour:
     type: 3}
   deciduousLeavesFallingPrefab: {fileID: 7587827484672038523, guid: d6bf16c064fef78ce9c857c19b6050df,
     type: 3}
+  choppingTreeTrunkPrefab: {fileID: 7933309312287359833, guid: 01f183e0bf75c124187af16e8a2860dd,
+    type: 3}
 --- !u!4 &1095759227
 Transform:
   m_ObjectHideFlags: 0
@@ -2939,6 +2941,9 @@ MonoBehaviour:
       type: 3}
   - poolSize: 5
     prefab: {fileID: 7587827484672038523, guid: d6bf16c064fef78ce9c857c19b6050df,
+      type: 3}
+  - poolSize: 5
+    prefab: {fileID: 7933309312287359833, guid: 01f183e0bf75c124187af16e8a2860dd,
       type: 3}
   objectPoolTransform: {fileID: 1291455216}
 --- !u!4 &1291455216

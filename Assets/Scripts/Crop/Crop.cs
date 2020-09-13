@@ -171,6 +171,13 @@ public class Crop : MonoBehaviour
         // This method will spawn the corresponding harvested items depending on it's CropDetails
         SpawnHarvestedItems(cropDetails);
 
+        // Check if this crop transforms into another crop once harvested (like tree -> stump)
+        if (cropDetails.harvestedTransformItemCode > 0)
+        {
+            // This method will create the new transformed crop instance at the same location as the original crop
+            CreateHarvestedTransformCrop(cropDetails, gridPropertyDetails);
+        }
+
         Destroy(gameObject);
     }
 
@@ -220,5 +227,22 @@ public class Crop : MonoBehaviour
                 }
             }
         }
+    }
+
+
+    // This method will create the new transformed crop after harvesting the original crop (i.e. tree -> stump)
+    private void CreateHarvestedTransformCrop(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
+    {
+        // Update the crop details in the grid properties, with the info from the harvestedTransformItemCode info in the cropDetails, and the default undug, 
+        // unwatered, and ungrown gridProperties
+        gridPropertyDetails.seedItemCode = cropDetails.harvestedTransformItemCode;
+        gridPropertyDetails.growthDays = 0;
+        gridPropertyDetails.daysSinceLastHarvest = -1;
+        gridPropertyDetails.daysSinceWatered = -1;
+
+        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+
+        // Display the new transformed crop as set up in the gridPropertyDetails
+        GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
     }
 }

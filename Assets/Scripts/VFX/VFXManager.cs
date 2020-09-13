@@ -14,6 +14,9 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
     // Populated in the editor with the prefab for the deciduous Leaves Falling particle effect
     [SerializeField] private GameObject deciduousLeavesFallingPrefab = null;
 
+    // Populated in the editor with the prefab for the chopping tree trunk particle effect
+    [SerializeField] private GameObject choppingTreeTrunkPrefab = null;
+
 
     protected override void Awake()
     {
@@ -50,21 +53,42 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
         // Check what the harvestActionEffect was!
         switch (harvestActionEffect)
         {
+            // Deciduous leaves falling from the tree as you chop it
             case HarvestActionEffect.deciduousLeavesFalling:
-                // If it was a deciduousLeavesFalling harvest, Grab the reaping GameObject from the PoolManager deciduousLeavesFalling queue, set it to active (This starts the 
-                // particle effect), and then initiate the coroutine to disable the gameObject after two seconds
-                GameObject deciduousLeavesFalling = PoolManager.Instance.ReuseObject(deciduousLeavesFallingPrefab, effectPosition, Quaternion.identity);
+                // If it was a deciduousLeavesFalling harvest (ie chopping the tree), Grab the deciduousLeavesFalling GameObject from the PoolManager 
+                // deciduousLeavesFalling queue, set it to active (This starts the particle effect in the prefab), and then initiate the 
+                // coroutine to disable the gameObject after two seconds
+                GameObject deciduousLeavesFalling =  PoolManager.Instance.ReuseObject(deciduousLeavesFallingPrefab, effectPosition, Quaternion.identity);
+
                 deciduousLeavesFalling.SetActive(true);
+
                 StartCoroutine(DisableHarvestActionEffect(deciduousLeavesFalling, twoSeconds));
+
+                break;
+            
+            // Wood splinters bursting as you chop a trunk
+            case HarvestActionEffect.choppingTreeTrunk:
+                // If it was a choppingTreeTrunk harvest (ie chopping the trunk), Grab the choppingTreeTrunk GameObject from the PoolManager 
+                // choppingTreeTrunk queue, set it to active (This starts the particle effect in the prefab), and then initiate the 
+                // coroutine to disable the gameObject after two seconds
+                GameObject choppingTreeTrunk = PoolManager.Instance.ReuseObject(choppingTreeTrunkPrefab, effectPosition, Quaternion.identity);
+
+                choppingTreeTrunk.SetActive(true);
+
+                StartCoroutine(DisableHarvestActionEffect(choppingTreeTrunk, twoSeconds));
+
                 break;
 
-
+            // Grass particles flying as you reap grass
             case HarvestActionEffect.reaping:
                 // If it was a reaping harvest, Grab the reaping GameObject from the PoolManager reaping queue, set it to active (This starts the 
                 // particle effect), and then initiate the coroutine to disable the gameObject after two seconds
                 GameObject reaping = PoolManager.Instance.ReuseObject(reapingPrefab, effectPosition, Quaternion.identity);
+
                 reaping.SetActive(true);
+
                 StartCoroutine(DisableHarvestActionEffect(reaping, twoSeconds));
+
                 break;
 
             // If anything else, just do nothing
