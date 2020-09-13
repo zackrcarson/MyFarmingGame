@@ -5,6 +5,7 @@ public class CropDetails
 {
     [ItemCodeDescription] // This custom property will display the item code description in the editor
     public int seedItemCode; // This is the item code for the corresponding seed for this crop
+    public bool doesNeedWater; // This bool determines whether or not the seed needs water to grow! I added this line so that crops do need water, and trees don't
     public int[] growthDays; // Array with the total days of growth required for each stage of the crop (i.e. [0,1,2,3,5] corresponds to 1,1,1,2 days of growth for each stage). The last element is the total number of days required!
     public GameObject[] growthPrefab; // List of prefabs to use when instantiating each growth stage (could be the same)
     public Sprite[] growthSprite; // List of sprites for the growth stages (i.e. seed -> sapling -> small tree -> medium tree -> tree)

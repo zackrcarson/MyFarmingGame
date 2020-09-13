@@ -83,7 +83,7 @@ MonoBehaviour:
     itemType: 4
     itemDescription: A Basic Axe
     itemLongDescription: A sharp, sturdy basic axe - great for chopping down trees
-    itemUseGridRadius: 0
+    itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1

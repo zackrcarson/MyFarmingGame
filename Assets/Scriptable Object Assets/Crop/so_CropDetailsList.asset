@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cropDetails:
   - seedItemCode: 10006
+    doesNeedWater: 0
     growthDays: 0000000001000000020000000300000005000000
     growthPrefab:
     - {fileID: 6067877433806709010, guid: 41b493f2eb64c967b8cfac13bcc6f7b1, type: 3}
@@ -43,6 +44,7 @@ MonoBehaviour:
     cropProducedMaxQuantity: 01000000
     daysToRegrow: 0
   - seedItemCode: 10000
+    doesNeedWater: 0
     growthDays: 00000000050000000a0000000f00000014000000
     growthPrefab:
     - {fileID: 6067877433806709010, guid: 41b493f2eb64c967b8cfac13bcc6f7b1, type: 3}

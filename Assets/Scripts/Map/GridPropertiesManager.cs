@@ -854,8 +854,12 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
                         #region Update all of the grid properties that reflect the advance in the day (i.e. watered squares, crop growth, etc.)
                         
-                        // If a crop has been planted, increase the number of days that crop has been growing for by 1
-                        if (gridPropertyDetails.growthDays > -1)
+                        // If a crop has been planted, increase the number of days that crop has been growing for by 1, only
+                        // if the plant has been watered (if it requires water)
+                        CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+                        if ((gridPropertyDetails.growthDays > -1 && gridPropertyDetails.daysSinceWatered == 0)
+                            ||
+                            (gridPropertyDetails.growthDays > -1 && cropDetails.doesNeedWater == false)) // I added these last four checks to see if the plant has been watered before advancing it's growth days, or to see if it doesn't need watering
                         {
                             gridPropertyDetails.growthDays += 1;
                         }

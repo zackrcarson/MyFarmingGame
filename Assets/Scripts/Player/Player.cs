@@ -342,11 +342,13 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
-                // If it's a hoeing/watering/reaping/collecting tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a 
-                // hoeing_tool/watering_tool/Reaping_tool/Collecting_tool and if the cursor position is valid, we will execute the player use hoe/water/reap/pick sequence - 
-                // which runs the hoeing/watering/reaping/picking animation in the correct player direction, marks the ground gridPropertyDetails as dug/watered/reaped/picked, 
-                // updates the soil sprite to dug/watered/collected, etc. (or destroys the reapableScenary)
+                // If it's a hoeing/watering/chopping/reaping/collecting tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a 
+                // hoeing_tool/watering_tool/Reaping_tool/Collecting_tool/Chopping_tool and if the cursor position is valid, we will execute the player use 
+                // hoe/water/reap/pick/chop sequence - which runs the hoeing/watering/reaping/picking animation in the correct player direction, marks the ground 
+                // gridPropertyDetails as dug/watered/reaped/picked/chopped, updates the soil/tree sprite to dug/watered/collected/chopped, etc. 
+                // (or destroys the reapableScenary, wobbles the tree animation, or harvest the tree action)
                 case ItemType.Watering_tool:
+                case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
@@ -506,6 +508,15 @@ public class Player : SingletonMonobehaviour<Player>
                     // If it's a watering tool, and the grid cursor position is valid, initiate the WaterGround sequence (play the watering animation in the correct player direction, mark the
                     // soil as watered, update the ground sprite to watered, etc.)
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
+
+            case ItemType.Chopping_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    // If it's a chopping tool, and the gridcursor position is valid for that tree, initiate the chopping sequence (play the chopping animation in the correct 
+                    // player direction, and harvest the tree (wobble it if not fully harvested yet, and fell it if it is)
+                    ChopInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
 
@@ -677,6 +688,46 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
+    // This method just initiates the coroutine that enables the chopping coroutine to initiate the chopping animation, 
+    // and harvest the tree (wobble it if the number of harvest actions not completed yet, fell it if they are)
+    private void ChopInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(ChopInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+
+
+    // This coroutine initiates the chopping animation, and checks for fully grown trees, harvests the tree (or wobbles it if
+    // not enough harvests yet), and spawns the harvest resources
+    private IEnumerator ChopInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {  
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set the tool animation to axe in the override animations. First, apply the 'axe' part variant type, for the attribute we want swapped
+        toolCharacterAttribute.partVariantType = PartVariantType.axe;
+        // Next, clear the list and add the tool character attribute struct to it. This list is used as an override to the animations
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        // This method builds an animation ovveride list, and applies it to the tool animator
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+
+        // This method will take in the gridPropertyDetails you want to harvest, and the equipped item details you want
+        // to harvest with, and properly processes what happens (like how to harvest it - number of actions, animations, etc)
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+        
+        // Pause to allow the pick animation to complete
+        yield return useToolAnimationPause;
+
+        // extra pause for after the animation is done
+        yield return afterUseToolAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+
     // This method just initiates the coroutine that enables the collecting coroutine to initiate the picking animation, 
     // and destroy the fully grown crop, add it to your inventory
     private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
@@ -836,6 +887,28 @@ public class Player : SingletonMonobehaviour<Player>
         // Check which tool is being used to harvest the crop (basket, hoe, axe, pickaxe, ...)
         switch (equippedItemDetails.itemType)
         {
+            case ItemType.Chopping_tool:
+                // Set the proper isUsingToolDirection bool for the player animation parameter.
+                // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) 
+                // to chop in the right direction
+                if (playerDirection == Vector3Int.right)
+                {
+                    isUsingToolRight = true;
+                }
+                else if (playerDirection == Vector3Int.left)
+                {
+                    isUsingToolLeft = true;
+                }
+                else if (playerDirection == Vector3Int.up)
+                {
+                    isUsingToolUp = true;
+                }
+                else if (playerDirection == Vector3Int.down)
+                {
+                    isUsingToolDown = true;
+                }
+                break;
+                
             case ItemType.Collecting_tool:
                 // Set the proper isPickingDirection bool for the player animation parameter.
                 // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) 
@@ -873,6 +946,13 @@ public class Player : SingletonMonobehaviour<Player>
             // Check what the item type is again (basket, hoe, axe, pickaxe, ...)
             switch (equippedItemDetails.itemType)
             {
+                case ItemType.Chopping_tool:
+                    // This method will determine if the player has used the correct number of chopping actions, and harvest the tree if so, if not the number of
+                    // actions increases by 1 (and the tree wobbles) and we can try again. Once harvested, the tree falls in the correct direction and 
+                    // the recourses are spawned
+                    crop.ProcessToolAction(equippedItemDetails, isUsingToolRight, isUsingToolLeft, isUsingToolDown, isUsingToolUp);
+                    break;
+
                 case ItemType.Collecting_tool:
                     // This method will determine if the player has used the correct number of harvest actions, and harvest the crop if so, if not the number of
                     // actions increases by 1 and we can try again. Once harvested, we harvest it and play the crop harvested animation, in the correct direction
