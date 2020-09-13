@@ -316,8 +316,9 @@ public class GridCursor : MonoBehaviour
                     // If we found crop details for that seed (i.e. as long as there is a cropDetails entry in the SO for this seed type):
                     if (cropDetails != null)
                     {
-                        // First check if the seed is fully grown (i.e. number days of growth >= the totalGrowthDays for that seed)
-                        if (gridPropertyDetails.growthDays >= cropDetails.totalGrowthDays)
+                        // First check if the seed is fully grown (i.e. number days of growth >= the total number of growth days 
+                        // (the final element of cropDetails.growthDays) for that seed)
+                        if (gridPropertyDetails.growthDays >= cropDetails.growthDays[cropDetails.growthDays.Length - 1])
                         {
                             // Check if the crop can be harvested with the selected tool (i.e. some crops need a hoe to harvest, etc)
                             // This method returns true if the tool given in itemDetails can be used to harvest the

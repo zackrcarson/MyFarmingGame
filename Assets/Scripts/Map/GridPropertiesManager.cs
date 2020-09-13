@@ -533,23 +533,19 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
                 // The crop starts off in stage0, and we will count down the total days of growth until it gets to 0
                 int currentGrowthStage = 0;
-                int daysCounter = cropDetails.totalGrowthDays;
 
                 // This for loop is just to determine which growth stage we are in, based on how many days the crop has been growing for
                 // Loop backwards through all of the growthstages
                 for (int i = growthStages -1; i >= 0; i--)
                 {
                     // When the number of days of growth on the crop (found in the gridPropertyDetails) is >= to the days counter
-                    // (starting at totalGrowth days, and counting downwards), we have found the currentStage as i
-                    if (gridPropertyDetails.growthDays >= daysCounter)
+                    // for the current stage (cropDetails.growthDays[i]), we have found the currentStage as i
+                    if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
                     {
                         // Break out of the loop - we have found the stage!
                         currentGrowthStage = i;
                         break;
                     }
-                    
-                    // If we didn't find the currentStage, Decrease the current days counter by the number of growth days in tha current stage before iterating the loop
-                    daysCounter = daysCounter - cropDetails.growthDays[i];
                 }
 
                 // Instantiate the crop prefab and sprite at the grid location, with the correct stage!

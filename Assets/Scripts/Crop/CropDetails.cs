@@ -5,8 +5,7 @@ public class CropDetails
 {
     [ItemCodeDescription] // This custom property will display the item code description in the editor
     public int seedItemCode; // This is the item code for the corresponding seed for this crop
-    public int[] growthDays; // Array with the days of growth required for each stage of the crop
-    public int totalGrowthDays; // Total days of growth required, this is the sum of all of the elements in growthDays for each stage
+    public int[] growthDays; // Array with the total days of growth required for each stage of the crop (i.e. [0,1,2,3,5] corresponds to 1,1,1,2 days of growth for each stage). The last element is the total number of days required!
     public GameObject[] growthPrefab; // List of prefabs to use when instantiating each growth stage (could be the same)
     public Sprite[] growthSprite; // List of sprites for the growth stages (i.e. seed -> sapling -> small tree -> medium tree -> tree)
     public Season[] growthSeasons; // List of seasons this crop can grow in
