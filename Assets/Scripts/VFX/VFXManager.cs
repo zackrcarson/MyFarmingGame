@@ -14,6 +14,9 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
     // Populated in the editor with the prefab for the deciduous Leaves Falling particle effect
     [SerializeField] private GameObject deciduousLeavesFallingPrefab = null;
 
+    // Populated in the editor with the prefab for the pine cones Falling particle effect
+    [SerializeField] private GameObject pineConesFallingPrefab = null;
+
     // Populated in the editor with the prefab for the chopping tree trunk particle effect
     [SerializeField] private GameObject choppingTreeTrunkPrefab = null;
 
@@ -63,6 +66,19 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
                 deciduousLeavesFalling.SetActive(true);
 
                 StartCoroutine(DisableHarvestActionEffect(deciduousLeavesFalling, twoSeconds));
+
+                break;
+
+            // Pine cones falling from the tree as you chop it
+            case HarvestActionEffect.pineConesFalling:
+                // If it was a pineConesFalling harvest (ie chopping the spruce tree), Grab the pineConesFalling GameObject from the PoolManager 
+                // pineConesFalling queue, set it to active (This starts the particle effect in the prefab), and then initiate the 
+                // coroutine to disable the gameObject after two seconds
+                GameObject pineConesFalling =  PoolManager.Instance.ReuseObject(pineConesFallingPrefab, effectPosition, Quaternion.identity);
+
+                pineConesFalling.SetActive(true);
+
+                StartCoroutine(DisableHarvestActionEffect(pineConesFalling, twoSeconds));
 
                 break;
             
