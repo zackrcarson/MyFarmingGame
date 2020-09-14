@@ -12,6 +12,10 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
     private Tilemap groundDecoration1; // Dug ground tiles
     private Tilemap groundDecoration2; // Watered ground tiles
+
+    //  This bool stores if this is the first time the scene is being loaded or not (right when we start up the game). This will allow
+    // pre-instantiated crops like trees to only instantiate once when we first load the game, not when we move between scenes
+    private bool isFirstTimeSceneLoaded = true;
     
     // dug ground tile set, and watered ground tile set as populated in the editor, so we can place various dug/watered ground tiles as we hoe/water
     [SerializeField] private Tile[] dugGround = null;
@@ -640,6 +644,10 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
                 this.gridPropertyDictionary = gridPropertyDictionary;
             }
 
+            // Add a bool dictionary to the sceneSave, and create a new entry keyed by a custom "isFirstTimeSceneLoaded" string, with a value of true (for now!)
+            sceneSave.boolDictionary = new Dictionary<string, bool>();
+            sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", true);
+
             // Add the sceneSave to the GameObjectSave dictionary, keyed by the scene name
             GameObjectSave.sceneData.Add(so_GridProperties.sceneName.ToString(), sceneSave);
         }
@@ -774,6 +782,19 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
                 gridPropertyDictionary = sceneSave.gridPropertyDetailsDictionary;
             }
 
+            // Get the dictionary of bool sstored in SceneSave, and check for the value of the isFirstTimeSceneLoaded value
+            if (sceneSave.boolDictionary != null && sceneSave.boolDictionary.TryGetValue("isFirstTimeSceneLoaded", out bool storedIsFirstTimeSceneLoaded))
+            {
+                isFirstTimeSceneLoaded = storedIsFirstTimeSceneLoaded;
+            }
+
+            // Instantiate any crop prefabe initally present in the scene, by publishing the CallInstantiateCropPrefabsEvent, which is subscribed to be
+            // CropInstantiator.cs's on any crops we want to have pre-grown. Only do this if it's the first time this scene has been loaded!
+            if (isFirstTimeSceneLoaded)
+            {
+                EventHandler.CallInstantiateCropPrefabsEvent();
+            }
+
             // Check if grid properties exist
             if (gridPropertyDictionary.Count > 0)
             {
@@ -782,6 +803,12 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
                 // Instantiate the grid property details for the current scene 
                 DisplayGridPropertyDetails();
+            }
+
+            // Update the isFirstTimeSceneLoaded bool to false so that it won't instantiate the crops anymore on scene loads
+            if (isFirstTimeSceneLoaded)
+            {
+                isFirstTimeSceneLoaded = false;
             }
         }
     }
@@ -799,6 +826,10 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
         // Create and add dict grid property details dictionary
         sceneSave.gridPropertyDetailsDictionary = gridPropertyDictionary;
+
+        // Create and add the boolDictionary for the first time scene loaded, to be stored and loaded again
+        sceneSave.boolDictionary = new Dictionary<string, bool>();
+        sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", isFirstTimeSceneLoaded);
 
         // Add scene save to the game object save scene data
         GameObjectSave.sceneData.Add(sceneName, sceneSave);

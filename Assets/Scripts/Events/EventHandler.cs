@@ -62,6 +62,21 @@ public static class EventHandler
         {
             InventoryUpdatedEvent(inventoryLocation, inventoryList);
         }
+
+    }
+
+    
+    // Instantiate crop prefabs Event
+    public static event Action InstantiateCropPrefabsEvent;
+
+    // Crops instantiated event call for publishers, to send out details to any subscribers
+    public static void CallInstantiateCropPrefabsEvent()
+    {
+        // Check if there are any subscribers - or else do nothing!
+        if (InstantiateCropPrefabsEvent != null)
+        {
+            InstantiateCropPrefabsEvent();
+        }
     }
 
 
