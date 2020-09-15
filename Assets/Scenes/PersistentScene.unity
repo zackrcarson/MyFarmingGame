@@ -2894,6 +2894,8 @@ MonoBehaviour:
     type: 3}
   choppingTreeTrunkPrefab: {fileID: 7933309312287359833, guid: 01f183e0bf75c124187af16e8a2860dd,
     type: 3}
+  breakingStonePrefab: {fileID: 2334348422792903078, guid: cd3c5103fb3ceed46b94d290db890bd4,
+    type: 3}
 --- !u!4 &1095759227
 Transform:
   m_ObjectHideFlags: 0
@@ -2949,6 +2951,9 @@ MonoBehaviour:
       type: 3}
   - poolSize: 5
     prefab: {fileID: 7587827484672038523, guid: a773a0f407cee6fdc8619d4f09dcf7d4,
+      type: 3}
+  - poolSize: 5
+    prefab: {fileID: 2334348422792903078, guid: cd3c5103fb3ceed46b94d290db890bd4,
       type: 3}
   objectPoolTransform: {fileID: 1291455216}
 --- !u!4 &1291455216

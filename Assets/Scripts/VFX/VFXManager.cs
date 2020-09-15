@@ -20,6 +20,9 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
     // Populated in the editor with the prefab for the chopping tree trunk particle effect
     [SerializeField] private GameObject choppingTreeTrunkPrefab = null;
 
+    // Populated in the editor with the prefab for the breaking stone particle effect
+    [SerializeField] private GameObject breakingStonePrefab = null;
+
 
     protected override void Awake()
     {
@@ -92,6 +95,19 @@ public class VFXManager : SingletonMonobehaviour<VFXManager>
                 choppingTreeTrunk.SetActive(true);
 
                 StartCoroutine(DisableHarvestActionEffect(choppingTreeTrunk, twoSeconds));
+
+                break;
+
+            // rock chunks spray as you break a stone
+            case HarvestActionEffect.breakingStone:
+                // If it was a breakingStone harvest (ie breaking rocks), Grab the breakingStone GameObject from the PoolManager 
+                // breakingStone queue, set it to active (This starts the particle effect in the prefab), and then initiate the 
+                // coroutine to disable the gameObject after two seconds
+                GameObject breakingStone = PoolManager.Instance.ReuseObject(breakingStonePrefab, effectPosition, Quaternion.identity);
+
+                breakingStone.SetActive(true);
+
+                StartCoroutine(DisableHarvestActionEffect(breakingStone, twoSeconds));
 
                 break;
 
