@@ -182,7 +182,7 @@ MonoBehaviour:
     itemType: 5
     itemDescription: A Basic Pickaxe
     itemLongDescription: A strong, sturdy pickaxe - great for breaking rocks
-    itemUseGridRadius: 0
+    itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
     canBePickedUp: 1

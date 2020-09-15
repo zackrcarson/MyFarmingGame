@@ -342,16 +342,17 @@ public class Player : SingletonMonobehaviour<Player>
                     }
                     break;
 
-                // If it's a hoeing/watering/chopping/reaping/collecting tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a 
-                // hoeing_tool/watering_tool/Reaping_tool/Collecting_tool/Chopping_tool and if the cursor position is valid, we will execute the player use 
-                // hoe/water/reap/pick/chop sequence - which runs the hoeing/watering/reaping/picking animation in the correct player direction, marks the ground 
-                // gridPropertyDetails as dug/watered/reaped/picked/chopped, updates the soil/tree sprite to dug/watered/collected/chopped, etc. 
-                // (or destroys the reapableScenary, wobbles the tree animation, or harvest the tree action)
+                // If it's a hoeing/watering/chopping/reaping/collecting/breaking tool, we use the ProcessPlayerClickInputTool method, which checks which tool is being used. If it's a 
+                // hoeing_tool/watering_tool/Reaping_tool/Collecting_tool/Chopping_tool/Breaking_tool and if the cursor position is valid, we will execute the player use 
+                // hoe/water/reap/pick/chop/break sequence - which runs the hoeing/watering/reaping/picking/breaking animation in the correct player direction, marks the ground 
+                // gridPropertyDetails as dug/watered/reaped/picked/chopped/broken, updates the soil/tree sprite to dug/watered/collected/chopped/broken, etc. 
+                // (or destroys the reapableScenary, wobbles the tree animation, or harvest the tree action, or harvest stone animation/action)
                 case ItemType.Watering_tool:
                 case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
+                case ItemType.Breaking_tool:
                     if (Input.GetMouseButtonDown(0))
                     {
                         ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
@@ -526,6 +527,15 @@ public class Player : SingletonMonobehaviour<Player>
                     // If it's a collecting tool, and the gridcursor position is valid, initiate the pick sequence (play the picking animation in the correct 
                     // player direction, destroy the fully grown crop. First, get the players direction relative to the grid cursor
                     CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                }
+                break;
+
+            case ItemType.Breaking_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    // If it's a breaking tool, and the gridcursor position is valid for that stone, initiate the breaking sequence (play the breaking animation in the correct 
+                    // player direction, and harvest the stone (wobble it if not fully harvested yet, and break it if it is)
+                    BreakInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
 
@@ -759,6 +769,46 @@ public class Player : SingletonMonobehaviour<Player>
     }
 
 
+    // This method just initiates the coroutine that enables the breaking coroutine to initiate the breaking animation, 
+    // and destroy/wobble the stone, and add the harvest resources to your inventory
+    private void BreakInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(BreakInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+
+
+    // This coroutine initiates the breaking animation, and checks for breakable stone, harvests the stone (or wobbles it if
+    // not enough harvests yet), and spawns the harvest resources
+    private IEnumerator BreakInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {  
+        // Disable player input and tool use so we can't walk away or use a tool again during the animation
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set the tool animation to pickaxeaxe in the override animations. First, apply the 'pickaxeaxe' part variant type, for the attribute we want swapped
+        toolCharacterAttribute.partVariantType = PartVariantType.pickaxe;
+        // Next, clear the list and add the tool character attribute struct to it. This list is used as an override to the animations
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        // This method builds an animation ovveride list, and applies it to the tool animator
+        animationOverrides.ApplyCharacterCustomizationParameters(characterAttributeCustomisationList);
+
+        // This method will take in the gridPropertyDetails you want to harvest, and the equipped item details you want
+        // to harvest with, and properly processes what happens (like how to harvest it - number of actions, animations, etc)
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+        
+        // Pause to allow the pick animation to complete
+        yield return useToolAnimationPause;
+
+        // extra pause for after the animation is done
+        yield return afterUseToolAnimationPause;
+
+        // Enable player input and tool use so we can walk away or use a tool again
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+
     // This method just initiates the coroutine that enables the reaping coroutine to initiate the animation, 
     // and check/destroy the reapable scenary in the way
     private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
@@ -888,9 +938,11 @@ public class Player : SingletonMonobehaviour<Player>
         switch (equippedItemDetails.itemType)
         {
             case ItemType.Chopping_tool:
+            case ItemType.Breaking_tool:
                 // Set the proper isUsingToolDirection bool for the player animation parameter.
                 // Now that the overrides are active, these will be picked up in the update loop (movement event publisher!) 
-                // to chop in the right direction
+                // to chop/break in the right direction (both of these use the same isUsingToolDirection paremeters
+                // so we can check them together)
                 if (playerDirection == Vector3Int.right)
                 {
                     isUsingToolRight = true;
@@ -947,6 +999,7 @@ public class Player : SingletonMonobehaviour<Player>
             switch (equippedItemDetails.itemType)
             {
                 case ItemType.Chopping_tool:
+                case ItemType.Breaking_tool:
                     // This method will determine if the player has used the correct number of chopping actions, and harvest the tree if so, if not the number of
                     // actions increases by 1 (and the tree wobbles) and we can try again. Once harvested, the tree falls in the correct direction and 
                     // the recourses are spawned

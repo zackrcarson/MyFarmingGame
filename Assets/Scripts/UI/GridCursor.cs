@@ -303,9 +303,10 @@ public class GridCursor : MonoBehaviour
                     return false;
                 }
 
-            // Now check if it's a collecting or chopping tool!
+            // Now check if it's a collecting or chopping or breaking tool!
             case ItemType.Collecting_tool:
             case ItemType.Chopping_tool:
+            case ItemType.Breaking_tool:
                 // Check if the item can be harvested with the item selected (basket), also check if the item is fully grown
 
                 // Check if a seed has been planted in this square

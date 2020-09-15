@@ -132,6 +132,20 @@ public class Crop : MonoBehaviour
             GetComponentInChildren<SpriteRenderer>().enabled = false;
         }
 
+        // Check if we need to disable the colliders on the harvest crop resource, and then disable them if so (or else, for example, the harvested rock
+        // will push the player out of the way as it animates upwards!
+        if (cropDetails.disableCropCollidersBeforeHarvestedAnimation)
+        {
+            // load up all of the box colliders in the children game components
+            Collider2D[] collider2Ds = GetComponentsInChildren<Collider2D>();
+            
+            // Disable all of the found colliders
+            foreach (Collider2D collider2D in collider2Ds)
+            {
+                collider2D.enabled = false;
+            }
+        }
+
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
         // If there is a harvested animation on this crop, wait until the animation is complete before spawning the harvested
