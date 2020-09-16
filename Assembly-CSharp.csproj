@@ -104,6 +104,7 @@
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
      <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryTextBox.cs" />
+     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
      <Compile Include="Assets\Scripts\Utilities\Property Drawers\ItemCodeDescriptionAttribute.cs" />
      <Compile Include="Assets\Scripts\VFX\PoolManager.cs" />
      <Compile Include="Assets\Scripts\VFX\VFXManager.cs" />
