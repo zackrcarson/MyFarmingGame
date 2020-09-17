@@ -190,4 +190,31 @@ public class UIInventoryBar : MonoBehaviour
             IsInventoryBarPositionBottom = false;
         }
     }
+
+
+    // This method will simply destroy all dragged objects, i.e. when we enter the pause menu
+    public void DestroyCurrentlyDraggedItems()
+    {
+        // Loop through all of the inventory slots
+        for (int i = 0; i < inventorySlot.Length; i++)
+        {
+            // If the current slot has an item currently being dragged, destroy the dragged item
+            if (inventorySlot[i].draggedItem != null)
+            {
+                Destroy(inventorySlot[i].draggedItem);
+            }
+        }
+    }
+
+
+    // This method will clear all of the currently selected items on the inventory slot, for e.g. when we enter the pause menu
+    public void ClearCurrentlySelectedItems()
+    {
+        // Loop through all of the inventory slots
+        for (int i = 0; i < inventorySlot.Length; i++)
+        {
+            // Clear the selected items on each slot
+            inventorySlot[i].ClearSelectedItem();
+        }
+    }
 }

@@ -7,6 +7,12 @@ public class UIManager : SingletonMonobehaviour<UIManager>
     private bool _pauseMenuOn = false;
     public bool PauseMenuOn { get => _pauseMenuOn; set => _pauseMenuOn = value; }
 
+    // This is populated in editor for the UI inventory bar, so we can control thigns like the dragged items, etc
+    [SerializeField] private UIInventoryBar uiInventoryBar = null;
+
+    // This is populated in editor for the pause menu inventory manager, so we can control thigns like the dragged items, etc
+    [SerializeField] private PauseMenuInventoryManagement pauseMenuInventoryManagement = null;
+
     // These are populated in the editor with the pause menu canvas (to activate and deactivate it when the player pauses/unpauses), a list of it's tabs (to activate 
     // different tabs within the pause menu), and a list of it's buttons (to control when the tabs are clicked with the Unity Buttons component!)
     [SerializeField] private GameObject pauseMenu = null;
@@ -51,6 +57,12 @@ public class UIManager : SingletonMonobehaviour<UIManager>
     // This method will disable the players input, turn off time counting, enable the pauseMenu UI, runs garbage collection, and highlight the selected tab's button
     private void EnablePauseMenu()
     {
+        // Destroy any currently dragged items
+        uiInventoryBar.DestroyCurrentlyDraggedItems();
+
+        // Clear all of the currently selected items
+        uiInventoryBar.ClearCurrentlySelectedItems();
+
         // Bool for us to know when the pause menu is on or not, so we know whether to pause or unpause on ESC
         PauseMenuOn = true;
 
@@ -74,6 +86,9 @@ public class UIManager : SingletonMonobehaviour<UIManager>
     // This method will re-enable the players input, turn back on time counting, and disables the pauseMenu UI
     private void DisablePauseMenu()
     {
+        // Destroy all of the currently dragged items as we disable the pause menu
+        pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
+
         // Bool for us to know when the pause menu is on or not, so we know whether to pause or unpause on ESC
         PauseMenuOn = false;
 
@@ -83,7 +98,7 @@ public class UIManager : SingletonMonobehaviour<UIManager>
         // Starts running all update methods again! Time flows again
         Time.timeScale = 1;
 
-        // Set the pause menu UI to be inactivea to uncover the screen with it
+        // Set the pause menu UI to be inactive to uncover the screen with it
         pauseMenu.SetActive(false);
     }
 

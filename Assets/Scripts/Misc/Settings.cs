@@ -27,7 +27,7 @@ public static class Settings
     public static float afterPickAnimationPause = 0.2f;
 
     // Inventory
-    public static int playerInitialInventoryCapacity = 24;
+    public static int playerInitialInventoryCapacity = 13;
     public static int playerMaximumInventoryCapacity = 48;
 
     // Player Animation Parameters

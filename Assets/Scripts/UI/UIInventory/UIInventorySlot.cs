@@ -16,7 +16,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Canvas parentCanvas;
 
     private Transform parentItem;
-    private GameObject draggedItem;
+    public GameObject draggedItem;
 
     private GridCursor gridCursor;
     private Cursor cursor;
@@ -149,7 +149,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     }
 
 
-    private void ClearSelectedItem()
+    public void ClearSelectedItem()
     {
         // Clear out the current cursors
         ClearCursors();
