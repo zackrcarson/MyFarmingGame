@@ -9,6 +9,7 @@ public class SceneSave
 
     // Dictionary storing which scene the player was in when the game was saved, and the direction they are facing. The key is just an identifier we pick to label it,
     // i.e. "currentScene" or "playerDirection".
+    // Also used to store TimeManager objects gameDayOfWeek and gameSeason, keyed by the same strings
     public Dictionary<string, string> stringDictionary;
 
     // Dictionary storing the players location (via a serializable Vector3) when the game was saved. The key is just an identifier we pick to label it (i.e. "playerPosition")
@@ -27,4 +28,8 @@ public class SceneSave
     // This dictionary will store the inventory capacity arrays, showing the inventory location capacities (i.e. how many items the players inventory can hold, the chest can hold, etc). The 
     // key is just an identifier we pick to label it (i.e. "inventoryListCapacityArray")
     public Dictionary<string, int[]> intArrayDictionary;
+
+    // This int dictionary will be used to store the game seconds, minutes, hours, days, months, season, and year, each keyed respectively, keyed by 
+    // "gameYear", "gameHour", ...
+    public Dictionary<string, int> intDictionary;
 }

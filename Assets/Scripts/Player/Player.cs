@@ -1065,7 +1065,10 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         // Test upgrade inventory size
         if (Input.GetKeyDown(KeyCode.U))
         {
-            InventoryManager.Instance.inventoryListCapacityIntArray[(int)InventoryLocation.player]++;
+            if (InventoryManager.Instance.inventoryListCapacityIntArray[(int)InventoryLocation.player] < Settings.playerMaximumInventoryCapacity)
+            {
+                InventoryManager.Instance.inventoryListCapacityIntArray[(int)InventoryLocation.player]++;
+            }
         }
 
         // Test object pool!
@@ -1228,6 +1231,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         sceneSave.stringDictionary.Add("playerDirection", playerDirection.ToString());
 
         // Add the SceneSave data for the player game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        // The player will get stored in the Persistent Scene
         GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
 
         // Return the GameObjectSave, which has a dict of the Saved stuff for the player GameObject

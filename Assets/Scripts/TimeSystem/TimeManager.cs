@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 // This is a singleton, so only one of them can exist!! Or else, our SingletonMonobehavious script will destroy the other one.
-public class TimeManager : SingletonMonobehaviour<TimeManager>
+// This class subscribes to the ISaveable interface, which means we must include several methods for saving/loading data (here, we will save the current time - second, minute, day, season, year)
+public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 {
     private int gameYear = 1;
     private Season gameSeason = Season.Spring;
@@ -16,6 +17,66 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>
     private bool gameClockPaused = false;
 
     private float gameTick = 0f;
+
+    // Unique ID required by the ISaveable interface, will store the GUID attached to the InventoryManager gameObject
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    // GameObjectSave required by the ISaveable interface, storesd the save data that is built up for every object that has the ISaveable interface attached
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
+
+
+    // on object awake, populate the GUID and GameObject saves for this object
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // Get the unique ID for the GameObject
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+
+        // Initialize the GameObjectSave variable
+        GameObjectSave = new GameObjectSave();
+    }
+
+
+    // On enable, this will just register this gameObject as an ISaveable, so that the SaveLoadManager can save/load the methods set up here
+    // Also subscribe to scene loading/unloading events so we can pause/start the game clock while scenes are unloading/loading
+    private void OnEnable()
+    {
+        // Registers this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableRegister();
+
+        // Subscribe the BeforeSceneUnloadFadeOut and AfterSceneLoadFadeIn methods to the corresponding events. These methods will then pause and restart the game clock
+        // when each one is triggered, respectively - so time doesn't pass as we load and reload scenes
+        EventHandler.BeforeSceneUnloadEvent += BeforeSceneUnloadFadeOut;
+        EventHandler.AfterSceneLoadEvent += AfterSceneLoadFadeIn;
+    }
+
+
+    // Deregister from the iSaveableObjectList
+    private void OnDisable()
+    {
+        // Deregisters this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableDeregister();
+
+        EventHandler.BeforeSceneUnloadEvent -= BeforeSceneUnloadFadeOut;
+        EventHandler.AfterSceneLoadEvent -= AfterSceneLoadFadeIn;
+    }
+
+
+    // Once the old scene begins to fade out, pause the game clock (gameClockPaused just stops the ticking if it's true)
+    private void BeforeSceneUnloadFadeOut()
+    {
+        gameClockPaused = true;
+    }
+
+
+    // After the new scene finishes fading in, restart the game clock (gameClockPaused just starts the ticking if it's false)
+    private void AfterSceneLoadFadeIn()
+    {
+        gameClockPaused = false;
+    }
 
 
     private void Start()
@@ -184,5 +245,141 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>
         {
             UpdateGameSecond();
         }
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnEnable() of the TimeManager GameObject, and it will 
+    // Add an entry (of this gameObject) to the iSaveableObjectList in SaveLoadManager, which will then manage
+    // Looping through all such items in this list to save/load their data
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnDisable() of the TimeManager GameObject, and it will
+    // Remove this item from the saveable objects list, as described above
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+
+    // Required method by the ISaveable interface. This will get called from the SaveLoadManager, for each scene to save the dictionaries (GameObjectSave has a dict keyed by scene name)
+    // This method will store the sceneData for the current scene (). It will then return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
+    public GameObjectSave ISaveableSave()
+    {
+        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists in the persistent scene
+        // which is where this data is going to be saved, so we can create a new one with updated dictionaries
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Create the SaveScene for this gameObject (keyed by the scene name, storing multiple dicts for bools, the scene the player ended in, the players location, the gridPropertyDetails,
+        // the SceneItems, and the inventory items and quantities, and the gameYear, day, hour, minute, second, season, day of week)
+        SceneSave sceneSave = new SceneSave();
+
+        // Create a new int dictionary to store the times
+        sceneSave.intDictionary = new Dictionary<string, int>();
+
+        // Create a new string dictionary, to store the day of the week and the season
+        sceneSave.stringDictionary = new Dictionary<string, string>();
+
+        // Add values to the int dictionary for the different time increments, keyed so we can easily retrieve them in load
+        sceneSave.intDictionary.Add("gameYear", gameYear);
+        sceneSave.intDictionary.Add("gameDay", gameDay);
+        sceneSave.intDictionary.Add("gameHour", gameHour);
+        sceneSave.intDictionary.Add("gameMinute", gameMinute);
+        sceneSave.intDictionary.Add("gameSecond", gameSecond);
+
+        // Add values to the string dictionary for the day of week and season, keyed so we can easily retrieve them in load
+        sceneSave.stringDictionary.Add("gameDayOfWeek", gameDayOfWeek);
+        sceneSave.stringDictionary.Add("gameSeason", gameSeason.ToString());
+
+        // Add the SceneSave data for the TimeManager game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        // The time manager will get stored in the Persistent Scene
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        // Return the GameObjectSave, which has a dict of the Saved stuff for the TimeManager GameObject
+        return GameObjectSave;
+    }
+
+
+    // This is a required method for the ISaveable interface, which passes in a GameObjectSave dictionary, and restores the current scene from it
+    // The SaveLoadManager script will loop through all of the ISaveableRegister GameObjects (all registered with their ISaveableRegister methods), and trigger this 
+    // ISaveableLoad, which will load that Save data (here for the persistent scene time information, which includes the all of the time increments, day of week, and season),
+    // for each scene (GameObjectSave is a Dict keyed by scene name).
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // gameSave stores a Dictionary of items to save keyed by GUID, see if there's one for this GUID (generated on the InventoryManager GameObject)
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // Get the save data for the scene, if one exists for the PersistentScene (what the time info is saved under)
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // If both the intDictionary (storing time increments) and the stringDictionary (storiny day of week and season)
+                // exist, populate the saved values!
+                if (sceneSave.intDictionary != null && sceneSave.stringDictionary != null)
+                {
+                    // Check if the intDictionary contains entries for the year, day, hour, minute and second. If so, populate the gameClock with the saved values
+                    if (sceneSave.intDictionary.TryGetValue("gameYear", out int savedGameYear))
+                    {
+                        gameYear = savedGameYear;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("gameDay", out int savedGameDay))
+                    {
+                        gameDay = savedGameDay;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("gameHour", out int savedGameHour))
+                    {
+                        gameHour = savedGameHour;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("gameMinute", out int savedGameMinute))
+                    {
+                        gameMinute = savedGameMinute;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("gameSecond", out int savedGameSecond))
+                    {
+                        gameSecond = savedGameSecond;
+                    }
+
+                    // Check if the stringDictionary contains entries for the DayOfWeek and Season. If so, populate the gameClock with the saved values
+                    if (sceneSave.stringDictionary.TryGetValue("gameDayOfWeek", out string savedGameDayOfWeek))
+                    {
+                        gameDayOfWeek = savedGameDayOfWeek;
+                    }
+                    if (sceneSave.stringDictionary.TryGetValue("gameSeason", out string savedGameSeason))
+                    {
+                        // For the Season Enum, we have to check if it passed us a proper Season Enum value before setting it, which will return out a Season Enum
+                        if (Enum.TryParse<Season>(savedGameSeason, out Season season))
+                        {
+                            gameSeason = season;
+                        }
+                    }
+
+                    // Zero out the game tick so it can start counting seconds fresh from the beginning of the updated gameSecond
+                    gameTick = 0f;
+
+                    // Trigger the advance minute event so any subscribers will know that a "minute" has happened, so the game clock GUI is refreshed
+                    EventHandler.CallAdvanceGameMinuteEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
+                }
+            }
+        }
+    }
+
+
+    // Required method by the ISaveable interface, which will store all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing to store here since the TimeManager is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
+
+
+    // Required method by the ISaveable interface, which will restore all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableRestoreScene(string sceneName)
+    {   
+        // Nothing to restore here since the TimeManager is on a persistent scene - it won't get reset ever because we always stay on that scene
     }
 }

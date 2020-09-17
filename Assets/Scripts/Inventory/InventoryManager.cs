@@ -433,7 +433,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>, ISavea
     // }
 
 
-    // Required method by the ISaveable interface, which will be called OnEnable() of the player GameObject, and it will 
+    // Required method by the ISaveable interface, which will be called OnEnable() of the InventoryManager GameObject, and it will 
     // Add an entry (of this gameObject) to the iSaveableObjectList in SaveLoadManager, which will then manage
     // Looping through all such items in this list to save/load their data
     public void ISaveableRegister()
@@ -442,7 +442,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>, ISavea
     }
 
 
-    // Required method by the ISaveable interface, which will be called OnDisable() of the player GameObject, and it will
+    // Required method by the ISaveable interface, which will be called OnDisable() of the InventoryManager GameObject, and it will
     // Remove this item from the saveable objects list, as described above
     public void ISaveableDeregister()
     {
@@ -470,7 +470,8 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>, ISavea
         sceneSave.intArrayDictionary = new Dictionary<string, int[]>();
         sceneSave.intArrayDictionary.Add("inventoryListCapacityArray", inventoryListCapacityIntArray);
 
-        // Add the SceneSave data for the player game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        // Add the SceneSave data for the InventoryManager game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        // The inventory manager will get stored in the Persistent Scene
         GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
 
         // Return the GameObjectSave, which has a dict of the Saved stuff for the InventoryManager GameObject
