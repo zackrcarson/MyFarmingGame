@@ -5,7 +5,9 @@ using UnityEngine.Tilemaps;
 // This class will always be running, both in the editor and in game. Each method only runs if it is in the editor
 [ExecuteAlways]
 public class TilemapGridProperties : MonoBehaviour
-{   
+{
+#if UNITY_EDITOR
+
     // This tileMap that this script is attached to
     private Tilemap tileMap;
 
@@ -96,4 +98,5 @@ public class TilemapGridProperties : MonoBehaviour
             Debug.Log("DISABLE PROPERTY TILEMAPS");
         }
     }
+#endif
 }

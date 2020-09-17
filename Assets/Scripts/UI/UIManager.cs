@@ -174,4 +174,11 @@ public class UIManager : SingletonMonobehaviour<UIManager>
         // Highlight the active tab, and unhighlight all of the inactive tabs (as set up in the above for loop
         HighlightButtonForSelectedTab();
     }
+
+
+    // This method simply quits the game. It is called from the 'On Click {}' functionality of the Unity button on the Quit Game panel
+    public void QuitGame()
+    { 
+        Application.Quit();
+    }
 }
