@@ -57,7 +57,6 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
 
         // Initialize player inventory list capacity (each index is the capacity of that inventory location: player, chest)
         inventoryListCapacityIntArray[(int)InventoryLocation.player] = Settings.playerInitialInventoryCapacity;
-        // inventoryListCapacityIntArray[(int)InventoryLocation.player] = 18;
     }
 
 
@@ -82,8 +81,8 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     /// </summary>
     public void AddItem(InventoryLocation inventoryLocation, Item item, GameObject gameObjectToDelete)
     {
-        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation]; // I added this and the next if statement so that we can't pickup items if we already have the current max allowed items
-        if (inventoryListCapacityIntArray[(int)InventoryLocation.player] > inventoryList.Count) 
+        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation]; // I added this and the next if statement so that we can't pickup items if we already have the current max allowed items (we can pick up if we currently have the item, and will be adding to the quantity)
+        if (inventoryListCapacityIntArray[(int)InventoryLocation.player] > inventoryList.Count || FindItemInInventory(inventoryLocation, item.ItemCode) != -1) 
         {
             AddItem(inventoryLocation, item);
 

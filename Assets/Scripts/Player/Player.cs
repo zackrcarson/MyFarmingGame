@@ -1040,6 +1040,12 @@ public class Player : SingletonMonobehaviour<Player>
             SceneControllerManager.Instance.FadeAndLoadScene(SceneName.Scene1_Farm.ToString(), transform.position);
         }
 
+        // Test upgrade inventory size
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            InventoryManager.Instance.inventoryListCapacityIntArray[(int)InventoryLocation.player]++;
+        }
+
         // Test object pool!
         // if (Input.GetMouseButtonDown(1))
         // {
