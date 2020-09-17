@@ -11,6 +11,8 @@ public class SaveLoadManager : SingletonMonobehaviour<SaveLoadManager>
     public GameSave gameSave;
 
     // Hold a variety of objects in this list, which all use the ISaveable interface
+    // This list is populated from EVERY object that uses the ISaveable interface (SceneItemsManager, GridPropertiesManager, Player, TimeManager, etc)
+    // in the ISaveableRegister() methods. Here, we will loop through this list of objects that are registered, and save/load them
     public List<ISaveable> iSaveableObjectList;
 
     protected override void Awake()

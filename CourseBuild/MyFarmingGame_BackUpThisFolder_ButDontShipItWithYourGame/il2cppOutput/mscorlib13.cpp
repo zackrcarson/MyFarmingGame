@@ -350,6 +350,8 @@ struct SHA1Internal_tD24028EB5FF6AAA8B128158A3EFDCCA6F4E14BF8;
 struct Evidence_t58C8D73D9B4FC7DD3BDDEE37E3C283678BFDC307;
 // System.Security.Policy.Evidence/EvidenceEnumerator
 struct EvidenceEnumerator_t6E9E6856C90081E4B1A731097D6FE1D14EC680B3;
+// System.Security.SecurityCriticalAttribute
+struct SecurityCriticalAttribute_tD4DA2F7A3B4140EABE6415FF8FF6EE279CC8FC07;
 // System.Security.SecurityElement
 struct SecurityElement_t6C5746EF572788E5111C20BA18526087574CCDD7;
 // System.Security.SecurityElement/SecurityAttribute
@@ -4809,6 +4811,15 @@ public:
 
 // System.Security.Cryptography.SHA1
 struct  SHA1_t242C3C0C91D0CC11FA6F3CB0B06B416A550C6EAA  : public HashAlgorithm_t65659695B16C0BBF05707BF45191A97DC156D6BA
+{
+public:
+
+public:
+};
+
+
+// System.Security.SecurityCriticalAttribute
+struct  SecurityCriticalAttribute_tD4DA2F7A3B4140EABE6415FF8FF6EE279CC8FC07  : public Attribute_tF048C13FB3C8CFCC53F82290E4A3F621089F9A74
 {
 public:
 
@@ -9408,6 +9419,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SHA1Internal_FillBuff_m89617E6F772A48B78
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SHA1Internal_AddLength_mF753A968068F3E32B94624249E572656FFF505DC (SHA1Internal_tD24028EB5FF6AAA8B128158A3EFDCCA6F4E14BF8 * __this, uint64_t ___length0, ByteU5BU5D_tD06FDBE8142446525DF1C40351D523A228373821* ___buffer1, int32_t ___position2, const RuntimeMethod* method);
 // System.Void System.Security.Policy.Evidence/EvidenceEnumerator::.ctor(System.Collections.IEnumerator,System.Collections.IEnumerator)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void EvidenceEnumerator__ctor_mD4153081415054237617C4E5AFAA036445E6A43B (EvidenceEnumerator_t6E9E6856C90081E4B1A731097D6FE1D14EC680B3 * __this, RuntimeObject* ___hostenum0, RuntimeObject* ___assemblyenum1, const RuntimeMethod* method);
+// System.Void System.Attribute::.ctor()
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Attribute__ctor_m45CAD4B01265CC84CC5A84F62EE2DBE85DE89EC0 (Attribute_tF048C13FB3C8CFCC53F82290E4A3F621089F9A74 * __this, const RuntimeMethod* method);
 // System.Void System.Security.SecurityElement::.ctor(System.String,System.String)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SecurityElement__ctor_mAFE29568F4B8B5605AAD1A6915B480D8BCABC2CA (SecurityElement_t6C5746EF572788E5111C20BA18526087574CCDD7 * __this, String_t* ___tag0, String_t* ___text1, const RuntimeMethod* method);
 // System.Boolean System.Security.SecurityElement::IsValidTag(System.String)
@@ -9498,8 +9511,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SerializationInfo_AddValue_mC9D1E16476E2
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* Exception_ToString_m403BC2DBD48C830789D6270B4E917AB2D5E88183 (Exception_t * __this, const RuntimeMethod* method);
 // System.Void System.SystemException::.ctor()
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SystemException__ctor_mEB9049B75DE1D23B0515DD294BEF0AAC7792F465 (SystemException_t5380468142AA850BE4A341D7AF3EAB9C78746782 * __this, const RuntimeMethod* method);
-// System.Void System.Attribute::.ctor()
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Attribute__ctor_m45CAD4B01265CC84CC5A84F62EE2DBE85DE89EC0 (Attribute_tF048C13FB3C8CFCC53F82290E4A3F621089F9A74 * __this, const RuntimeMethod* method);
 // System.Boolean System.Single::IsNaN(System.Single)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Single_IsNaN_m1ACB82FA5DC805F0F5015A1DA6B3DC447C963AFB (float ___f0, const RuntimeMethod* method);
 // System.Int32 System.Single::CompareTo(System.Object)
@@ -12579,6 +12590,22 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject * EvidenceEnumerator_get_Curren
 		NullCheck(L_0);
 		RuntimeObject * L_1 = InterfaceFuncInvoker0< RuntimeObject * >::Invoke(1 /* System.Object System.Collections.IEnumerator::get_Current() */, IEnumerator_t8789118187258CC88B77AFAC6315B5AF87D3E18A_il2cpp_TypeInfo_var, L_0);
 		return L_1;
+	}
+}
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winvalid-offsetof"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+// System.Void System.Security.SecurityCriticalAttribute::.ctor()
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SecurityCriticalAttribute__ctor_mFBB68DD8E1ACE07229E9EA179BC1CD19F3412A73 (SecurityCriticalAttribute_tD4DA2F7A3B4140EABE6415FF8FF6EE279CC8FC07 * __this, const RuntimeMethod* method)
+{
+	{
+		Attribute__ctor_m45CAD4B01265CC84CC5A84F62EE2DBE85DE89EC0(__this, /*hidden argument*/NULL);
+		return;
 	}
 }
 #ifdef __clang__

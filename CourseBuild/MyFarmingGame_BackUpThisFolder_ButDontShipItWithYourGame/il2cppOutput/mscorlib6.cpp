@@ -1093,6 +1093,7 @@ IL2CPP_EXTERN_C const uint32_t File_Delete_mBE814E569EAB07FAD140C6DCDB957F1CB8C8
 IL2CPP_EXTERN_C const uint32_t File_Exists_m6B9BDD8EEB33D744EB0590DD27BC0152FAFBD1FB_MetadataUsageId;
 IL2CPP_EXTERN_C const uint32_t File_FillAttributeInfo_m8FF0F8B5A94968B8C87E54850DF60D3825EEAD53_MetadataUsageId;
 IL2CPP_EXTERN_C const uint32_t File_OpenRead_m3B2974AB5AA8011E587AC834BE71862BF77C2129_MetadataUsageId;
+IL2CPP_EXTERN_C const uint32_t File_Open_mDA5EB4A312EAEBF8543B13C572271FB5F673A501_MetadataUsageId;
 IL2CPP_EXTERN_C const uint32_t FormatLiterals_InitInvariant_m501393400057C78D3EC3D3C496D13204BDC75728_MetadataUsageId;
 IL2CPP_EXTERN_C const uint32_t FormatLiterals_Init_m26950C0842F18ACD1CF754BB234C6C4D37694364_MetadataUsageId;
 IL2CPP_EXTERN_C const uint32_t GuidResult_GetGuidParseException_mFCC6B57DC1E3E4FDE2ADFACCB15DF1E96DEEFC65_MetadataUsageId;
@@ -30297,6 +30298,56 @@ IL_0021:
 		IL2CPP_RUNTIME_CLASS_INIT(MonoIO_t1C937D98906A6B4CFC3F10BFC69C70F2F70166C6_il2cpp_TypeInfo_var);
 		bool L_7 = MonoIO_ExistsFile_m95E5B1CAC56402436D1C1D2FDED7D943F24682ED(L_6, (int32_t*)(&V_0), /*hidden argument*/NULL);
 		return L_7;
+	}
+}
+// System.IO.FileStream System.IO.File::Open(System.String,System.IO.FileMode)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR FileStream_tA770BF9AF0906644D43C81B962C7DBC3BC79A418 * File_Open_mDA5EB4A312EAEBF8543B13C572271FB5F673A501 (String_t* ___path0, int32_t ___mode1, const RuntimeMethod* method)
+{
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_method (File_Open_mDA5EB4A312EAEBF8543B13C572271FB5F673A501_MetadataUsageId);
+		s_Il2CppMethodInitialized = true;
+	}
+	int32_t G_B2_0 = 0;
+	String_t* G_B2_1 = NULL;
+	int32_t G_B1_0 = 0;
+	String_t* G_B1_1 = NULL;
+	int32_t G_B3_0 = 0;
+	int32_t G_B3_1 = 0;
+	String_t* G_B3_2 = NULL;
+	{
+		String_t* L_0 = ___path0;
+		int32_t L_1 = ___mode1;
+		int32_t L_2 = ___mode1;
+		G_B1_0 = L_1;
+		G_B1_1 = L_0;
+		if ((((int32_t)L_2) == ((int32_t)6)))
+		{
+			G_B2_0 = L_1;
+			G_B2_1 = L_0;
+			goto IL_0009;
+		}
+	}
+	{
+		G_B3_0 = 3;
+		G_B3_1 = G_B1_0;
+		G_B3_2 = G_B1_1;
+		goto IL_000a;
+	}
+
+IL_0009:
+	{
+		G_B3_0 = 2;
+		G_B3_1 = G_B2_0;
+		G_B3_2 = G_B2_1;
+	}
+
+IL_000a:
+	{
+		FileStream_tA770BF9AF0906644D43C81B962C7DBC3BC79A418 * L_3 = (FileStream_tA770BF9AF0906644D43C81B962C7DBC3BC79A418 *)il2cpp_codegen_object_new(FileStream_tA770BF9AF0906644D43C81B962C7DBC3BC79A418_il2cpp_TypeInfo_var);
+		FileStream__ctor_mB254658F1E758D76B41C942CB91BDF38FD544C83(L_3, G_B3_2, G_B3_1, G_B3_0, 0, /*hidden argument*/NULL);
+		return L_3;
 	}
 }
 // System.IO.FileStream System.IO.File::OpenRead(System.String)

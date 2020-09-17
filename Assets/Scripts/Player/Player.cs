@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class Player : SingletonMonobehaviour<Player>
+// This class subscribes to the ISaveable interface, which means we must include several methods for saving/loading data (here, we will save the players location, direction, and scene
+public class Player : SingletonMonobehaviour<Player>, ISaveable
 {
     // Prefab for the tree used to test the pool manager
     // public GameObject canyonOakTreePrefab;
@@ -61,9 +65,7 @@ public class Player : SingletonMonobehaviour<Player>
 
     private Rigidbody2D rigidBody2D;
 
-#pragma warning disable 414
     private Direction playerDirection;
-#pragma warning restore 414
 
     // List for characterAttribute Structs that we want to swap animations for. This is what we pass into the AnimationOverride
     private List<CharacterAttribute> characterAttributeCustomisationList;
@@ -78,9 +80,17 @@ public class Player : SingletonMonobehaviour<Player>
     private CharacterAttribute armsCharacterAttribute;
     private CharacterAttribute toolCharacterAttribute;
 
+    // Bool that restricts the player from moving if it's set to true (i.e. while something else is happening, like an animation
     private bool _playerInputIsDisabled = false;
-
     public bool PlayerInputIsDisabled {get => _playerInputIsDisabled; set => _playerInputIsDisabled = value;}
+
+    // Unique ID required by the ISaveable interface, will store the GUID attached to the player gameObject
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    // GameObjectSave required by the ISaveable interface, storesd the save data that is built up for every object that has the ISaveable interface attached
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
 
     protected override void Awake()
     {
@@ -99,6 +109,12 @@ public class Player : SingletonMonobehaviour<Player>
         // Initialize the list of character attributes
         characterAttributeCustomisationList = new List<CharacterAttribute>();
 
+        // Get the unique ID for the GameObject
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+
+        // Initialize the GameObjectSave variable
+        GameObjectSave = new GameObjectSave();
+
         // Get reference to the main camera
         mainCamera = Camera.main;
     }
@@ -109,6 +125,9 @@ public class Player : SingletonMonobehaviour<Player>
     // EnablePlayerInput method to the AfterSceneLoadFadeInEvent, so that once the new scene has faded in, we can move again
     private void OnEnable()
     {
+        // Registers this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableRegister();
+
         EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
     }
@@ -116,6 +135,9 @@ public class Player : SingletonMonobehaviour<Player>
 
     private void OnDisable()
     {
+        // Deregisters this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableDeregister();
+
         EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
     }
@@ -1156,5 +1178,166 @@ public class Player : SingletonMonobehaviour<Player>
     public Vector3 GetPlayerCenterPosition()
     {
         return new Vector3(transform.position.x, transform.position.y + Settings.playerCenterYOffset, transform.position.z);
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnEnable() of the player GameObject, and it will 
+    // Add an entry (of this gameObject) to the iSaveableObjectList in SaveLoadManager, which will then manage
+    // Looping through all such items in this list to save/load their data
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnDisable() of the player GameObject, and it will
+    // Remove this item from the saveable objects list, as described above
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+
+    // Required method by the ISaveable interface. This will get called from the SaveLoadManager, for each scene to save the dictionaries (GameObjectSave has a dict keyed by scene name)
+    // This method will store the sceneData for the current scene (populating the vector3Dictionary with the players position, and the stringDictionary with the players current scene
+    // and facing direction. It will then return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
+    public GameObjectSave ISaveableSave()
+    {
+        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists, so we can create a new one with updated dictionaries
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Create the SaveScene for this gameObject (keyed by the scene name, storing multiple dicts for bools, the scene the player ended in, the players location, the gridPropertyDetails,
+        // and the SceneItems)
+        SceneSave sceneSave = new SceneSave();
+
+        // Create the Vector3 dictionary for saving the players location
+        sceneSave.vector3Dictionary = new Dictionary<string, Vector3Serializable>();
+
+        // Create the string dictionary for saving the players scene location
+        sceneSave.stringDictionary = new Dictionary<string, string>();
+
+        // Add the players position to the Vector3 dictionary, keyed by "playerPosition" so we can easily find and load it later
+        Vector3Serializable vector3Serializable = new Vector3Serializable(transform.position.x, transform.position.y, transform.position.z);
+        sceneSave.vector3Dictionary.Add("playerPosition", vector3Serializable);
+
+        // Add the current scene name to the string dictionary, keyed by "currentScene" so we can easily find and load it later
+        sceneSave.stringDictionary.Add("currentScene", SceneManager.GetActiveScene().name);
+
+        // Add the player's direction to the string dictionary, keyed by "playerDirection" so we can easily find and load it later
+        sceneSave.stringDictionary.Add("playerDirection", playerDirection.ToString());
+
+        // Add the SceneSave data for the player game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        // Return the GameObjectSave, which has a dict of the Saved stuff for the player GameObject
+        return GameObjectSave;
+    }
+
+
+    // This is a required method for the ISaveable interface, which passes in a GameObjectSave dictionary, and restores the current scene from it
+    // The SaveLoadManager script will loop through all of the ISaveableRegister GameObjects (all registered with their ISaveableRegister methods), and trigger this 
+    // ISaveableLoad, which will load that Save data (here for the persistent scene player information, which includes a Vector3 dict for the players position, and
+    // a string dict for the players scene and facing direction), for each scene (GameObjectSave is a Dict keyed by scene name)
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // gameSave stores a Dictionary of items to save keyed by GUID, see if there's one for this GUID (generated on the player GameObject)
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            // Get the save data for the scene, if one exists for the PersistentScene (what the player info is saved under)
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // Get the players position, if it exists in the SceneSave vector3Dictionary, keyed by  "playerPosition"
+                if (sceneSave.vector3Dictionary != null && sceneSave.vector3Dictionary.TryGetValue("playerPosition", out Vector3Serializable playerPosition))
+                {
+                    // Set the player's transform position to what was previously saved
+                    transform.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+                }
+
+                // Get the string dictionary, if the SceneSave stringDictionary exists
+                if (sceneSave.stringDictionary != null)
+                {
+                    // Get the players saved scene location if it exists in the SceneSave stringDictionary with key "currentScene"
+                    if (sceneSave.stringDictionary.TryGetValue("currentScene", out string currentScene))
+                    {
+                        // Fade out and unload the current scene, then load the saved scene and fade in, with the player at the saved position
+                        SceneControllerManager.Instance.FadeAndLoadScene(currentScene, transform.position);
+                    }
+
+                    // Get the players facing direction if it exists in the SceneSave stringDictionary with key "playerDirection"
+                    if (sceneSave.stringDictionary.TryGetValue("playerDirection", out string playerDir))
+                    {
+                        // Check if the saved player direction is a valid one in the Direction enum (left, right, up, down)
+                        bool playerDirfound = Enum.TryParse<Direction>(playerDir, true, out Direction direction);
+
+                        if (playerDirfound)
+                        {
+                            // If the direction was found, update the playerDirection variable, and set the players direction like so 
+                            playerDirection = direction;
+                            SetPlayerDirection(playerDirection);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Required method by the ISaveable interface, which will store all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing to store here since the player is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
+
+
+    // Required method by the ISaveable interface, which will restore all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableRestoreScene(string sceneName)
+    {   
+        // Nothing to restore here since the player is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
+
+
+    // This method simply checked which player direction we want to set (from the loaded SceneSave stringDictionary), and calls a movement event to set an idle animation in that direction,
+    // with everything else false. The sprite/animation will then be picked up by subscribers to face the player in that direction
+    private void SetPlayerDirection(Direction playerDirection)
+    {
+        switch (playerDirection)
+        {
+            case Direction.up:
+                // Set the idle up trigger, and call the movement event so the animation will be reset to idle up, with everything else false, and no movement
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, 
+                                               false, false, false, false, false, false, false, false, true, false, false, false);
+
+                break;
+
+            case Direction.down:
+                // Set the idle down trigger, and call the movement event so the animation will be reset to idle down, with everything else false, and no movement
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, 
+                                               false, false, false, false, false, false, false, false, false, true, false, false);
+
+                break;
+
+            case Direction.left:
+                // Set the idle left trigger, and call the movement event so the animation will be reset to idle left, with everything else false, and no movement
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, 
+                                               false, false, false, false, false, false, false, false, false, false, true, false);
+
+                break;
+
+            case Direction.right:
+                // Set the idle right trigger, and call the movement event so the animation will be reset to idle right, with everything else false, and no movement
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, 
+                                               false, false, false, false, false, false, false, false, false, false, false, true);
+
+                break;
+
+            default:
+                // If none of the above are triggered, just set it to idle down!
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, 
+                                               false, false, false, false, false, false, false, false, false, true, false, false);
+
+                break;
+        }
     }
 }
