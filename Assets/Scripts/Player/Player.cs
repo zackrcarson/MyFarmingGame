@@ -5,7 +5,7 @@ using System.Configuration;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// This class subscribes to the ISaveable interface, which means we must include several methods for saving/loading data (here, we will save the players location, direction, and scene
+// This class subscribes to the ISaveable interface, which means we must include several methods for saving/loading data (here, we will save the players location, direction, and scene)
 public class Player : SingletonMonobehaviour<Player>, ISaveable
 {
     // Prefab for the tree used to test the pool manager
@@ -1203,7 +1203,8 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // and facing direction. It will then return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
     public GameObjectSave ISaveableSave()
     {
-        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists, so we can create a new one with updated dictionaries
+        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists in the persistent scene
+        // which is where this data is going to be saved, so we can create a new one with updated dictionaries
         GameObjectSave.sceneData.Remove(Settings.PersistentScene);
 
         // Create the SaveScene for this gameObject (keyed by the scene name, storing multiple dicts for bools, the scene the player ended in, the players location, the gridPropertyDetails,

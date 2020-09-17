@@ -21,5 +21,10 @@ public class SceneSave
     // Dictionary storing the bool values on the grid Property Bool maps, keyed by the coordinate, with a value of bool property and value
     public Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary;
 
+    // This will be a list of inventory items to save/load
+    public List<InventoryItem>[] listInvItemArray;
 
+    // This dictionary will store the inventory capacity arrays, showing the inventory location capacities (i.e. how many items the players inventory can hold, the chest can hold, etc). The 
+    // key is just an identifier we pick to label it (i.e. "inventoryListCapacityArray")
+    public Dictionary<string, int[]> intArrayDictionary;
 }

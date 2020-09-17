@@ -29,23 +29,23 @@ public class SaveLoadManager : SingletonMonobehaviour<SaveLoadManager>
     {
         // This will deserialize our data
         BinaryFormatter bf = new BinaryFormatter();
-
+    
         // Check if a save file exists
         if (File.Exists(Application.persistentDataPath + "/WildHopeCreek.dat"))
         {
             gameSave = new GameSave();
-
+    
             // Open the data file for reading
             FileStream file = File.Open(Application.persistentDataPath + "/WildHopeCreek.dat", FileMode.Open);
-
+    
             // Deserialize the data file into a GameSave object, which contains all of the save data in a dictionary, keyed by GUID
             gameSave = (GameSave)bf.Deserialize(file);
 
-            // Loop through all of the ISaveable objects registered in iSaveableObjectList (all classes that use the ISaveable interface will register in this list. So it
-            // contains SceneItemsManager.cs to save/load the scene items, the GridPropertiesManager to save/load gridProperties, etc. Each of those will then have a dictionary
-            // keyed by the scene name for things to save/load), and then apply load data
-            for (int i = iSaveableObjectList.Count - 1; i > -1; i--)
-            {
+           // Loop through all of the ISaveable objects registered in iSaveableObjectList (all classes that use the ISaveable interface will register in this list. So it
+           // contains SceneItemsManager.cs to save/load the scene items, the GridPropertiesManager to save/load gridProperties, etc. Each of those will then have a dictionary
+           // keyed by the scene name for things to save/load), and then apply load data
+           for (int i = iSaveableObjectList.Count - 1; i > -1; i--)
+           {
                 // gameSave.gameObjectData is the dictionary keyed by GUID
                 if (gameSave.gameObjectData.ContainsKey(iSaveableObjectList[i].ISaveableUniqueID))
                 {
@@ -66,11 +66,12 @@ public class SaveLoadManager : SingletonMonobehaviour<SaveLoadManager>
 
         // Disable the pause screen so it just goes back into the loaded scene!
         UIManager.Instance.DisablePauseMenu();
-    }
+}
 
 
     // This method will get called from our Pause menu GUI button for "Save Game", which will be linked here through the 'On click {}' field in the editor.
-    // It will
+    // It will loop through all of the ISaveable objects of stuff to save, and call ISaveableSave on all of them to Save the proper data, and then it will
+    // Serialize it and save it to a .dat file.
     public void SaveDataToFile()
     {
         gameSave = new GameSave();

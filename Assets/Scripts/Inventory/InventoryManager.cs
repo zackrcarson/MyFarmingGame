@@ -2,8 +2,12 @@
 using System.Diagnostics;
 using UnityEngine;
 
-public class InventoryManager : SingletonMonobehaviour<InventoryManager>
+// This class subscribes to the ISaveable interface, which means we must include several methods for saving/loading data (here, we will save the players inventory)
+public class InventoryManager : SingletonMonobehaviour<InventoryManager>, ISaveable
 {
+    // Get a reference to the inventoryBar so we can deselect any selected items when we load the inventory
+    private UIInventoryBar inventoryBar;
+
     // Create a dictionary for inventory, with itemCode : itemDetails. This will be fast to access
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
 
@@ -17,6 +21,14 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     [HideInInspector] public int[] inventoryListCapacityIntArray;
 
     [SerializeField] private SO_ItemList itemList = null;
+
+    // Unique ID required by the ISaveable interface, will store the GUID attached to the InventoryManager gameObject
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    // GameObjectSave required by the ISaveable interface, storesd the save data that is built up for every object that has the ISaveable interface attached
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
 
 
     // Awake will run before start! This way this class and Item don't have to fight over accessing this dictionary. If this goes in Start() instead, 
@@ -38,6 +50,36 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         {
             selectedInventoryItem[i] = -1;
         }
+
+        // Get the unique ID for the GameObject
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+
+        // Initialize the GameObjectSave variable
+        GameObjectSave = new GameObjectSave();
+    }
+
+
+    // On enable, this will just register this gameObject as an ISaveable, so that the SaveLoadManager can save/load the methods set up here
+    private void OnEnable()
+    {
+        // Registers this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableRegister();
+    }
+
+
+    // Deregister from the iSaveableObjectList
+    private void OnDisable()
+    {
+        // Deregisters this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableDeregister();
+    }
+
+
+    // On Start, find the UIInventoryBar
+    private void Start()
+    {
+        // Find the UIInventoryBar, and populate it so we can access it later (to deselect selected items on load)
+        inventoryBar = FindObjectOfType<UIInventoryBar>();
     }
 
 
@@ -389,4 +431,107 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     //     }
     //     Debug.Log("**********************************************************************************");
     // }
+
+
+    // Required method by the ISaveable interface, which will be called OnEnable() of the player GameObject, and it will 
+    // Add an entry (of this gameObject) to the iSaveableObjectList in SaveLoadManager, which will then manage
+    // Looping through all such items in this list to save/load their data
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnDisable() of the player GameObject, and it will
+    // Remove this item from the saveable objects list, as described above
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+
+    // Required method by the ISaveable interface. This will get called from the SaveLoadManager, for each scene to save the dictionaries (GameObjectSave has a dict keyed by scene name)
+    // This method will store the sceneData for the current scene (populating the listInvItemArray with the players inventory list, and the intArrayDictionary with the 
+    // inventory list capacity arrays. It will then return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
+    public GameObjectSave ISaveableSave()
+    {
+        // Create the SaveScene for this gameObject (keyed by the scene name, storing multiple dicts for bools, the scene the player ended in, the players location, the gridPropertyDetails,
+        // the SceneItems, and the inventory items and quantities)
+        SceneSave sceneSave = new SceneSave();
+
+        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists in the persistent scene
+        // which is where this data is going to be saved, so we can create a new one with updated dictionaries
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Add inventory lists array to the persistent sceneSave
+        sceneSave.listInvItemArray = inventoryLists;
+
+        // Add inventory list capacity array to the persistent scene save, which stores how many items each inventory location can store (i.e. backpack, chest, etc)
+        sceneSave.intArrayDictionary = new Dictionary<string, int[]>();
+        sceneSave.intArrayDictionary.Add("inventoryListCapacityArray", inventoryListCapacityIntArray);
+
+        // Add the SceneSave data for the player game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        // Return the GameObjectSave, which has a dict of the Saved stuff for the InventoryManager GameObject
+        return GameObjectSave;
+    }
+
+
+    // This is a required method for the ISaveable interface, which passes in a GameObjectSave dictionary, and restores the current scene from it
+    // The SaveLoadManager script will loop through all of the ISaveableRegister GameObjects (all registered with their ISaveableRegister methods), and trigger this 
+    // ISaveableLoad, which will load that Save data (here for the persistent scene inventory information, which includes a list of inventory items, and
+    // an int[] dict for the different inventory location capacities), for each scene (GameObjectSave is a Dict keyed by scene name)
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // gameSave stores a Dictionary of items to save keyed by GUID, see if there's one for this GUID (generated on the InventoryManager GameObject)
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            // Get the save data for the scene, if one exists for the PersistentScene (what the inventory info is saved under)
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // Get the inventory item array dictionary, if the SceneSave listInvItemArray exists in the persistent scene
+                if (sceneSave.listInvItemArray != null)
+                {
+                    // Saved inventory list
+                    inventoryLists = sceneSave.listInvItemArray;
+
+                    // Send events that the inventory has been updated for each inventory location
+                    for (int i = 0; i < (int)InventoryLocation.count; i++)
+                    {
+                        EventHandler.CallInventoryUpdatedEvent((InventoryLocation)i, inventoryLists[i]);
+                    }
+
+                    // Clear out any items the player migth have been carrying
+                    Player.Instance.ClearCarriedItem();
+
+                    // Clear out any highlights on the inventory bar
+                    inventoryBar.ClearHighlightOnInventorySlots();
+                }
+
+                // Get the array of inventory capacities (i.e. for backpack, chest, etc) if it exists, and contains the "inventoryListCapacityArray" key.
+                if (sceneSave.intArrayDictionary != null && sceneSave.intArrayDictionary.TryGetValue("inventoryListCapacityArray", out int[] inventoryCapacityArray))
+                {
+                    // Reset the current array of inventory capacities with the saved one
+                    inventoryListCapacityIntArray = inventoryCapacityArray;   
+                }
+            }
+        }
+    }
+
+
+    // Required method by the ISaveable interface, which will store all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing to store here since the InventoryManager is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
+
+
+    // Required method by the ISaveable interface, which will restore all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableRestoreScene(string sceneName)
+    {   
+        // Nothing to restore here since the InventoryManager is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
 }
