@@ -89,6 +89,7 @@
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerAnimationTest.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
+     <Compile Include="Assets\Scripts\SaveSystem\GameSave.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\GenerateGUID.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\ISaveable.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />

@@ -13,6 +13,12 @@ public interface ISaveable
     // Registers the saveable objects with the SaveLoadManager
     void ISaveableDeregister();
 
+    // Returns a GameObjectSave object, storing the items in the scene to save
+    GameObjectSave ISaveableSave();
+    
+    // Takes in a gameSave object (dictionary of GameObjectSave dictionaries), and loads the saved data
+    void ISaveableLoad(GameSave gameSave);
+
     // Store sceneData for a scene
     void ISaveableStoreScene(string sceneName);
 

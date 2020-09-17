@@ -84,7 +84,7 @@ public class UIManager : SingletonMonobehaviour<UIManager>
 
 
     // This method will re-enable the players input, turn back on time counting, and disables the pauseMenu UI
-    private void DisablePauseMenu()
+    public void DisablePauseMenu()
     {
         // Destroy all of the currently dragged items as we disable the pause menu
         pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
@@ -100,6 +100,8 @@ public class UIManager : SingletonMonobehaviour<UIManager>
 
         // Set the pause menu UI to be inactive to uncover the screen with it
         pauseMenu.SetActive(false);
+
+        SwitchPauseMenuTab(0); // I added this to return back to the first pause menu tab (inventory) for the next time we open the pause menu
     }
 
 

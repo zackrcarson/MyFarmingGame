@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 // This is a singleton that storing, restoring, saving, and unloading of items. It 
@@ -108,10 +109,39 @@ public class SceneItemsManager : SingletonMonobehaviour<SceneItemsManager>, ISav
     }
 
 
+    // This is a required method for the ISaveable interface, which passes in a GameObjectSave dictionary, and restores the current scene from it
+    // The SaveLoadManager script will loop through all of the ISaveableRegister GameObjects, and trigger this ISaveableLoad, which will load that
+    // Save data (here for ScenItems, for each scene (GameObjectSave is a Dict keyed by scene name)
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // gameSave stores a Dictionary of items to save, see if there's one for this GUID
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            // If we've found the save data, set the GridPropertiesManager GameObjectSave property with that save dictionary
+            GameObjectSave = gameObjectSave;
+
+            // Restore data for the current scene, with the GameObjectSave that was just updated from the save file, for the active scene
+            ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+
     // Add this item to the saveable objects list
     public void ISaveableRegister()
     {
         SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+
+    // This method will store the scene data for the current scene, and return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
+    // This will get called from the SaveLoadManager, for each scene to save the dictionaries (GameObjectSave has a dict keyed by scene name)
+    public GameObjectSave ISaveableSave()
+    {
+        // Store the current scene data
+        ISaveableStoreScene(SceneManager.GetActiveScene().name);
+
+        // Return the GameObjectSave, which has a dict of Saved stuff
+        return GameObjectSave;
     }
 
 
