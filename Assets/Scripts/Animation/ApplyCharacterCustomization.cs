@@ -88,6 +88,20 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // I added this method to redo our player shirt customization from the pause screen! This change shirt method will be called from the change shirt buttons to change our shirt color
+    public void ChangeShirt(int shirtNo)
+    {
+        // Change the input shirt style
+        inputShirtStyleNo = shirtNo;
+
+        // Initialize the color swap list that we will fill with all of the color swaps we want to initiate
+        colorSwapList = new List<colorSwap>();
+
+        // Process the customization - process the gender, shirt, arms, and then merge them all together
+        ProcessCustomization();
+    }
+
+
     // This method is in charge of processing all of the customizations that we can make, in turn
     private void ProcessCustomization()
     {

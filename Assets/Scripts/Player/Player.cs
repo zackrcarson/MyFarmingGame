@@ -28,7 +28,6 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private GridCursor gridCursor;
     private Cursor cursor;
 
-
     // Movement Parameters
     public float xInput;
     public float yInput;
