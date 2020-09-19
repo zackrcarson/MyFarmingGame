@@ -92,12 +92,63 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // I added this method to redo our player gender customization from the pause screen! This change gender method will be called from the change gender buttons to change our shirt color
+    public void ChangeGender(int sexNo)
+    {
+        // Change the input gender number
+        inputSex = sexNo;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+
     // I added this method to redo our player shirt customization from the pause screen! This change shirt method will be called from the change shirt buttons to change our shirt color
     public void ChangeShirt(int shirtNo)
     {
         // Change the input shirt style
         inputShirtStyleNo = shirtNo;
 
+        // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+    
+    // I added this method to change the players red trouser color dynamically from a red slider in the pause menu customization tab 
+    public void ChangeTrousersRed(System.Single newRed)
+    {
+        inputTrouserColor.r = newRed / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players green trouser color dynamically from a green slider in the pause menu customization tab 
+    public void ChangeTrousersGreen(System.Single newGreen)
+    {
+        inputTrouserColor.g = newGreen / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players blue trouser color dynamically from a blue slider in the pause menu customization tab 
+    public void ChangeTrousersBlue(System.Single newBlue)
+    {
+        inputTrouserColor.b = newBlue / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to redo all of the processing for our player customization from the pause screen! 
+    // This method is called from the change shirt method, change trousers methods, etc after they change the customization variables from the pause screen
+    // buttons and sliders
+    public void RedoCustomizations()
+    {
         // Initialize the color swap list that we will fill with all of the color swaps we want to initiate
         colorSwapList = new List<colorSwap>();
 
@@ -122,7 +173,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // the swapped colors corresponding to the chosen shirt
         ProcessArms();
 
-        // 
+        // This will take care of recoloring the trousers to what the player customized, via a simply tint over the base gray trouser sprites
         ProcessTrousers();
 
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
