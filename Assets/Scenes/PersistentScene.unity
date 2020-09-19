@@ -19409,9 +19409,13 @@ MonoBehaviour:
   femaleFarmerBaseTexture: {fileID: 2800000, guid: c4e8a25a818969f4faa9e0679d36d253,
     type: 3}
   shirtsBaseTexture: {fileID: 2800000, guid: bae27de6a19db3443894c2350fec9717, type: 3}
+  hairBaseTexture: {fileID: 2800000, guid: 9982bf9edb0201b4583055eb8b80c925, type: 3}
   farmerBaseCustomized: {fileID: 2800000, guid: 73946c4cd19968e4486ca15a2e699ab6,
     type: 3}
+  hairCustomized: {fileID: 2800000, guid: 3fdea510f6c395642bec63c0e92feb05, type: 3}
   inputShirtStyleNo: 0
+  inputHairStyleNo: 1
+  inputHairColor: {r: 0.3490566, g: 0.1137632, b: 0.027990391, a: 1}
   inputSex: 0
   inputTrouserColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &1924049000

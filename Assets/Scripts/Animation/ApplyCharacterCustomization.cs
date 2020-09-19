@@ -19,29 +19,45 @@ public class colorSwap
 
 public class ApplyCharacterCustomization : MonoBehaviour
 {
+    // INPUT TEXTURES
     // Input Textures to be populated in the editor. The first two are the "naked farmer" textures that we will be drawing clothes over (for now, male = female, but later
-    // we can add a female one). The next one is the set of shirt textures (i.e. green and red - maybe more in the future!) that we will be drawing over the naked farmer. The last one is
-    // is the base texture for the "naked farmer". This will be set to the male or female one based on what we've selected.
-    // A texture is the sprite sheet filled with the sprites for every player direction etc
+    // we can add a female one). The next one is the set of shirt textures (i.e. green and red - maybe more in the future!) that we will be drawing over the naked farmer. The next one
+    // is the set of all possible hairstyles the player can pick. The last one is the base texture for the "naked farmer". This will be set to the male or female one based on what we've 
+    // selected. A texture is the sprite sheet filled with the sprites for every player direction etc
     [Header("Base Textures")]
     [SerializeField] private Texture2D maleFarmerBaseTexture = null;
     [SerializeField] private Texture2D femaleFarmerBaseTexture = null;
     [SerializeField] private Texture2D shirtsBaseTexture = null;
+    [SerializeField] private Texture2D hairBaseTexture = null;
     private Texture2D farmerBaseTexture;
 
+    // OUTPUT CREATED TEXTURES
     // Created textures. The first one is the target final texture that we have created with the character customizer, and will be used to draw over the naked base farmer.
-    // The next one will be a texture (sprite sheet) of the customized shirts to be drawn over each of the naked player positions at the same sprite sheet locations. The last one is the 
-    // set of shirts that we've selected (i.e. the red one or the green one.)
+    // The next one will be a texture (sprite sheet) of the customized shirts to be drawn over each of the naked player positions at the same sprite sheet locations. 
+    // The next one is the final, customized hair texture that the player chose, and colored to what the player picked. The next one is the 
+    // set of shirts that we've selected (i.e. the red one or the green one.). The last one is the texture containing the shirt in all facing directions that the player chose.
     // The farmerBaseCustomized will be updated in this class, and is the one that is used by the animator to draw the player!
     [Header("Output Base Texture To Be Used For Animation")]
     [SerializeField] private Texture2D farmerBaseCustomized = null;
+    [SerializeField] private Texture2D hairCustomized = null;
     private Texture2D farmerBaseShirtsUpdated;
     private Texture2D selectedShirt;
 
+    // CUSTOMIZATION OPTIONS
     // Select the shirt style with a slider (0 - green, 1 - red), populated in the editor
     [Header("Select Shirt Style: 0 = red, 1 = green")]
     [Range(0, 1)]
     [SerializeField] private int inputShirtStyleNo = 0;
+
+    // Select the hair style with a slider (0 - styled, 1 - spiky, 2 - bald), populated in the editor
+    // The bald hairstyle will simply grab empty sprites from the base hair texture - so it will show up as bald
+    [Header("Select Hair Style: 0 = styled, 1 = spiky, 2 = bald")]
+    [Range(0, 2)]
+    [SerializeField] private int inputHairStyleNo = 0;
+
+    // Select the hair color from an RGB color picker
+    [Header("Select Hair Color")]
+    [SerializeField] private Color inputHairColor = Color.black;
 
     // Select the gender (0 - male, 1 - female), populated in the editor (right now both male and female are the same)
     [Header("Select Sex: 0 = Male, 1 = Female")]
@@ -49,7 +65,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [SerializeField] private int inputSex = 0;
 
     // Select the trouser color from an RGB color picker
-    [Header("Select Trouser color")]
+    [Header("Select Trouser Color")]
     [SerializeField] private Color inputTrouserColor = Color.blue;
 
     // 2D Array of enums storing the different directions the player could be facing, so we can always apply the correct shirt over it
@@ -69,6 +85,10 @@ public class ApplyCharacterCustomization : MonoBehaviour
     private int shirtSpriteWidth = 9; // Each shirt sprite itself is 9x9 pixels
     private int shirtSpriteHeight = 9;
     private int shirtStylesInSpriteWidth = 16; // We can fit 16 different shirts (we are currently only using 2!!) across the texture (sprite sheet) width 
+
+    private int hairTextureWidth = 16; // height and width of a selected hair texture (each hair style has 3 16x16 views of the same hairstyle, and can hold up to 6 in the vertical direction). There is room for 8 columns (8 hairstyles) horizontally
+    private int hairTextureHeight = 96;
+    private int hairStylesInSpriteWidth = 8;
 
     // List of color swaps we want to apply! We will loop through this list and apply all of the color swaps initiated there
     private List<colorSwap> colorSwapList;
@@ -176,6 +196,9 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // This will take care of recoloring the trousers to what the player customized, via a simply tint over the base gray trouser sprites
         ProcessTrousers();
 
+        // This will create a new customized Hair texture containing only the users selected hairstyle, recolored to the user-selected color
+        ProcessHair();
+
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
         // into the base naked farmer texture to create our final farmer texture, farmerBaseCustomized, that will be used in gameplay, now
         // colored with new shirt, arms, trousers, etc.
@@ -274,6 +297,25 @@ public class ApplyCharacterCustomization : MonoBehaviour
 
         // Apply the new texture changes to the farmerBaseCustomized texture, which is the one used by Unity to draw the character!
         farmerBaseCustomized.Apply();
+    }
+
+
+    // This method will grab the user-selected hairstyles from the base hairstyle sheet, add them to a new hairCustomized sheet that the game will use, and tint
+    // Them all with the users selected hair color
+    private void ProcessHair()
+    {
+        // Create the selected hair texture. Basically takes the user-selected hairstyles from the base hairstyle texture, and add them to a new customizedHairstyle texture that the game will use
+        AddHairToTexture(inputHairStyleNo);
+
+        // Get all of the hair pixels from the newly updated hairCustomized that we will need to recolor
+        Color[] farmerSelectedHairPixels = hairCustomized.GetPixels();
+
+        // Tint the hair pixels, like we did for the trousers
+        TintPixelColors(farmerSelectedHairPixels, inputHairColor);
+
+        // Apply the colored, customizedhair styles to the hairCustomized Texture
+        hairCustomized.SetPixels(farmerSelectedHairPixels);
+        hairCustomized.Apply();
     }
 
 
@@ -832,5 +874,22 @@ public class ApplyCharacterCustomization : MonoBehaviour
             basePixelArray[i].g = basePixelArray[i].g * tintColor.g;
             basePixelArray[i].b = basePixelArray[i].b * tintColor.b;
         }
+    }
+
+
+    // This method is similar to the AddShirtTexture method, which will find all of the pixels corresponding to the players chosen hairstyle
+    // from the base hairstyles texture, and then add them to a new blank texture for the customized hair that the game will use in play
+    private void AddHairToTexture(int hairStyleNo)
+    {
+        // Calculate the coordinates for the hair pixels in the base hair textures
+        int y = (hairStyleNo / hairStylesInSpriteWidth) * hairTextureHeight; // Calculate the row of this hair style
+        int x = (hairStyleNo % hairStylesInSpriteWidth) * hairTextureWidth; // Calculate the column of this hair style
+
+        // Get the hairs pixels into a color array at the x,y position in the bottom left corner of the sprites, and then add the texture width and height
+        Color[] hairPixels = hairBaseTexture.GetPixels(x, y, hairTextureWidth, hairTextureHeight);
+
+        // Apply the selected shirt pixels to the new selected shirt texture hairCustomized, which is used in the game
+        hairCustomized.SetPixels(hairPixels);
+        hairCustomized.Apply();
     }
 }
