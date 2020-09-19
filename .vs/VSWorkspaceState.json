@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Assets",
+    "\\Assets\\Scripts",
+    "\\Assets\\Scripts\\Inventory",
+    "\\Assets\\Scripts\\Misc",
+    "\\Assets\\Scripts\\Player",
+    "\\Assets\\Scripts\\SaveSystem",
+    "\\Assets\\Scripts\\Scene",
+    "\\Assets\\Scripts\\TimeSystem",
+    "\\Assets\\Scripts\\UI"
+  ],
+  "SelectedNode": "\\Assets\\Scripts\\Player\\Player.cs",
+  "PreviewInSolutionExplorer": false
+}
