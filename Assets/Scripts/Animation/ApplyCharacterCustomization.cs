@@ -133,6 +133,17 @@ public class ApplyCharacterCustomization : MonoBehaviour
         RedoCustomizations();
     }
 
+
+    // I added this method to redo our player hair customization from the pause screen! This change hair method will be called from the change hair buttons to change our hair style
+    public void ChangeHair(int hairNo)
+    {
+        // Change the input shirt style
+        inputHairStyleNo = hairNo;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair and then merge them all together
+        RedoCustomizations();
+    }
+
     
     // I added this method to change the players red trouser color dynamically from a red slider in the pause menu customization tab 
     public void ChangeTrousersRed(System.Single newRed)
@@ -160,6 +171,36 @@ public class ApplyCharacterCustomization : MonoBehaviour
         inputTrouserColor.b = newBlue / 255f;
 
         // Process the customization - process the gender, shirt, arms, trousers, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players red hair color dynamically from a red slider in the pause menu customization tab 
+    public void ChangeHairRed(System.Single newRed)
+    {
+        inputHairColor.r = newRed / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and hair, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players green hair color dynamically from a green slider in the pause menu customization tab 
+    public void ChangeHairGreen(System.Single newGreen)
+    {
+        inputHairColor.g = newGreen / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and hair, and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players blue hair color dynamically from a blue slider in the pause menu customization tab 
+    public void ChangeHairBlue(System.Single newBlue)
+    {
+        inputHairColor.b = newBlue / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, and hair, and then merge them all together
         RedoCustomizations();
     }
 
