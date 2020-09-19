@@ -48,6 +48,10 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [Range(0, 1)]
     [SerializeField] private int inputSex = 0;
 
+    // Select the trouser color from an RGB color picker
+    [Header("Select Trouser color")]
+    [SerializeField] private Color inputTrouserColor = Color.blue;
+
     // 2D Array of enums storing the different directions the player could be facing, so we can always apply the correct shirt over it
     // Also a 2D array of Vector2Ints for the shirt offset to be drawn on the naked farmer, i.e. as he bobs up and down while running
     private Facing[,] bodyFacingArray;
@@ -117,6 +121,9 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // This method will find all of the colors in the base farmer texture arm sprites that need to be recolored, and then apply
         // the swapped colors corresponding to the chosen shirt
         ProcessArms();
+
+        // 
+        ProcessTrousers();
 
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
         // into the base naked farmer texture to create our final farmer texture, farmerBaseCustomized, that will be used in gameplay, now
@@ -202,14 +209,31 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // This method changes the Trouser color to the one customized by the user directly on the final farmerBaseCustomized texture
+    private void ProcessTrousers()
+    {
+        // Get the trouser pixels to recolor from the base naked farmer texture, by selecting the block containing all trouser sprites, put it into a Color array
+        Color[] farmerTrouserPixels = farmerBaseTexture.GetPixels(288, 0, 96, farmerBaseTexture.height);
+
+        // Change the trouser color to the customized color in the farmerTrouserPixels variable
+        TintPixelColors(farmerTrouserPixels, inputTrouserColor);
+
+        // Set the changed trouser pixels onto the final customized Texture, farmerBaseCustomized, in the same Texture sprite locations as they were taken from the base farmer texture
+        farmerBaseCustomized.SetPixels(288, 0, 96, farmerBaseTexture.height, farmerTrouserPixels);
+
+        // Apply the new texture changes to the farmerBaseCustomized texture, which is the one used by Unity to draw the character!
+        farmerBaseCustomized.Apply();
+    }
+
+
     // This method takes the customized shirt and trouser Textures and merges them into the base naked farmer texture (sprite sheet) to add new shirts/trousers onto him when we play!
     private void MergeCustomizations()
     {
         // Get all of the farmer shirt pixels from the texture containing the 6x24 array of correctly-facing & x/y off-setted shirts, to be merged with the base naked farmer texture
         Color[] farmerShirtPixels = farmerBaseShirtsUpdated.GetPixels(0, 0, bodyColumns * farmerSpriteWidth, farmerBaseTexture.height);
 
-        // Get the farmer trouser pixels, for now just from the base naked farmer texture - the gray pants - later we'll recolor these as well.
-        Color[] farmerTrouserPixelsSelection = farmerBaseTexture.GetPixels(288, 0, 96, farmerBaseTexture.height);
+        // Get the farmer trouser pixels, as updated in ProcessTrousers() into the farmerBaseCustomized sprite sheet (texture)
+        Color[] farmerTrouserPixelsSelection = farmerBaseCustomized.GetPixels(288, 0, 96, farmerBaseTexture.height);
 
         // Get the same farmer body pixels as the shirt ones above from the base farmer texture sheet - these are naked and we will merge the shirts ontop of them!
         Color[] farmerBodyPixels = farmerBaseCustomized.GetPixels(0, 0, bodyColumns * farmerSpriteWidth, farmerBaseTexture.height);
@@ -740,6 +764,22 @@ public class ApplyCharacterCustomization : MonoBehaviour
                     baseArray[i].a += mergeArray[i].a;
                 }
             }
+        }
+    }
+
+
+    // This method will tint a basePixelArray (i.e. the base gray farmer trousers in the base farmer texture) with a tintColor, which is
+    // chosen by the user in the customization editor
+    private void TintPixelColors(Color[] basePixelArray, Color tintColor)
+    {
+        // Loop through all of the pixels in the basePixelArray
+        for (int i = 0; i < basePixelArray.Length; i++)
+        {
+            // For each pixel in the array, multiply the current base RGB pixel values, to the tint Colors RGB values. This way every pixel in the trousers are
+            // tinted with the tintColor
+            basePixelArray[i].r = basePixelArray[i].r * tintColor.r;
+            basePixelArray[i].g = basePixelArray[i].g * tintColor.g;
+            basePixelArray[i].b = basePixelArray[i].b * tintColor.b;
         }
     }
 }
