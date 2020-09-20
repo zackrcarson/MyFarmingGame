@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -59,6 +60,12 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [Header("Select Hair Color")]
     [SerializeField] private Color inputHairColor = Color.black;
 
+    // Select the skin color from an RGB color picker
+    [Header("Select Skin Color")]
+    [Range(0, 3)]
+    [SerializeField] private int inputSkinType = 0;
+
+
     // Select the gender (0 - male, 1 - female), populated in the editor (right now both male and female are the same)
     [Header("Select Sex: 0 = Male, 1 = Female")]
     [Range(0, 1)]
@@ -100,6 +107,13 @@ public class ApplyCharacterCustomization : MonoBehaviour
     private Color32 armTargetColor2 = new Color32(138, 41, 41, 255); // The middle-dark color on the default arm sleeve
     private Color32 armTargetColor3 = new Color32(172, 50, 50, 255); // The lightest color on the default arm sleeve
 
+    // Target skin colors for color replacement. The default skin consists of four colors: darkest, medium-high-dark. medium-low-dark, and light,
+    // Which are defined by the exact RGB values defined below. We will be finding all of these colors (fromColorSwap) and replacing them with a new color 
+    // (toColorSwap) that the player customized. The colors below msut be exact so the code can find and replace them!
+    private Color32 skinTargetColor1 = new Color32(145, 117, 90, 255); // The darkest color on the default skin
+    private Color32 skinTargetColor2 = new Color32(204, 155, 108, 255); // The middle-high-dark color on the default skin
+    private Color32 skinTargetColor3 = new Color32(207, 166, 128, 255); // The middle-low-dark color on the default skin
+    private Color32 skinTargetColor4 = new Color32(238, 195, 154, 255); // The lightest color on the default skin
 
     // When the player GameObject is Awake (at the beginning of the game), we will imediately initialize the color swap list and process the customization
     private void Awake()
@@ -240,6 +254,9 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // This will create a new customized Hair texture containing only the users selected hairstyle, recolored to the user-selected color
         ProcessHair();
 
+        // This will take care of recoloring the players skin (face and hands) using a color swap list
+        ProcessSkin();
+
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
         // into the base naked farmer texture to create our final farmer texture, farmerBaseCustomized, that will be used in gameplay, now
         // colored with new shirt, arms, trousers, etc.
@@ -357,6 +374,29 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // Apply the colored, customizedhair styles to the hairCustomized Texture
         hairCustomized.SetPixels(farmerSelectedHairPixels);
         hairCustomized.Apply();
+    }
+
+
+    // This method will find all of the skin pixels to be recolored, then populates a color swap list for the 4 colors present in the 
+    // Farmers skin, swap them for new colors, and then apply the color swaps to the selected skin sprites in the customized farmer texture
+    private void ProcessSkin()
+    {
+        // Get the skin pixels that we want to to recolor from the base farmer texture. This selects the entire block of pixels containing
+        // all skin that need to be recolored (heads, and arms)
+        Color[] farmerPixelsToRecolor = farmerBaseTexture.GetPixels(0, 0, 288, farmerBaseTexture.height);
+
+        // Populate the skin color swap list with the from and to colors we want to swap in the skin
+        PopulateSkinColorSwapList(inputSkinType);
+
+        // Change the skin colors. Given the block of arm pixels that we want to recolor, and the colorSwapList populated above,
+        // this method will swap all of the colors in farmerPixelsToRecolor for the ones detailed in colorSwapList
+        ChangePixelColors(farmerPixelsToRecolor, colorSwapList);
+
+        // Set the recolored pixels to the updated farmerPixelsToRecolor
+        farmerBaseCustomized.SetPixels(0, 0, 288, farmerBaseTexture.height, farmerPixelsToRecolor);
+
+        // Apply the texture changes to the farmer texture
+       farmerBaseCustomized.Apply();
     }
 
 
@@ -932,5 +972,53 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // Apply the selected shirt pixels to the new selected shirt texture hairCustomized, which is used in the game
         hairCustomized.SetPixels(hairPixels);
         hairCustomized.Apply();
+    }
+
+
+    // This method just adds the four skin color swaps to add to the colorSwapList, which will be used to swap old base skin colors to new customized farmer texture skin colors
+    private void PopulateSkinColorSwapList(int skinType)
+    {
+        // clear out the color swap list
+        colorSwapList.Clear();
+
+        // Set up the replacement colors (toColor) in the colorSwap list, with the already-filled
+        // fromColors (for the dark, medium-dark, medium-light and light skin colors), and then new colors
+        // to replace them with depending on the skin color chosen by the player. This list will be used to swap the fromColor to the toColor in all of the skins 
+        // in the final customized farmer texture
+        switch (skinType)
+        {
+            // If the player chose skin type 0, just leave as the base (swap same colors)
+            case 0:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, skinTargetColor1));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, skinTargetColor2));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, skinTargetColor3));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, skinTargetColor4));
+                break;
+            // The other cases have new Colors to be swapped for other skins!
+            case 1:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, new Color32(187, 157, 128, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, new Color32(231, 187, 144, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, new Color32(221, 186, 154, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, new Color32(213, 189, 167, 255)));
+                break;
+            case 2:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, new Color32(105, 69, 2, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, new Color32(128, 87, 12, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, new Color32(145, 103, 26, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, new Color32(161, 114, 25, 255)));
+                break;
+            case 3:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, new Color32(151, 132, 0, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, new Color32(187, 166, 15, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, new Color32(209, 188, 39, 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, new Color32(211, 199, 112, 255)));
+                break;
+            default:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, skinTargetColor1));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, skinTargetColor2));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, skinTargetColor3));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, skinTargetColor4));
+                break;
+        }
     }
 }

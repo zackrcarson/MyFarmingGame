@@ -21800,6 +21800,7 @@ MonoBehaviour:
   inputShirtStyleNo: 0
   inputHairStyleNo: 1
   inputHairColor: {r: 0.3490566, g: 0.1137632, b: 0.027990391, a: 1}
+  inputSkinType: 3
   inputSex: 0
   inputTrouserColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &1924049000
