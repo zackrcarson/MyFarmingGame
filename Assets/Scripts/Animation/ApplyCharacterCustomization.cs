@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -196,6 +197,17 @@ public class ApplyCharacterCustomization : MonoBehaviour
         inputHatStyleNo = hatNo;
 
         // Process the customization - process the gender, shirt, arms, trousers, hair, skin, and hat and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to redo our player hat customization from the pause screen! This change adornments method will be called from the change adornments buttons to change our adornments style
+    public void ChangeAdornments(int adornmentNo)
+    {
+        // Change the input hat style
+        inputAdornmentsStyleNo = adornmentNo;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair, skin, hat, and adornments, and then merge them all together
         RedoCustomizations();
     }
 
@@ -1346,6 +1358,19 @@ public class ApplyCharacterCustomization : MonoBehaviour
 
         // Get the adornment pixels at the x,y position in the bottom left corner of the sprites, and then add the texture width and height. Add these into a Color array
         Color[] adornmentPixels = adornmentsBaseTexture.GetPixels(x, y, adornmentTextureWidth, adornmentTextureHeight);
+
+        // If we have a beard, tint the beardhair pixels to the same color as our hair selection, like we did for the trousers
+        if (adornmentStyleNo == 2)
+        {
+            // First swap the standard brown beard pixels for a grayscale set
+            colorSwapList.Clear();
+            colorSwapList.Add(new colorSwap(new Color32(94, 63, 5, 255), new Color32(71, 71, 71, 255)));
+            colorSwapList.Add(new colorSwap(new Color32(143, 94, 4, 255), new Color32(187, 187, 187, 255)));
+            ChangePixelColors(adornmentPixels, colorSwapList);
+
+            // Then tint the grayscale beard with the input hair color!
+            TintPixelColors(adornmentPixels, inputHairColor);
+        }
 
         // Apply the selected adornment pixels to the new selected adornment texture
         selectedAdornment.SetPixels(adornmentPixels);

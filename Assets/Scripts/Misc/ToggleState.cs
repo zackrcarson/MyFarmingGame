@@ -125,4 +125,30 @@ public class ToggleState : MonoBehaviour
             playerCusomize.ChangeHair(hairNum);
         }
     }
+
+
+    // For changing the adornments
+    public void toggleOffAdornments(int adornmentNum)
+    {
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if ((toggle.isOn && otherToggles[0].isOn && !otherToggles[1].isOn) || (toggle.isOn && otherToggles[1].isOn && !otherToggles[0].isOn))
+        {
+            // Set the other toggle to off
+            otherToggles[0].isOn = false;
+            otherToggles[1].isOn = false;
+
+            // Process the gender change
+            playerCusomize.ChangeAdornments(adornmentNum);
+        }
+
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (!toggle.isOn && !otherToggles[0].isOn && !otherToggles[1].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = true;
+
+            // Process the gender change
+            playerCusomize.ChangeAdornments(adornmentNum);
+        }
+    }
 }
