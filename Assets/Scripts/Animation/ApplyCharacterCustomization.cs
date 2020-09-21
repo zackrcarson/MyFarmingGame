@@ -23,24 +23,26 @@ public class ApplyCharacterCustomization : MonoBehaviour
     // INPUT TEXTURES
     // Input Textures to be populated in the editor. The first two are the "naked farmer" textures that we will be drawing clothes over (for now, male = female, but later
     // we can add a female one). The next one is the set of shirt textures (i.e. green and red - maybe more in the future!) that we will be drawing over the naked farmer. The next one
-    // is the set of all possible hairstyles the player can pick. The last one is the base texture for the "naked farmer". This will be set to the male or female one based on what we've 
-    // selected. A texture is the sprite sheet filled with the sprites for every player direction etc
+    // is the set of all possible hairstyles the player can pick. The next one is the base texture for the "naked farmer". This will be set to the male or female one based on what we've 
+    // selected. The last one is the base texture for the players different hat choices (currently only null and hat1). A texture is the sprite sheet filled with the sprites for every player direction etc
     [Header("Base Textures")]
     [SerializeField] private Texture2D maleFarmerBaseTexture = null;
     [SerializeField] private Texture2D femaleFarmerBaseTexture = null;
     [SerializeField] private Texture2D shirtsBaseTexture = null;
     [SerializeField] private Texture2D hairBaseTexture = null;
+    [SerializeField] private Texture2D hatsBaseTexture = null;
     private Texture2D farmerBaseTexture;
 
     // OUTPUT CREATED TEXTURES
     // Created textures. The first one is the target final texture that we have created with the character customizer, and will be used to draw over the naked base farmer.
     // The next one will be a texture (sprite sheet) of the customized shirts to be drawn over each of the naked player positions at the same sprite sheet locations. 
-    // The next one is the final, customized hair texture that the player chose, and colored to what the player picked. The next one is the 
+    // The next two are the final, customized hair and hat textures that the player chose, and colored to what the player picked. The next one is the 
     // set of shirts that we've selected (i.e. the red one or the green one.). The last one is the texture containing the shirt in all facing directions that the player chose.
     // The farmerBaseCustomized will be updated in this class, and is the one that is used by the animator to draw the player!
     [Header("Output Base Texture To Be Used For Animation")]
     [SerializeField] private Texture2D farmerBaseCustomized = null;
     [SerializeField] private Texture2D hairCustomized = null;
+    [SerializeField] private Texture2D hatsCustomized = null;
     private Texture2D farmerBaseShirtsUpdated;
     private Texture2D selectedShirt;
 
@@ -55,6 +57,12 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [Header("Select Hair Style: 0 = styled, 1 = spiky, 2 = bald")]
     [Range(0, 2)]
     [SerializeField] private int inputHairStyleNo = 0;
+
+    // Select the hat style with a slider (0 - no hat, 1 - hat), populated in the editor
+    // The no-hat option will simply grab empty sprites from the base hat texture - so it will show up as nothing on head
+    [Header("Select Hat Style: 0 = no hat, 1 = hat")]
+    [Range(0, 1)]
+    [SerializeField] private int inputHatStyleNo = 0;
 
     // Select the hair color from an RGB color picker
     [Header("Select Hair Color")]
@@ -98,6 +106,10 @@ public class ApplyCharacterCustomization : MonoBehaviour
     private int hairTextureWidth = 16; // height and width of a selected hair texture (each hair style has 3 16x16 views of the same hairstyle, and can hold up to 6 in the vertical direction). There is room for 8 columns (8 hairstyles) horizontally
     private int hairTextureHeight = 96;
     private int hairStylesInSpriteWidth = 8;
+
+    private int hatTextureWidth = 20; // height and width of a selected hat texture, in the final customized hat texture (each hat style has 4 20x20 views of the same hat, and can hold up to 6 in the vertical direction). There is room for 12 columns (12 hats) horizontally in the input, base, texture to add later, if wanted
+    private int hatTextureHeight = 80;
+    private int hatStylesInSpriteWidth = 12;
 
     // List of color swaps we want to apply! We will loop through this list and apply all of the color swaps initiated there
     private List<colorSwap> colorSwapList;
@@ -289,6 +301,9 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // This will take care of recoloring the players skin (face and hands) using a color swap list
         ProcessSkin();
 
+        // This will take care of changing the hat sprite on the player GameObject, depending on the players choice
+        ProcessHat();
+
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
         // into the base naked farmer texture to create our final farmer texture, farmerBaseCustomized, that will be used in gameplay, now
         // colored with new shirt, arms, trousers, etc.
@@ -429,6 +444,14 @@ public class ApplyCharacterCustomization : MonoBehaviour
 
         // Apply the texture changes to the farmer texture
        farmerBaseCustomized.Apply();
+    }
+
+
+    // This method will process the players hat choice, extracting the proper hat sprites from the base hat texture, creating a new customized hats texture to be used in game
+    private void ProcessHat()
+    {
+        // Create the selected hat texture to be used by the game with the players hat choice
+        AddHatToTexture(inputHatStyleNo);
     }
 
 
@@ -1061,5 +1084,22 @@ public class ApplyCharacterCustomization : MonoBehaviour
                 colorSwapList.Add(new colorSwap(skinTargetColor4, skinTargetColor4));
                 break;
         }
+    }
+
+
+    // This method will simply take the hat sprites from the base hat texture containing all hat styles, corresponding to the players hat choice, and then create
+    // a new customized hats texture containing only the hat sprites corresponding to that choice, to be used by the game
+    private void AddHatToTexture(int hatStyleNo)
+    {
+        // Calculate the coordinates for the hat pixels that we have selected, in the base hat texture containing all of the different styles
+        int y = (hatStyleNo / hatStylesInSpriteWidth) * hatTextureHeight; // Calculate the row of this hat style
+        int x = (hatStyleNo % hatStylesInSpriteWidth) * hatTextureWidth; // Calculate the column of this hat style
+
+        // Get the hat pixels from the base hat texture
+        Color[] hatPixels = hatsBaseTexture.GetPixels(x, y, hatTextureWidth, hatTextureHeight);
+
+        // Apply the selected hat pixels to the new customized hat texture, containing only the selected hat to be used in hame
+        hatsCustomized.SetPixels(hatPixels);
+        hatsCustomized.Apply();
     }
 }

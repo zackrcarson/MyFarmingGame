@@ -23080,11 +23080,14 @@ MonoBehaviour:
     type: 3}
   shirtsBaseTexture: {fileID: 2800000, guid: bae27de6a19db3443894c2350fec9717, type: 3}
   hairBaseTexture: {fileID: 2800000, guid: 9982bf9edb0201b4583055eb8b80c925, type: 3}
+  hatsBaseTexture: {fileID: 2800000, guid: bfd5930cb171ad448883f9eca56c9e08, type: 3}
   farmerBaseCustomized: {fileID: 2800000, guid: 73946c4cd19968e4486ca15a2e699ab6,
     type: 3}
   hairCustomized: {fileID: 2800000, guid: 3fdea510f6c395642bec63c0e92feb05, type: 3}
+  hatsCustomized: {fileID: 2800000, guid: 3f98ab3abed1cec40b1c2e61bead43d6, type: 3}
   inputShirtStyleNo: 0
   inputHairStyleNo: 1
+  inputHatStyleNo: 0
   inputHairColor: {r: 0.3490566, g: 0.1137632, b: 0.027990391, a: 1}
   inputSkinType: 4
   inputSkinColor: {r: 0.8117647, g: 0.6509804, b: 0.5019608, a: 1}
