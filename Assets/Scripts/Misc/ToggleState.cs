@@ -1,6 +1,7 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
 using System.Diagnostics;
+using System;
 
 // This script is in charge of toggles for the character customization screen. When a toggle is selected,
 // This will unselect the other toggle in the same category and apply those character customization changes
@@ -13,6 +14,8 @@ public class ToggleState : MonoBehaviour
     public Toggle[] otherToggles;
 
     public ApplyCharacterCustomization playerCusomize = null;
+
+    //public mySkinNum = 0;
 
     public void Start()
     {

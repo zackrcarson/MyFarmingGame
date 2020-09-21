@@ -61,10 +61,12 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [SerializeField] private Color inputHairColor = Color.black;
 
     // Select the skin color from an RGB color picker
-    [Header("Select Skin Color")]
-    [Range(0, 3)]
-    [SerializeField] private int inputSkinType = 0;
+    [Header("Select Skin Color (if 4, use color picker)")]
+    [Range(0, 4)]
+    [SerializeField] private int inputSkinType = 4;
 
+    [SerializeField]
+    private Color inputSkinColor = new Color32(207, 166, 128, 255);
 
     // Select the gender (0 - male, 1 - female), populated in the editor (right now both male and female are the same)
     [Header("Select Sex: 0 = Male, 1 = Female")]
@@ -158,7 +160,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
         RedoCustomizations();
     }
 
-    
+
     // I added this method to change the players red trouser color dynamically from a red slider in the pause menu customization tab 
     public void ChangeTrousersRed(System.Single newRed)
     {
@@ -219,6 +221,36 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // I added this method to change the players red skin color dynamically from a red slider in the pause menu customization tab 
+    public void ChangeSkinRed(System.Single newRed)
+    {
+        inputSkinColor.r = newRed / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair, and skin and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players green skin color dynamically from a red slider in the pause menu customization tab 
+    public void ChangeSkinGreen(System.Single newGreen)
+    {
+        inputSkinColor.g = newGreen / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair, and skin and then merge them all together
+        RedoCustomizations();
+    }
+
+
+    // I added this method to change the players blue skin color dynamically from a red slider in the pause menu customization tab 
+    public void ChangeSkinBlue(System.Single newBlue)
+    {
+        inputSkinColor.b = newBlue / 255f;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair, and skin and then merge them all together
+        RedoCustomizations();
+    }
+
+
     // I added this method to redo all of the processing for our player customization from the pause screen! 
     // This method is called from the change shirt method, change trousers methods, etc after they change the customization variables from the pause screen
     // buttons and sliders
@@ -243,7 +275,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // player sprite in the base farmer texture, with the correct facing direction and x/y offset. This texture will later be drawn over the base
         // farmer texture to add the new shirt
         ProcessShirt();
-
+        
         // This method will find all of the colors in the base farmer texture arm sprites that need to be recolored, and then apply
         // the swapped colors corresponding to the chosen shirt
         ProcessArms();
@@ -1012,6 +1044,15 @@ public class ApplyCharacterCustomization : MonoBehaviour
                 colorSwapList.Add(new colorSwap(skinTargetColor2, new Color32(187, 166, 15, 255)));
                 colorSwapList.Add(new colorSwap(skinTargetColor3, new Color32(209, 188, 39, 255)));
                 colorSwapList.Add(new colorSwap(skinTargetColor4, new Color32(211, 199, 112, 255)));
+                break;
+            // This cases uses the color picker!! Use these color swaps so we can change the base color (3) with the sliders, and the other 3 shades
+            // change according to the value differences in the base skin sprite. We can only adjust the sliders so much so that these values don't loop back around to 255 when they get too low!
+            // The min/max values allowable so this doesn't happen is set manually in the editor for the sliders
+            case 4:
+                colorSwapList.Add(new colorSwap(skinTargetColor1, new Color32((byte)((inputSkinColor.r * 255) - 62), (byte)((inputSkinColor.g * 255) - 49), (byte)((inputSkinColor.b * 255) - 38), 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor2, new Color32((byte)((inputSkinColor.r * 255) - 3), (byte)((inputSkinColor.g * 255) - 11), (byte)((inputSkinColor.b * 255) - 20), 255)));
+                colorSwapList.Add(new colorSwap(skinTargetColor3, inputSkinColor));
+                colorSwapList.Add(new colorSwap(skinTargetColor4, new Color32((byte)((inputSkinColor.r * 255) + 31), (byte)((inputSkinColor.g * 255) + 29), (byte)((inputSkinColor.b * 255) + 26), 255)));
                 break;
             default:
                 colorSwapList.Add(new colorSwap(skinTargetColor1, skinTargetColor1));
