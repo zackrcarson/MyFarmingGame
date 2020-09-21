@@ -24,27 +24,31 @@ public class ApplyCharacterCustomization : MonoBehaviour
     // Input Textures to be populated in the editor. The first two are the "naked farmer" textures that we will be drawing clothes over (for now, male = female, but later
     // we can add a female one). The next one is the set of shirt textures (i.e. green and red - maybe more in the future!) that we will be drawing over the naked farmer. The next one
     // is the set of all possible hairstyles the player can pick. The next one is the base texture for the "naked farmer". This will be set to the male or female one based on what we've 
-    // selected. The last one is the base texture for the players different hat choices (currently only null and hat1). A texture is the sprite sheet filled with the sprites for every player direction etc
+    // selected. The next one is the base texture for the players different hat choices (currently only null and hat1). The last one is the base texture sheet containing all of the 
+    // adornments - currently glasses and a beard. A texture is the sprite sheet filled with the sprites for every player direction etc
     [Header("Base Textures")]
     [SerializeField] private Texture2D maleFarmerBaseTexture = null;
     [SerializeField] private Texture2D femaleFarmerBaseTexture = null;
     [SerializeField] private Texture2D shirtsBaseTexture = null;
     [SerializeField] private Texture2D hairBaseTexture = null;
     [SerializeField] private Texture2D hatsBaseTexture = null;
+    [SerializeField] private Texture2D adornmentsBaseTexture = null;
     private Texture2D farmerBaseTexture;
 
     // OUTPUT CREATED TEXTURES
     // Created textures. The first one is the target final texture that we have created with the character customizer, and will be used to draw over the naked base farmer.
     // The next one will be a texture (sprite sheet) of the customized shirts to be drawn over each of the naked player positions at the same sprite sheet locations. 
-    // The next two are the final, customized hair and hat textures that the player chose, and colored to what the player picked. The next one is the 
-    // set of shirts that we've selected (i.e. the red one or the green one.). The last one is the texture containing the shirt in all facing directions that the player chose.
+    // The next two are the final, customized hair and hat textures that the player chose, and colored to what the player picked. The next two are the 
+    // set of shirts and adornments that we've selected (i.e. the red one or the green one.). The last two are the textures containing the shirt and adornment in all facing directions that the player chose.
     // The farmerBaseCustomized will be updated in this class, and is the one that is used by the animator to draw the player!
     [Header("Output Base Texture To Be Used For Animation")]
     [SerializeField] private Texture2D farmerBaseCustomized = null;
     [SerializeField] private Texture2D hairCustomized = null;
     [SerializeField] private Texture2D hatsCustomized = null;
     private Texture2D farmerBaseShirtsUpdated;
+    private Texture2D farmerBaseAdornmentsUpdated;
     private Texture2D selectedShirt;
+    private Texture2D selectedAdornment;
 
     // CUSTOMIZATION OPTIONS
     // Select the shirt style with a slider (0 - green, 1 - red), populated in the editor
@@ -63,6 +67,11 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [Header("Select Hat Style: 0 = no hat, 1 = hat")]
     [Range(0, 1)]
     [SerializeField] private int inputHatStyleNo = 0;
+
+    // Select the adornment style with a slider (0 - none, 1 - glasses, 2 - beard), populated in the editor
+    [Header("Select Adornments Style: 0 = no adornments, 1 = glasses, 2 = beard")]
+    [Range(0, 2)]
+    [SerializeField] private int inputAdornmentsStyleNo = 0;
 
     // Select the hair color from an RGB color picker
     [Header("Select Hair Color")]
@@ -86,9 +95,10 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [SerializeField] private Color inputTrouserColor = Color.blue;
 
     // 2D Array of enums storing the different directions the player could be facing, so we can always apply the correct shirt over it
-    // Also a 2D array of Vector2Ints for the shirt offset to be drawn on the naked farmer, i.e. as he bobs up and down while running
+    // Also, 2D arrays of Vector2Ints for the shirt offsets and adornments offsets to be drawn on the naked farmer, i.e. as he bobs up and down while running
     private Facing[,] bodyFacingArray;
     private Vector2Int[,] bodyShirtOffsetArray;
+    private Vector2Int[,] bodyAdornmentsOffsetArray;
 
     // Sprite sheet dimensions
     private int bodyRows = 21; // There are 21 total rows and 6 columns of farmer animations (although currently the bottom ~10 rows or so are greened out with nothing there
@@ -110,6 +120,12 @@ public class ApplyCharacterCustomization : MonoBehaviour
     private int hatTextureWidth = 20; // height and width of a selected hat texture, in the final customized hat texture (each hat style has 4 20x20 views of the same hat, and can hold up to 6 in the vertical direction). There is room for 12 columns (12 hats) horizontally in the input, base, texture to add later, if wanted
     private int hatTextureHeight = 80;
     private int hatStylesInSpriteWidth = 12;
+
+    private int adornmentTextureWidth = 16; // Texture width/height of a given adornment output sprite (column of 2 16x16 sprites, one for forward and one for side)
+    private int adornmentTextureHeight = 32;
+    private int adornmentStylesInSpriteWidth = 8; // number of adornments that can fit in the sprite sheet
+    private int adornmentSpriteWidth = 16; // 16x16 adorment sizes
+    private int adornmentSpriteHeight = 16;
 
     // List of color swaps we want to apply! We will loop through this list and apply all of the color swaps initiated there
     private List<colorSwap> colorSwapList;
@@ -315,6 +331,10 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // This will take care of changing the hat sprite on the player GameObject, depending on the players choice
         ProcessHat();
 
+        // This method will take care of changing the adornment sprites on the player, depending on the players choice. These adornments 
+        // are drawn directly on top of the base players customized texture that is displayed in game
+        ProcessAdornments();
+
         // This method will simply take the new customized shirt texture (farmerBaseShirtsUpdated) and trousers, and merge them
         // into the base naked farmer texture to create our final farmer texture, farmerBaseCustomized, that will be used in gameplay, now
         // colored with new shirt, arms, trousers, etc.
@@ -466,6 +486,38 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // This method will process the adornments that were selected by the user. It will first calculate the offsets of the players face in each sprite on the base farmer texture,
+    // then create a new selectedAdornment texture with the user-selected adornment, and then it will overlay it ontop of the base customized player texture, so it will all be drawn together
+    private void ProcessAdornments()
+    {
+        // Initialize the body adornments x/y offset array, with the size of body rows and columns declared at the beginning
+        // Each element will be populated with the y-offset of that particular sprite (i.e. for player bobbing up and down, etc.)
+        bodyAdornmentsOffsetArray = new Vector2Int[bodyColumns, bodyRows];
+
+        // Populate the body adornments offset array (manually added the x and y offsets each player sprite has from it's sprite box, in the 6x21 texture (sprite sheet)
+        // This will allow us to correctly place the adornments on the players face
+        PopulateBodyAdornmentsOffsetArray();
+
+        // Create the selected adornments texture (sprite sheet). This method goes to the base adornments texture, and creates a new selectedAdornment texture containing only
+        // the 2 sprites corresponding to the adornment we selected (inputAdornmentStyleNo)
+        AddAdornmentsToTexture(inputAdornmentsStyleNo);
+
+        // Create the adornments texture which will hold the 2 16x16 shirt sprites for the user-selected adornment style (so this texture is 16x32
+        farmerBaseAdornmentsUpdated = new Texture2D(farmerBaseTexture.width, farmerBaseTexture.height);
+
+        // Set the filter mode so it doesn't add any anti-aliasing (pixel-perfect texture)
+        farmerBaseAdornmentsUpdated.filterMode = FilterMode.Point;
+
+        // First set the entire farmerBaseAdornmentsUpdated texture to transparent so we can draw the selected adornments over it, and then write it over the 
+        // customized farmer texture
+        SetTextureToTransparent(farmerBaseAdornmentsUpdated);
+
+        // Apply the selected adornment texture to the base customized texture. This method will basically create an adornment texture (sprite sheet) with the same dimensions
+        // as the base customized farmer texture, with the properly drawn facing directions and x/y offsets. This will later be drawn over the base farmer customized texture
+        ApplyAdornmentsTextureToBase();
+    }
+
+
     // This method takes the customized shirt and trouser Textures and merges them into the base naked farmer texture (sprite sheet) to add new shirts/trousers onto him when we play!
     private void MergeCustomizations()
     {
@@ -475,13 +527,17 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // Get the farmer trouser pixels, as updated in ProcessTrousers() into the farmerBaseCustomized sprite sheet (texture)
         Color[] farmerTrouserPixelsSelection = farmerBaseCustomized.GetPixels(288, 0, 96, farmerBaseTexture.height);
 
+        // Get the farmer adornments pixels, as updated in ProcessAdornments() into the farmerBaseCustomized sprite sheet (texture)
+        Color[] farmerAdornmentsPixelsSelection = farmerBaseAdornmentsUpdated.GetPixels(0, 0, bodyColumns * farmerSpriteWidth, farmerBaseTexture.height);
+
         // Get the same farmer body pixels as the shirt ones above from the base farmer texture sheet - these are naked and we will merge the shirts ontop of them!
         Color[] farmerBodyPixels = farmerBaseCustomized.GetPixels(0, 0, bodyColumns * farmerSpriteWidth, farmerBaseTexture.height);
 
-        // First merge the trouser pixels into the base naked farmer body pixels, and then the customized farmerShirtPixels we created earlier based on
-        // player customization into the same base naked farmer texture. This will create a clothed customized farmer texture (sprite sheet)!
+        // First merge the trouser pixels into the base naked farmer body pixels, and then the customized farmerShirtPixels, and then the customized farmerAdornmentsPixels we created earlier based on
+        // player customization or shirt, trousers, and adornmentsinto the same base naked farmer texture. This will create a clothed customized farmer texture (sprite sheet)!
         MergeColorArray(farmerBodyPixels, farmerTrouserPixelsSelection);
         MergeColorArray(farmerBodyPixels, farmerShirtPixels);
+        MergeColorArray(farmerBodyPixels, farmerAdornmentsPixelsSelection);
 
         // Paste the above merged pixels in farmerBodyPixels onto our final customized farmer texture, farmerBaseCustomized
         farmerBaseCustomized.SetPixels(0, 0, bodyColumns * farmerSpriteWidth, farmerBaseTexture.height, farmerBodyPixels);
@@ -1112,5 +1168,251 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // Apply the selected hat pixels to the new customized hat texture, containing only the selected hat to be used in hame
         hatsCustomized.SetPixels(hatPixels);
         hatsCustomized.Apply();
+    }
+
+
+    // This method manually populates all of the sprites in the 6x20 texture (sprite sheet) with the x/y-offsets that each player
+    // sprite has (i.e. from the player bobbing while walking), so we can apply the same offset to the shirt we're drawing over it
+    // The offsets are defined from the (0,0) pixel in the bottom left-corner of each sprite box, to the bottom left corner 
+    // of the naked farmer body sprite in that same box
+    private void PopulateBodyAdornmentsOffsetArray()
+    {
+        // The first 10 elements are empty, so just add a 99,99 offset to make it clear
+        bodyAdornmentsOffsetArray[0, 0] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 0] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 0] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 0] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 0] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 0] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 1] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 1] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 1] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 1] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 1] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 1] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 2] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 2] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 2] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 2] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 2] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 2] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 3] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 3] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 3] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 3] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 3] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 3] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 4] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 4] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 4] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 4] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 4] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 4] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 5] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 5] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 5] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 5] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 5] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 5] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 6] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 6] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 6] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 6] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 6] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 6] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 7] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 7] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 7] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 7] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 7] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 7] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 8] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 8] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 8] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 8] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 8] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 8] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 9] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 9] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 9] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 9] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 9] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 9] = new Vector2Int(99, 99);
+
+        // The 11th and up rows have actual sprites, so simply add the x/y offsets for each sprite at the given locations
+        // The ones with 99,99 are backwards facing! No adornments to be drawn
+        bodyAdornmentsOffsetArray[0, 10] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 10] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 10] = new Vector2Int(0, 1 + 16);
+        bodyAdornmentsOffsetArray[3, 10] = new Vector2Int(0, 2 + 16);
+        bodyAdornmentsOffsetArray[4, 10] = new Vector2Int(0, 1 + 16);
+        bodyAdornmentsOffsetArray[5, 10] = new Vector2Int(0, 0 + 16);
+
+        bodyAdornmentsOffsetArray[0, 11] = new Vector2Int(0, 1 + 16);
+        bodyAdornmentsOffsetArray[1, 11] = new Vector2Int(0, 2 + 16);
+        bodyAdornmentsOffsetArray[2, 11] = new Vector2Int(0, 1 + 16);
+        bodyAdornmentsOffsetArray[3, 11] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[4, 11] = new Vector2Int(99, 11);
+        bodyAdornmentsOffsetArray[5, 11] = new Vector2Int(99, 12);
+
+        bodyAdornmentsOffsetArray[0, 12] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 12] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 12] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[3, 12] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[4, 12] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[5, 12] = new Vector2Int(0, -1 + 16);
+
+        bodyAdornmentsOffsetArray[0, 13] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[1, 13] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[2, 13] = new Vector2Int(1, -1 + 16);
+        bodyAdornmentsOffsetArray[3, 13] = new Vector2Int(1, -1 + 16);
+        bodyAdornmentsOffsetArray[4, 13] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 13] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 14] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 14] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 14] = new Vector2Int(0, -3 + 16);
+        bodyAdornmentsOffsetArray[3, 14] = new Vector2Int(0, -5 + 16);
+        bodyAdornmentsOffsetArray[4, 14] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[5, 14] = new Vector2Int(0, 1 + 16);
+
+        bodyAdornmentsOffsetArray[0, 15] = new Vector2Int(0, -2 + 16);
+        bodyAdornmentsOffsetArray[1, 15] = new Vector2Int(0, -5 + 16);
+        bodyAdornmentsOffsetArray[2, 15] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[3, 15] = new Vector2Int(0, 1 + 16);
+        bodyAdornmentsOffsetArray[4, 15] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 15] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 16] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 16] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 16] = new Vector2Int(0, -3 + 16);
+        bodyAdornmentsOffsetArray[3, 16] = new Vector2Int(0, -2 + 16);
+        bodyAdornmentsOffsetArray[4, 16] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[5, 16] = new Vector2Int(0, 0 + 16);
+
+        bodyAdornmentsOffsetArray[0, 17] = new Vector2Int(0, -3 + 16);
+        bodyAdornmentsOffsetArray[1, 17] = new Vector2Int(0, -2 + 16);
+        bodyAdornmentsOffsetArray[2, 17] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[3, 17] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[4, 17] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 17] = new Vector2Int(99, 99);
+
+        bodyAdornmentsOffsetArray[0, 18] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[1, 18] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[2, 18] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[3, 18] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[4, 18] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[5, 18] = new Vector2Int(0, -1 + 16);
+
+        bodyAdornmentsOffsetArray[0, 19] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[1, 19] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[2, 19] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[3, 19] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[4, 19] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[5, 19] = new Vector2Int(0, -1 + 16);
+
+        bodyAdornmentsOffsetArray[0, 20] = new Vector2Int(0, 0 + 16);
+        bodyAdornmentsOffsetArray[1, 20] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[2, 20] = new Vector2Int(0, -1 + 16);
+        bodyAdornmentsOffsetArray[3, 20] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[4, 20] = new Vector2Int(99, 99);
+        bodyAdornmentsOffsetArray[5, 20] = new Vector2Int(99, 99);
+    }
+
+
+    // Given the user-selected adornments style number, this method finds the correct adornments sprites in the original adornments texture, and 
+    // adds them to a new selectedAdornments texture just containing the adornments sprites for the adornments style we selected
+    private void AddAdornmentsToTexture(int adornmentStyleNo)
+    {
+        // Create the adornment texture which will hold the 2 9x9 adornment sprites for the user-selected adornment style (so this texture is 32x16)
+        selectedAdornment = new Texture2D(adornmentTextureWidth, adornmentTextureHeight);
+
+        // Set the filter mode so it doesn't add any anti-aliasing (pixel-perfect texture)
+        selectedAdornment.filterMode = FilterMode.Point;
+
+        // Calculate the coordinates for the adornment pixels from the adornment sprite sheet (texture) that contains all of the customization options (so we can add JUST the selected
+        // adornment to our new selectedAdornment texture (sprite sheet)
+        int y = (adornmentStyleNo / adornmentStylesInSpriteWidth) * adornmentTextureHeight; // Calculate the row of this adornment style
+        int x = (adornmentStyleNo % adornmentStylesInSpriteWidth) * adornmentTextureWidth; // Calculate the column of this adornment style
+
+        // Get the adornment pixels at the x,y position in the bottom left corner of the sprites, and then add the texture width and height. Add these into a Color array
+        Color[] adornmentPixels = adornmentsBaseTexture.GetPixels(x, y, adornmentTextureWidth, adornmentTextureHeight);
+
+        // Apply the selected adornment pixels to the new selected adornment texture
+        selectedAdornment.SetPixels(adornmentPixels);
+        selectedAdornment.Apply();
+    }
+
+
+    // This method will create a new Texture farmerBaseAdornmentsUpdated texture containing a 6x21 grid of sprites containing only the selected adornments in the proper
+    // facing direction and x/y offset found in the base customized farmer texture. This sheet will then later be drawn over the base farmer texture
+    private void ApplyAdornmentsTextureToBase()
+    {
+        // Create color arrays for each of the front/side facing shirts
+        Color[] frontAdornmentsPixels;
+        Color[] rightAdornmentsPixels;
+
+        // Populate the color arrays for the front/back/right facing adornments, from the selectedAdornment texture (sprite sheet) previously created with the final adornment texture
+        frontAdornmentsPixels = selectedAdornment.GetPixels(0, adornmentSpriteHeight * 1, adornmentSpriteWidth, adornmentSpriteHeight);
+        rightAdornmentsPixels = selectedAdornment.GetPixels(0, adornmentSpriteHeight * 0, adornmentSpriteWidth, adornmentSpriteHeight);
+
+        // Loop through all of the the base texture sprite grid boxes, and apply the adornments pixels with the proper facing direction and x,y offset to each sprite in the 6x21 sprite array
+        for (int x = 0; x < bodyColumns; x++)
+        {
+            for (int y = 0; y < bodyRows; y++)
+            {
+                // This calculates the actual x,y pixel value of the (x,y) sprite location in the grid, by multiplying them by the farmer sprite height/width
+                int pixelX = x * farmerSpriteWidth;
+                int pixelY = y * farmerSpriteHeight;
+
+                // If there is a x/y offset value for this sprite grid position, add it to our pixelX/pixelY values to add an offset to the adornment sprite we're drawing
+                if (bodyAdornmentsOffsetArray[x, y] != null)
+                {
+                    //If both the x/y offsets are 99, we know this is a null sprite - don't do anything
+                    if (bodyAdornmentsOffsetArray[x, y].x == 99 && bodyAdornmentsOffsetArray[x, y].y == 99)
+                    {
+                        continue;
+                    }
+
+                    // Add the x/y offsets to our pixel location so we have the proper offset when drawing the adornment. This is the exact position we will be drawing the adornment sprite at
+                    pixelX += bodyAdornmentsOffsetArray[x, y].x;
+                    pixelY += bodyAdornmentsOffsetArray[x, y].y;
+                }
+
+                // Check the facing direction for the current sprite we are looking at, and apply the proper adornment facing direction sprite to that grid box
+                switch (bodyFacingArray[x, y])
+                {
+                    // If there is no facing direction (i.e. the blank sprites in the sheet), draw nothing
+                    case Facing.none:
+                        break;
+
+                    case Facing.front:
+                        // Populate the front-facing pixels with the frontAdornmentPixels at pixel x,y, with the proper Adornment sprite width/height
+                        farmerBaseAdornmentsUpdated.SetPixels(pixelX, pixelY, adornmentSpriteWidth, adornmentSpriteHeight, frontAdornmentsPixels);
+                        break;
+
+                    case Facing.right:
+                        // Populate the right-facing pixels with the rightAdornmentixels at pixel x,y, with the proper Adornment sprite width/height
+                        farmerBaseAdornmentsUpdated.SetPixels(pixelX, pixelY, adornmentSpriteWidth, adornmentSpriteHeight, rightAdornmentsPixels);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // Apply the new adornments texture pixels that we updated above to the farmerBaseAdornmentsUpdated texture (sprite sheet)
+        // This will be a sprite sheet (texture) containing all of the adornments (including proper facing direction and x/y offset) to be drawn over the base naked farmer texture
+        farmerBaseAdornmentsUpdated.Apply();
     }
 }
