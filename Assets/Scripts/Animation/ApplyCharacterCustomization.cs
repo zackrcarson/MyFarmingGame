@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 // This class simply stores the from color and to color for any color swap that we'll be using
@@ -19,8 +20,16 @@ public class colorSwap
 }
 
 
-public class ApplyCharacterCustomization : MonoBehaviour
+public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
 {
+    // Unique ID required by the ISaveable interface, will store the GUID attached to the InventoryManager gameObject
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    // GameObjectSave required by the ISaveable interface, storesd the save data that is built up for every object that has the ISaveable interface attached
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
+
     // INPUT TEXTURES
     // Input Textures to be populated in the editor. The first two are the "naked farmer" textures that we will be drawing clothes over (for now, male = female, but later
     // we can add a female one). The next one is the set of shirt textures (i.e. green and red - maybe more in the future!) that we will be drawing over the naked farmer. The next one
@@ -51,6 +60,17 @@ public class ApplyCharacterCustomization : MonoBehaviour
     private Texture2D selectedShirt;
     private Texture2D selectedAdornment;
 
+    // List of toggles and sliders so we can control them from here when we load the game!
+    [SerializeField] private Toggle[] sexToggles = null;
+    [SerializeField] private Toggle[] shirtToggles = null;
+    [SerializeField] private Toggle[] hairToggles = null;
+    [SerializeField] private Toggle[] hatToggles = null;
+    [SerializeField] private Toggle[] adornmentsToggles = null;
+
+    [SerializeField] private Slider[] trouserSliders = null;
+    [SerializeField] private Slider[] hairSliders = null;
+    [SerializeField] private Slider[] skinSliders = null;
+
     // CUSTOMIZATION OPTIONS
     // Select the shirt style with a slider (0 - green, 1 - red), populated in the editor
     [Header("Select Shirt Style: 0 = red, 1 = green")]
@@ -62,7 +82,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
     [Header("Select Hair Style: 0 = styled, 1 = spiky, 2 = bald")]
     [Range(0, 2)]
     [SerializeField] private int inputHairStyleNo = 0;
-
+    
     // Select the hat style with a slider (0 - no hat, 1 - hat), populated in the editor
     // The no-hat option will simply grab empty sprites from the base hat texture - so it will show up as nothing on head
     [Header("Select Hat Style: 0 = no hat, 1 = hat")]
@@ -85,6 +105,11 @@ public class ApplyCharacterCustomization : MonoBehaviour
 
     [SerializeField]
     private Color inputSkinColor = new Color32(207, 166, 128, 255);
+
+    // The ranges used in the skin sliders, so we can convert to the proper normalized values
+    private int skinRangeR = 223 - 63;
+    private int skinRangeG = 225 - 50;
+    private int skinRangeB = 228 - 39;
 
     // Select the gender (0 - male, 1 - female), populated in the editor (right now both male and female are the same)
     [Header("Select Sex: 0 = Male, 1 = Female")]
@@ -154,6 +179,29 @@ public class ApplyCharacterCustomization : MonoBehaviour
 
         // Process the customization - process the gender, shirt, arms, and then merge them all together
         ProcessCustomization();
+
+        // Get the unique ID for the GameObject
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+
+        // Initialize the GameObjectSave variable
+        GameObjectSave = new GameObjectSave();
+    }
+
+
+    // On enable, this will just register this gameObject as an ISaveable, so that the SaveLoadManager can save/load the methods set up here
+    // Also subscribe to scene loading/unloading events so we can pause/start the game clock while scenes are unloading/loading
+    private void OnEnable()
+    {
+        // Registers this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableRegister();
+    }
+
+
+    // Deregister from the iSaveableObjectList
+    private void OnDisable()
+    {
+        // Deregisters this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items
+        ISaveableDeregister();
     }
 
 
@@ -1166,6 +1214,7 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+
     // This method will simply take the hat sprites from the base hat texture containing all hat styles, corresponding to the players hat choice, and then create
     // a new customized hats texture containing only the hat sprites corresponding to that choice, to be used by the game
     private void AddHatToTexture(int hatStyleNo)
@@ -1439,5 +1488,258 @@ public class ApplyCharacterCustomization : MonoBehaviour
         // Apply the new adornments texture pixels that we updated above to the farmerBaseAdornmentsUpdated texture (sprite sheet)
         // This will be a sprite sheet (texture) containing all of the adornments (including proper facing direction and x/y offset) to be drawn over the base naked farmer texture
         farmerBaseAdornmentsUpdated.Apply();
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnEnable() of the CharacterCustomization GameObject, and it will 
+    // Add an entry (of this gameObject) to the iSaveableObjectList in SaveLoadManager, which will then manage
+    // Looping through all such items in this list to save/load their data
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+
+    // Required method by the ISaveable interface, which will be called OnDisable() of the CharacterCustomization GameObject, and it will
+    // Remove this item from the saveable objects list, as described above
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+
+    // Required method by the ISaveable interface. This will get called from the SaveLoadManager, for each scene to save the dictionaries (GameObjectSave has a dict keyed by scene name)
+    // This method will store the sceneData for the current scene (). It will then return a GameObjectSave, which just has a Dict of SceneSave data for each scene, keyed by scene name
+    public GameObjectSave ISaveableSave()
+    {
+        // Delete the sceneData (dict of data to save in that scene, keyed by scene name) for the GameObject if it already exists in the persistent scene
+        // which is where this data is going to be saved, so we can create a new one with updated dictionaries
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Create the SaveScene for this gameObject (keyed by the scene name, storing multiple dicts for bools, the scene the player ended in, the players location, the gridPropertyDetails,
+        // the SceneItems, and the inventory items and quantities, and the gameYear, day, hour, minute, second, season, day of week)
+        SceneSave sceneSave = new SceneSave();
+
+        // Create a new int dictionary to store the customization parameters
+        sceneSave.intDictionary = new Dictionary<string, int>();
+
+        // Add values to the int dictionary for the different customization parameters, keyed so we can easily retrieve them in load
+        sceneSave.intDictionary.Add("shirtStyleNo", inputShirtStyleNo);
+        sceneSave.intDictionary.Add("hairStyleNo", inputHairStyleNo);
+        sceneSave.intDictionary.Add("hatStyleNo", inputHatStyleNo);
+        sceneSave.intDictionary.Add("adornmentsStyleNo", inputAdornmentsStyleNo);
+        sceneSave.intDictionary.Add("skinType", inputSkinType);
+        sceneSave.intDictionary.Add("sex", inputSex);
+        sceneSave.intDictionary.Add("hairColorR", (int)(255f * inputHairColor.r));
+        sceneSave.intDictionary.Add("hairColorG", (int)(255f * inputHairColor.g));
+        sceneSave.intDictionary.Add("hairColorB", (int)(255f * inputHairColor.b));
+        sceneSave.intDictionary.Add("skinColorR", (int)(255f * inputSkinColor.r));
+        sceneSave.intDictionary.Add("skinColorG", (int)(255f * inputSkinColor.g));
+        sceneSave.intDictionary.Add("skinColorB", (int)(255f * inputSkinColor.b));
+        sceneSave.intDictionary.Add("trouserColorR", (int)(255f * inputTrouserColor.r));
+        sceneSave.intDictionary.Add("trouserColorG", (int)(255f * inputTrouserColor.g));
+        sceneSave.intDictionary.Add("trouserColorB", (int)(255f * inputTrouserColor.b));
+
+        // Add the SceneSave data for the CharacterCustomization game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
+        // The time manager will get stored in the Persistent Scene
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        // Return the GameObjectSave, which has a dict of the Saved stuff for the CharacterCustomization GameObject
+        return GameObjectSave;
+    }
+
+
+    // This is a required method for the ISaveable interface, which passes in a GameObjectSave dictionary, and restores the current scene from it
+    // The SaveLoadManager script will loop through all of the ISaveableRegister GameObjects (all registered with their ISaveableRegister methods), and trigger this 
+    // ISaveableLoad, which will load that Save data (here for the persistent scene CharacterCustomization information, which includes the all of the customization parameters),
+    // for each scene (GameObjectSave is a Dict keyed by scene name).
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // gameSave stores a Dictionary of items to save keyed by GUID, see if there's one for this GUID (generated on the InventoryManager GameObject)
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // Get the save data for the scene, if one exists for the PersistentScene (what the time info is saved under)
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // If both the intDictionary (storing all of the character customization ints and colors)
+                // exist, populate the saved values!
+                if (sceneSave.intDictionary != null)
+                {
+                    // Check if the intDictionary contains entries for the customization parameters. If so, populate the them with the saved values
+                    if (sceneSave.intDictionary.TryGetValue("shirtStyleNo", out int savedShirtStyleNo))
+                    {
+                        inputShirtStyleNo = savedShirtStyleNo;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("hairStyleNo", out int savedHairStyleNo))
+                    {
+                        inputHairStyleNo = savedHairStyleNo;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("hatStyleNo", out int savedHatStyleNo))
+                    {
+                        inputHatStyleNo = savedHatStyleNo;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("adornmentsStyleNo", out int savedAdornmentStyleNo))
+                    {
+                        inputAdornmentsStyleNo = savedAdornmentStyleNo;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("skinType", out int savedSkinStyleNo))
+                    {
+                        inputSkinType = savedSkinStyleNo;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("sex", out int savedSex))
+                    {
+                        inputSex = savedSex;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("hairColorR", out int savedHairColorR))
+                    {
+                        inputHairColor.r = (float) savedHairColorR / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("hairColorG", out int savedHairColorG))
+                    {
+                        inputHairColor.g = (float) savedHairColorG / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("hairColorB", out int savedHairColorB))
+                    {
+                        inputHairColor.b = (float) savedHairColorB / 255f;
+                    }
+
+                    if (sceneSave.intDictionary.TryGetValue("skinColorR", out int savedSkinColorR))
+                    {
+                        inputSkinColor.r = (float) savedSkinColorR / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("skinColorG", out int savedSkinColorG))
+                    {
+                        inputSkinColor.g = (float) savedSkinColorG / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("skinColorB", out int savedSkinColorB))
+                    {
+                        inputSkinColor.b = (float) savedSkinColorB / 255f;
+                    }
+
+                    if (sceneSave.intDictionary.TryGetValue("trouserColorR", out int savedTrouserColorR))
+                    {
+                        inputTrouserColor.r = (float) savedTrouserColorR / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("trouserColorG", out int savedTrouserColorG))
+                    {
+                        inputTrouserColor.g = (float) savedTrouserColorG / 255f;
+                    }
+                    if (sceneSave.intDictionary.TryGetValue("trouserColorB", out int savedTrouserColorB))
+                    {
+                        inputTrouserColor.b = (float) savedTrouserColorB / 255f;
+                    }
+
+                    // Process the customization - process the gender, shirt, arms, trousers, skin, hat, adornments and then merge them all together
+                    RedoCustomizations();
+
+                    // Set all of the toggles to the loaded values, depending on theier states
+                    switch (inputSex)
+                    { 
+                        case 0:
+                            sexToggles[0].isOn = true;
+                            sexToggles[1].isOn = false;
+                            break;
+                        case 1:
+                            sexToggles[0].isOn = false;
+                            sexToggles[1].isOn = true;
+                            break;
+                    }
+
+                    switch (inputShirtStyleNo)
+                    {
+                        case 0:
+                            shirtToggles[0].isOn = true;
+                            shirtToggles[1].isOn = false;
+                            break;
+                        case 1:
+                            shirtToggles[0].isOn = false;
+                            shirtToggles[1].isOn = true;
+                            break;
+                    }
+
+                    switch (inputHairStyleNo)
+                    {
+                        case 1:
+                            hairToggles[0].isOn = true;
+                            hairToggles[1].isOn = false;
+                            hairToggles[2].isOn = false;
+                            break;
+                        case 0:
+                            hairToggles[0].isOn = false;
+                            hairToggles[1].isOn = true;
+                            hairToggles[2].isOn = false;
+                            break;
+                        case 2:
+                            hairToggles[0].isOn = false;
+                            hairToggles[1].isOn = false;
+                            hairToggles[2].isOn = true;
+                            break;
+                    }
+
+                    switch (inputHatStyleNo)
+                    {
+                        case 1:
+                            hatToggles[0].isOn = true;
+                            hatToggles[1].isOn = false;
+                            break;
+                        case 0:
+                            hatToggles[0].isOn = false;
+                            hatToggles[1].isOn = true;
+                            break;
+                    }
+
+                    switch (inputAdornmentsStyleNo)
+                    {
+                        case 0:
+                            adornmentsToggles[0].isOn = true;
+                            adornmentsToggles[1].isOn = false;
+                            adornmentsToggles[2].isOn = false;
+                            break;
+                        case 1:
+                            adornmentsToggles[0].isOn = false;
+                            adornmentsToggles[1].isOn = true;
+                            adornmentsToggles[2].isOn = false;
+                            break;
+                        case 2:
+                            adornmentsToggles[0].isOn = false;
+                            adornmentsToggles[1].isOn = false;
+                            adornmentsToggles[2].isOn = true;
+                            break;
+                    }
+
+                    // Set the sliders to the saved values!
+                    hairSliders[0].normalizedValue = inputHairColor.r;
+                    hairSliders[1].normalizedValue = inputHairColor.g;
+                    hairSliders[2].normalizedValue = inputHairColor.b;
+
+                    // Skin sliders need extra care because the sliders don't encompass all 255 bytes! need to divide by the slider range rather than 255
+                    skinSliders[0].normalizedValue = (float)(savedSkinColorR / skinRangeR);
+                    skinSliders[1].normalizedValue = (float)(savedSkinColorG / skinRangeG);
+                    skinSliders[2].normalizedValue = (float)(savedSkinColorB / skinRangeB);
+
+                    trouserSliders[0].normalizedValue = inputTrouserColor.r;
+                    trouserSliders[1].normalizedValue = inputTrouserColor.g;
+                    trouserSliders[2].normalizedValue = inputTrouserColor.b;
+                }
+            }
+        }
+    }
+
+
+    // Required method by the ISaveable interface, which will store all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing to store here since the CharacterCustomization is on a persistent scene - it won't get reset ever because we always stay on that scene
+    }
+
+
+    // Required method by the ISaveable interface, which will restore all of the scene data, executed for every item in the iSaveableObjectList. This let's us walk between
+    // scenes and keep the stored stuff active with ISaveableRestoreScene 
+    public void ISaveableRestoreScene(string sceneName)
+    {
+        // Nothing to restore here since the CharacterCustomization is on a persistent scene - it won't get reset ever because we always stay on that scene
     }
 }
