@@ -173,6 +173,17 @@ public class ApplyCharacterCustomization : MonoBehaviour
     }
 
 
+    // I added this method to redo our player hat customization from the pause screen! This change hat method will be called from the change hat buttons to change our hat style
+    public void ChangeHat(int hatNo)
+    {
+        // Change the input hat style
+        inputHatStyleNo = hatNo;
+
+        // Process the customization - process the gender, shirt, arms, trousers, hair, skin, and hat and then merge them all together
+        RedoCustomizations();
+    }
+
+
     // I added this method to change the players red trouser color dynamically from a red slider in the pause menu customization tab 
     public void ChangeTrousersRed(System.Single newRed)
     {

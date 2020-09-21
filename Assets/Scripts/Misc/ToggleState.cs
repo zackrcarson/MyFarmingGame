@@ -53,6 +53,21 @@ public class ToggleState : MonoBehaviour
     }
 
 
+    // For changing the hat
+    public void toggleOffHat(int hatNum)
+    {
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (toggle.isOn && otherToggles[0].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = false;
+
+            // Process the hat change
+            playerCusomize.ChangeHat(hatNum);
+        }
+    }
+
+
     // For changing the hair
     public void toggleOffHair(int hairNum)
     {
