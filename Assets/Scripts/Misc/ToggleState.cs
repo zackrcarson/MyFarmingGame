@@ -35,6 +35,17 @@ public class ToggleState : MonoBehaviour
             // Process the gender change
             playerCusomize.ChangeGender(sexNum);
         }
+
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (!toggle.isOn && !otherToggles[0].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = true;
+            otherToggles[0].isOn = true;
+
+            // Process the gender change
+            playerCusomize.ChangeGender(sexNum);
+        }
     }
 
 
@@ -46,6 +57,17 @@ public class ToggleState : MonoBehaviour
         {
             // Set the other toggle to off
             toggle.isOn = false;
+
+            // Process the gender change
+            playerCusomize.ChangeShirt(shirtNum);
+        }
+
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (!toggle.isOn && !otherToggles[0].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = true;
+            otherToggles[0].isOn = true;
 
             // Process the gender change
             playerCusomize.ChangeShirt(shirtNum);
@@ -65,6 +87,17 @@ public class ToggleState : MonoBehaviour
             // Process the hat change
             playerCusomize.ChangeHat(hatNum);
         }
+
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (!toggle.isOn && !otherToggles[0].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = true;
+            otherToggles[0].isOn = true;
+
+            // Process the gender change
+            playerCusomize.ChangeHat(hatNum);
+        }
     }
 
 
@@ -77,6 +110,16 @@ public class ToggleState : MonoBehaviour
             // Set the other toggle to off
             otherToggles[0].isOn = false;
             otherToggles[1].isOn = false;
+
+            // Process the gender change
+            playerCusomize.ChangeHair(hairNum);
+        }
+
+        // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
+        if (!toggle.isOn && !otherToggles[0].isOn && !otherToggles[1].isOn)
+        {
+            // Set the other toggle to off
+            toggle.isOn = true;
 
             // Process the gender change
             playerCusomize.ChangeHair(hairNum);

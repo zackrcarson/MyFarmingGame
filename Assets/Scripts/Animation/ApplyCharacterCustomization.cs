@@ -439,9 +439,9 @@ public class ApplyCharacterCustomization : MonoBehaviour
     // Farmers skin, swap them for new colors, and then apply the color swaps to the selected skin sprites in the customized farmer texture
     private void ProcessSkin()
     {
-        // Get the skin pixels that we want to to recolor from the base farmer texture. This selects the entire block of pixels containing
-        // all skin that need to be recolored (heads, and arms)
-        Color[] farmerPixelsToRecolor = farmerBaseTexture.GetPixels(0, 0, 288, farmerBaseTexture.height);
+        // Get the skin pixels that we want to to recolor from the customized farmer texture (we use this one so we can grab the already-updated farmers sleeves.
+        // This selects the entire block of pixels containing all skin that need to be recolored (heads, and arms)
+        Color[] farmerPixelsToRecolor = farmerBaseCustomized.GetPixels(0, 0, 288, farmerBaseCustomized.height);
 
         // Populate the skin color swap list with the from and to colors we want to swap in the skin
         PopulateSkinColorSwapList(inputSkinType);
