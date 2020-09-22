@@ -712,6 +712,36 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
 
     /// <summary>
+    /// Given a sceneName, this method returns true and two Vector2Ints with the grid dimensions and origin for that scene, or false and Vector2Int.zero's if the scene was not found
+    /// </summary>
+    public bool GetGridDimensions(SceneName sceneName, out Vector2Int gridDimensions, out Vector2Int gridOrigin)
+    {
+        // Start off with 0 grid dimensions and origin, to e changed if we found a scene with that sceneName
+        gridDimensions = Vector2Int.zero;
+        gridOrigin = Vector2Int.zero;
+
+        // Loop through all of the scenes
+        foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
+        {
+            // If we find a scene with the given sceneName, populate the corresponding grid dimensions and origin and return true
+            if (so_GridProperties.sceneName == sceneName)
+            {
+                gridDimensions.x = so_GridProperties.gridWidth;
+                gridDimensions.y = so_GridProperties.gridHeight;
+
+                gridOrigin.x = so_GridProperties.originX;
+                gridOrigin.y = so_GridProperties.originY;
+
+                return true;
+            }
+        }
+
+        // If we didn't find that scene name, return false and keep the dimensions and origin as 0
+        return false;
+    }
+
+
+    /// <summary>
     /// Returns the Crop object at the gridX, gridY position, or null if no crop was found
     /// </summary>
     public Crop GetCropObjectAtGridLocation(GridPropertyDetails gridPropertyDetails)
