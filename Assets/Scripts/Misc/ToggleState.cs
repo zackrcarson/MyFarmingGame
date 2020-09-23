@@ -15,9 +15,7 @@ public class ToggleState : MonoBehaviour
 
     public ApplyCharacterCustomization playerCusomize = null;
 
-    //public mySkinNum = 0;
-
-    public void Start()
+    public void Awake()
     {
         toggle = GetComponent<Toggle>();
     }
@@ -26,6 +24,8 @@ public class ToggleState : MonoBehaviour
     // For changing the gender
     public void toggleOffGender(int sexNum)
     {
+        toggle = GetComponent<Toggle>();
+
         // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
         if (toggle.isOn && otherToggles[0].isOn)
         {
@@ -52,6 +52,8 @@ public class ToggleState : MonoBehaviour
     // For changing the shirt
     public void toggleOffShirt(int shirtNum)
     {
+        toggle = GetComponent<Toggle>();
+
         // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
         if (toggle.isOn && otherToggles[0].isOn)
         {
@@ -78,6 +80,8 @@ public class ToggleState : MonoBehaviour
     // For changing the hat
     public void toggleOffHat(int hatNum)
     {
+        toggle = GetComponent<Toggle>();
+
         // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
         if (toggle.isOn && otherToggles[0].isOn)
         {
@@ -104,6 +108,8 @@ public class ToggleState : MonoBehaviour
     // For changing the hair
     public void toggleOffHair(int hairNum)
     {
+        toggle = GetComponent<Toggle>();
+
         // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
         if ((toggle.isOn && otherToggles[0].isOn && !otherToggles[1].isOn) || (toggle.isOn && otherToggles[1].isOn && !otherToggles[0].isOn))
         {
@@ -130,6 +136,8 @@ public class ToggleState : MonoBehaviour
     // For changing the adornments
     public void toggleOffAdornments(int adornmentNum)
     {
+        toggle = GetComponent<Toggle>();
+
         // We need to check both so that when we change the other toggle to off, it's On Click functionality won't turn off the current toggle as well..
         if ((toggle.isOn && otherToggles[0].isOn && !otherToggles[1].isOn) || (toggle.isOn && otherToggles[1].isOn && !otherToggles[0].isOn))
         {

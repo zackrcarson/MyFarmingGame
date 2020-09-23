@@ -171,6 +171,7 @@ public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
     private Color32 skinTargetColor3 = new Color32(207, 166, 128, 255); // The middle-low-dark color on the default skin
     private Color32 skinTargetColor4 = new Color32(238, 195, 154, 255); // The lightest color on the default skin
 
+
     // When the player GameObject is Awake (at the beginning of the game), we will imediately initialize the color swap list and process the customization
     private void Awake()
     {

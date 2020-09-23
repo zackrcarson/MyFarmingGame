@@ -3,7 +3,7 @@
     "",
     "\\Assets",
     "\\Assets\\Scripts",
-    "\\Assets\\Scripts\\Inventory",
+    "\\Assets\\Scripts\\Animation",
     "\\Assets\\Scripts\\Misc",
     "\\Assets\\Scripts\\Player",
     "\\Assets\\Scripts\\SaveSystem",
@@ -11,6 +11,6 @@
     "\\Assets\\Scripts\\TimeSystem",
     "\\Assets\\Scripts\\UI"
   ],
-  "SelectedNode": "\\Assets\\Scripts\\Player\\Player.cs",
+  "SelectedNode": "\\Assets\\Scripts\\SaveSystem\\SaveLoadManager.cs",
   "PreviewInSolutionExplorer": false
 }

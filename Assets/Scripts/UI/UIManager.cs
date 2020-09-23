@@ -73,6 +73,7 @@ public class UIManager : SingletonMonobehaviour<UIManager>
         Time.timeScale = 0; 
 
         // Set the pause menu UI to be active to cover the screen with it
+        
         pauseMenu.SetActive(true);
 
         // Trigger the garbage collector - might as well do it now while not much is happening
