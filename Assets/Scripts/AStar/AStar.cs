@@ -347,6 +347,14 @@ public class AStar : MonoBehaviour
                                 Node node = gridNodes.GetGridNode(x, y);
                                 node.isObstacle = true;
                             }
+                            if (gridPropertyDetails.seedItemCode == 10000 || gridPropertyDetails.seedItemCode == 10009 || 
+                                gridPropertyDetails.seedItemCode == 10010|| gridPropertyDetails.seedItemCode == 10011 || 
+                                gridPropertyDetails.seedItemCode == 10014 || gridPropertyDetails.seedItemCode == 10016 || 
+                                gridPropertyDetails.seedItemCode == 10022 || gridPropertyDetails.seedItemCode == 10023) // I added this if statement so that things like trees, rocks, etc are considered obstacles for the path finding algorithm to navigate around
+                            {
+                                Node node = gridNodes.GetGridNode(x, y);
+                                node.isObstacle = true;
+                            }
                             // Else, if the current square is a path, create a node at that grid location (obtained from the gridNodes array GetGridNode at this position), 
                             // and populate it's movement penalty with pathMovementPenalty
                             else if (gridPropertyDetails.isPath == true)
