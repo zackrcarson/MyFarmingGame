@@ -50,6 +50,9 @@ public class AStar : MonoBehaviour
     /// <returns> Returns a bool true if a path is found, and false if not. The NPC movement steps are also passed into NPCMovementStepStack </returns>
     public bool BuildPath(SceneName sceneName, Vector2Int startGridPosition, Vector2Int endGridPosition, Stack<NPCMovementStep> npcMovementStepStack)
     {
+        // Make sure pathFound always starts off as false, i.e. for when we call BuildPath a second time after it already found a path earlier!
+        pathFound = false;
+
         // This method will populate all of the GridNodes array nodes with the isPath and isNPCObstacle properties from the GridPropertiesDictionary for this scene, and also set up
         // the starting/ending grid nodes, and the open/closed nodes lists. It will return true if this was successful.
         if (PopulateGridNodesFromGridPropertiesDictionary(sceneName, startGridPosition, endGridPosition))

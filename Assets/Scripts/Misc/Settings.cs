@@ -12,6 +12,7 @@ public static class Settings
 
     // Tilemap
     public const float gridCellSize = 1f; // grid cell size in unity units
+    public const float gridCellDiagonalSize = 1.41f; // diagonal distance between unity cell centers - for moving the NPC's diagonally in the proper amount of time
     public static Vector2 cursorSize = Vector2.one;
 
     // Player
@@ -29,9 +30,19 @@ public static class Settings
     public static float afterLiftToolAnimationPause = 0.4f;
     public static float afterPickAnimationPause = 0.2f;
 
+    // NPC movement
+    public static float pixelSize = 0.0625f; // To check if moving NPC's are within a pixels' distance from the target location
+
     // Inventory
     public static int playerInitialInventoryCapacity = 12;
     public static int playerMaximumInventoryCapacity = 48;
+
+    // NPC animation parameters - hashed values for efficiency
+    public static int walkUp;
+    public static int walkDown;
+    public static int walkLeft;
+    public static int walkRight;
+    public static int eventAnimation;
 
     // Player Animation Parameters
     public static int xInput;
@@ -80,6 +91,13 @@ public static class Settings
     // Static constructor
     static Settings()
     {
+        // NPC animation parameters
+        walkUp = Animator.StringToHash("walkUp");
+        walkDown = Animator.StringToHash("walkDown");
+        walkLeft = Animator.StringToHash("walkLeft");
+        walkRight = Animator.StringToHash("walkRight");
+        eventAnimation = Animator.StringToHash("eventAnimation");
+
         // Player Animation Parameter hashes
         xInput = Animator.StringToHash("xInput");
         yInput = Animator.StringToHash("yInput");

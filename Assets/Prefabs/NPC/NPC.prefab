@@ -14,6 +14,9 @@ GameObject:
   - component: {fileID: 6898429673677717458}
   - component: {fileID: 6898429673677717459}
   - component: {fileID: 5401490041598543747}
+  - component: {fileID: 532002782685460050}
+  - component: {fileID: 8381615691447316884}
+  - component: {fileID: 6663482925134434457}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -163,4 +166,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32afc0f3ce4719ad1977d5172785636e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gUID: 
+  _gUID: 39350e38-92d6-4026-b403-40fc0f604e40
+--- !u!114 &532002782685460050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898429673677717470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0359b16a350af7a4f8222fb6c79aff67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8381615691447316884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898429673677717470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f494ee26e56704fac27ccf2962cf6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6663482925134434457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898429673677717470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c3842c8e35d4bf44b8c32fb97b769bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  npcCurrentScene: 0
+  npcTargetScene: 0
+  npcCurrentGridPosition: {x: 0, y: 0, z: 0}
+  npcTargetGridPosition: {x: 0, y: 0, z: 0}
+  npcTargetWorldPosition: {x: 0, y: 0, z: 0}
+  npcFacingDirectionAtDestination: 0
+  npcNormalSpeed: 2
+  npcMinSpeed: 1
+  npcMaxSpeed: 2
+  npcTargetAnimationClip: {fileID: 0}
+  blankAnimation: {fileID: 7400000, guid: de73329f78eb6d645a9a70faf2bddfce, type: 2}
+  npcActiveInScene: 0

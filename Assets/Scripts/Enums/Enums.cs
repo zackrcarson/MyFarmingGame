@@ -115,6 +115,15 @@ public enum HarvestActionEffect
     none
 }
 
+public enum Weather
+{
+    dry,
+    raining,
+    snowing,
+    none,
+    count
+}
+
 public enum Direction
 {
     up,

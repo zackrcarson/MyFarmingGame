@@ -22759,6 +22759,11 @@ PrefabInstance:
       propertyPath: _gUID
       value: 5257c14d-2fdf-4d74-bab0-9f0a9476cbc4
       objectReference: {fileID: 0}
+    - target: {fileID: 6663482925134434457, guid: 4260a1a54c31d11409ea46382491ed7b,
+        type: 3}
+      propertyPath: npcMaxSpeed
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6898429673677717456, guid: 4260a1a54c31d11409ea46382491ed7b,
         type: 3}
       propertyPath: m_Controller
@@ -22783,7 +22788,7 @@ PrefabInstance:
     - target: {fileID: 6898429673677717471, guid: 4260a1a54c31d11409ea46382491ed7b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 6898429673677717471, guid: 4260a1a54c31d11409ea46382491ed7b,
         type: 3}
@@ -22843,6 +22848,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1655014037}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1655014039 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8381615691447316884, guid: 4260a1a54c31d11409ea46382491ed7b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1655014037}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f494ee26e56704fac27ccf2962cf6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1665221679
 GameObject:
   m_ObjectHideFlags: 0
@@ -24242,8 +24259,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1774554337}
+  - component: {fileID: 1774554339}
   - component: {fileID: 1774554336}
   - component: {fileID: 1774554338}
+  - component: {fileID: 1774554340}
   m_Layer: 0
   m_Name: NPCManager
   m_TagString: Untagged
@@ -24300,6 +24319,37 @@ MonoBehaviour:
     type: 2}
   displayStartAndFinish: 0
   displayPath: 0
+--- !u!114 &1774554339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774554335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb97cb72d42ce9a41a3f27c4880d7fbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  npcArray: []
+--- !u!114 &1774554340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774554335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be4cb3e1a94ed1347a1b70a4ef1680c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  npcPath: {fileID: 1655014039}
+  moveNPC: 0
+  finishPosition: {x: 22, y: 28}
+  idleDownAnimationClip: {fileID: 7400000, guid: cb83867c6252b5c4a8e8758697474f88,
+    type: 2}
+  eventAnimationClip: {fileID: 7400000, guid: cb83867c6252b5c4a8e8758697474f88, type: 2}
 --- !u!1001 &1788073796
 PrefabInstance:
   m_ObjectHideFlags: 0

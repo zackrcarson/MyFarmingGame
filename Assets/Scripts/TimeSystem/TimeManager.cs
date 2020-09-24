@@ -218,6 +218,16 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
     }
 
 
+    // This method returns a TimeSpan (unit of time in (hr, min, sec) for the current game Time, so the NPCs know the time, for scheduling purposes
+    public TimeSpan GetGameTime()
+    {
+        // TimeSpan stores a time i.e. hr:min:sec in a tuple (hr, min, sec)
+        TimeSpan gameTime = new TimeSpan(gameHour, gameMinute, gameSecond);
+
+        return gameTime;
+    }
+
+
     //TODO:Remove
     /// <summary>
     /// Advance 1 game minute automatically

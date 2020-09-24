@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 // This script is used to test the AStar algorthm in AStar.cs. It will run the algorithm between a start/stop point, and then display the tiles used as the NPC's steps on a tilemap
 [RequireComponent(typeof(AStar))] // Must have an AStar component on the GameObject so we can use it here
-public class AStarTest : MonoBehaviour
+public class AStarTestTileMap : MonoBehaviour
 {
     private AStar aStar;
 
