@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AStar))]
 public class NPCManager : SingletonMonobehaviour<NPCManager>
 {
+    // Populated in the inspector with the so_SceneRouteList describing all the possible routes between scenes, and then a dictionary we'll create to store these routes,
+    // so we can easily find if a route exists, keyed by a combination of the two scene names we want to traverse
+    [SerializeField] private SO_SceneRouteList so_SceneRouteList = null;
+    private Dictionary<string, SceneRoute> sceneRouteDictionary;
+
     // This will hold our array of NPCs int he game
     [HideInInspector]
     public NPC[] npcArray;
@@ -19,6 +23,27 @@ public class NPCManager : SingletonMonobehaviour<NPCManager>
     {
         base.Awake();
 
+        // Create the SceneRouteDictionary containing all of the possible scene routes the NPC can take (i.e. farm->field, cabin->field, etc, each describing the enter/exit points)
+        sceneRouteDictionary = new Dictionary<string, SceneRoute>();
+
+        if (so_SceneRouteList.sceneRouteList.Count > 0)
+        {
+            // As long as the SO_SceneRouteList has been populated, loop through all of the SceneRoutes in the SO's sceneRouteList, adding them to the dictionary keyed by the from and to scene names
+            foreach (SceneRoute so_sceneRoute in so_SceneRouteList.sceneRouteList)
+            {
+                // Check for duplicate routes already in the dictionary - don't add it to the dictionary if so
+                if (sceneRouteDictionary.ContainsKey(so_sceneRoute.fromSceneName.ToString() + so_sceneRoute.toSceneName.ToString()))
+                {
+                    Debug.Log("** Duplicate Scene Route Key Found ** Check for duplicate routes in the scriptable object scene route list");
+                    continue;
+                }
+
+                // Add the current route to our dictionary, keyed by a combination of the fromSceneName and the toSceneName
+                sceneRouteDictionary.Add(so_sceneRoute.fromSceneName.ToString() + so_sceneRoute.toSceneName.ToString(), so_sceneRoute);
+            }
+        }
+
+        // AStar is our path builder algorithm
         aStar = GetComponent<AStar>();
 
         // Get an array of all NPC objects in the scene
@@ -63,6 +88,24 @@ public class NPCManager : SingletonMonobehaviour<NPCManager>
             {
                 npcMovement.SetNPCInactiveInScene();
             }
+        }
+    }
+
+
+    // This method takes in a desired fromScene and toScene that we want our NPC to move between, and returns the corresponding SceneRoute from the sceneRouteDictionary, if that route exists.
+    // Else, it returns null
+    public SceneRoute GetSceneRoute(string fromSceneName, string toSceneName)
+    {
+        SceneRoute sceneRoute;
+
+        // Get the scene route desired from the SceneRouteDictionary if it exists. Return the scene route if it exists, and null if not
+        if (sceneRouteDictionary.TryGetValue(fromSceneName + toSceneName, out sceneRoute))
+        {
+            return sceneRoute;
+        }
+        else
+        {
+            return null;
         }
     }
 

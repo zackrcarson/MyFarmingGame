@@ -24331,6 +24331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb97cb72d42ce9a41a3f27c4880d7fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  so_SceneRouteList: {fileID: 11400000, guid: 27aabe54fd385fb428777bffe00413ba, type: 2}
   npcArray: []
 --- !u!114 &1774554340
 MonoBehaviour:

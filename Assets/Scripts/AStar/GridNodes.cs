@@ -40,7 +40,7 @@ public class GridNodes
         }
         else
         {
-            Debug.Log("Requested grid node is out of range, with grid of dimensionality " + width + " x " + height + ".");
+            Debug.Log("Requested grid node at (" + xPosition + ", " + yPosition + ") is out of range, with grid of dimensionality " + width + " x " + height + ".");
             return null;
         }
     }

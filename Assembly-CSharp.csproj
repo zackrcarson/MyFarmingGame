@@ -108,8 +108,11 @@
      <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
      <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
+     <Compile Include="Assets\Scripts\Scene\SO_SceneRouteList.cs" />
      <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
      <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
+     <Compile Include="Assets\Scripts\Scene\ScenePath.cs" />
+     <Compile Include="Assets\Scripts\Scene\SceneRoute.cs" />
      <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
      <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
      <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />

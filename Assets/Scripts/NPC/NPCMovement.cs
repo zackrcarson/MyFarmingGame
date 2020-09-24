@@ -134,6 +134,20 @@ public class NPCMovement : MonoBehaviour
                     // Set the current NPC scene to the first movement step in this stack
                     npcCurrentScene = npcMovementStep.sceneName;
 
+                    // If the NPC is about to move to a new scene, reset their position to the starting point in the new scene, and re-update the step times for the
+                    // next path elements in the new scene
+                    if (npcCurrentScene != npcPreviousMovementStepScene)
+                    {
+                        // If the current and next scenes are different, we are about to change scenes. Update the NPCs current grid position to the next movement steps grid coordinate
+                        // (in the next scene), set the nextGridPosition to the current one, update the NPCs transform to immediately teleport them to the new scenes entrance point,
+                        // update the NPCs current scene, and re-update the remaining times on the path (things probably got messed up between scenes because the grid coordinates changed substantially)
+                        npcCurrentGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+                        npcNextGridPosition = npcCurrentGridPosition;
+                        transform.position = GetWorldPosition(npcCurrentGridPosition);
+                        npcPreviousMovementStepScene = npcCurrentScene;
+                        npcPath.UpdateTimesOnPath();
+                    }
+
                     // If the NPC is in the current scene, then set the NPC to active to make it visiblie, then pop the movement step off 
                     // The top of the stack, and then call the method to actually move the NPC
                     if (npcCurrentScene.ToString() == SceneManager.GetActiveScene().name)
@@ -153,6 +167,39 @@ public class NPCMovement : MonoBehaviour
                         // This method will move the NPC to the next grid position npcNextGridPosition, and make sure they are there by the time npcMovementStepTime, starting off
                         // at the current game time
                         MoveToGridPosition(npcNextGridPosition, npcMovementStepTime, TimeManager.Instance.GetGameTime());
+                    }
+
+                    // Else, if the NPC is not in the current scene, then set the NPC to inactive to make it invisible (it's still moving but we can't see it until we move to their scene)
+                    // Once the movement step time is less than the game time (i.e. in the past), then pop the movement step off the stack and set the NPC position to the 
+                    // movement step position. Because we can't see the NPC, we don't need to run the walking animations - just keep popping off the next movement Step and
+                    // immediately teleporting the NPC there at the proper times. This will keep happening until the player enters the NPC's current scene - and then
+                    // they will start smoothly walking again.
+                    else
+                    {
+                        // Disables the sprite renderer and box collider, and sets the npcActiveInScene to false. The NPC is still on the persistent scene and moving, but we can't see them so it looks like they arent
+                        SetNPCInactiveInScene();
+
+                        // Set the current and nextGrid position and move the NPC to the current one
+                        npcCurrentGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+                        npcNextGridPosition = npcCurrentGridPosition;
+                        transform.position = GetWorldPosition(npcCurrentGridPosition);
+
+                        // The step time needed for the next step to be completed by, and the current game time
+                        TimeSpan npcMovementStepTime = new TimeSpan(npcMovementStep.hour, npcMovementStep.minute, npcMovementStep.second);
+                        TimeSpan gameTime = TimeManager.Instance.GetGameTime();
+
+                        // Whenever the stepTime < gameTime (so they should be to the next position by now), immediately teleport the NPC to that step, and then wait for the next step to occur, and then
+                        // teleport them again. This will keep going until the player enters the NPC's current scene - then they will start smoothly walking again.
+                        if (npcMovementStepTime < gameTime)
+                        {
+                            // Pop off the next Movement Step from the Stack
+                            npcMovementStep = npcPath.npcMovementStepStack.Pop();
+
+                            // Update the current and next grid positions, and immediately teleport the NPC to the next step position, rather than the smooth walking animation if the player IS in the NPCs scene.
+                            npcCurrentGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+                            npcNextGridPosition = npcCurrentGridPosition;
+                            transform.position = GetWorldPosition(npcCurrentGridPosition);
+                        }
                     }
                 }
 
@@ -354,6 +401,9 @@ public class NPCMovement : MonoBehaviour
             // This method disables the spriteRenderer and boxCollider of the NPC in the scene
             SetNPCInactiveInScene();
         }
+
+        // Make sure the NPCs current scene is correct because it can be changing
+        npcPreviousMovementStepScene = npcCurrentScene;
 
         // Get the NPC's current grid position
         npcCurrentGridPosition = GetGridPosition(transform.position);

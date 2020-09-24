@@ -361,6 +361,7 @@ public class AStar : MonoBehaviour
                             {
                                 Node node = gridNodes.GetGridNode(x, y);
                                 node.movementPenalty = pathMovementPenalty;
+                                UnityEngine.Debug.Log((node.gridPosition, node.movementPenalty));
                             }
                             // Else, if the current square is not a path or obstacle, create a node at that grid location (obtained from the gridNodes array GetGridNode at this position), 
                             // and populate it's movement penalty with defaultMovementPenalty

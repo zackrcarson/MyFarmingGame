@@ -14,6 +14,8 @@ public static class Settings
     public const float gridCellSize = 1f; // grid cell size in unity units
     public const float gridCellDiagonalSize = 1.41f; // diagonal distance between unity cell centers - for moving the NPC's diagonally in the proper amount of time
     public static Vector2 cursorSize = Vector2.one;
+    public const int maxGridWidth = 99999;
+    public const int maxGridHeight = 99999;
 
     // Player
     public static float playerCenterYOffset = 0.875f;

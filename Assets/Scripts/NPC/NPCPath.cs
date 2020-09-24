@@ -37,7 +37,8 @@ public class NPCPath : MonoBehaviour
         // First clear out the npcMovementStepStack in case it has extra steps from earlier builds
         ClearPath();
 
-        // If the scheduled event is for the same scene as the current NPC scene. For now, we are only moving the NPC within the current scene. If it's not, don't run the scheduled event
+        // If the scheduled event is for the same scene as the current NPC scene. For now, we are only moving the NPC within the current scene. If it's not, go to the 
+        // next else if statement to move to a new scene
         if (npcScheduleEvent.toSceneName == npcMovement.npcCurrentScene)
         {
             // If we are in the same scene as the scheduled event, get the current (start) and target grid positions for the movement event, the former from the npcMovement, and
@@ -48,20 +49,86 @@ public class NPCPath : MonoBehaviour
 
             // Build the path with NPCManager -> AStar and add the corresponding movement steps to the movement step stack
             NPCManager.Instance.BuildPath(npcScheduleEvent.toSceneName, npcCurrentGridPosition, npcTargetGridPosition, npcMovementStepStack);
+        }
+        // Else, if the movement event is for a location in another scene, we need to build Paths from the current NPC position, to the scene exit position specified in
+        // the SceneRoute, then a new path from the new scene entrance position to where the NPC targets (or to another scene if there is a 3-scene scene route between the scenes)
+        else if (npcScheduleEvent.toSceneName != npcMovement.npcCurrentScene)
+        {
+            SceneRoute sceneRoute;
 
-            // If stack count is > 1 (i.e. has steps beyond the starting one), update the times and the pop off the 1st item which is the starting position
-            if (npcMovementStepStack.Count > 1)
+            // Get the corresponding sceneRoute for the matching schedule
+            sceneRoute = NPCManager.Instance.GetSceneRoute(npcMovement.npcCurrentScene.ToString(), npcScheduleEvent.toSceneName.ToString());
+
+            // Check if a valid SceneRoute has been found in the NPCManager SceneRouteDictionary
+            if (sceneRoute != null)
             {
-                // This method will loop through all of the steps in the npcMovementStepStack, and populate the gameTime that the NPC needs to 
-                // be to that step by.
-                UpdateTimesOnPath();
+                // Loop through all of the scene paths the NPC will need to traverse to get to the toSceneName, backwards
+                // For each ScenePath in the SceneRoute, calculate the to and from grid positions (if it's a starting scene, fromGrid is the NPCs current position, and toGrid is that scenes
+                // exit point specified in the scenePath. If it's a middle scene, fromGrid is the scene entrance point, and toGrid is the scene exit point. If it's the ending scene, the 
+                // fromGrid is the scene entrance point, and the toGrid is the target destination specified in the NPCScheduleEvent
+                for (int i = sceneRoute.scenePathList.Count - 1; i >= 0; i--)
+                {
+                    int toGridX, toGridY, fromGridX, fromGridY;
 
-                // discard starting step (we're already on the starting step)
-                //npcMovementStepStack.Pop();  // I removed this line so the NPC doesn't jump a square for the very first step...
+                    ScenePath scenePath = sceneRoute.scenePathList[i];
 
-                // Set the schedule event details in NPC movement, so it knows how to move the NPC, and what facing direction/animation to play when they get there
-                npcMovement.SetScheduleEventDetails(npcScheduleEvent);
+                    // Check if this current ScenePath is the final destination (we set it up so final destinations have toGridCells of (999999, 999999), while the maxGridDims are smaller at 99999)
+                    // - when this happens we know to suibstitute the final destination as the one the NPCScheduleEvent wants
+                    if (scenePath.toGridCell.x >= Settings.maxGridWidth || scenePath.toGridCell.y >= Settings.maxGridHeight)
+                    {
+                        // If so, set up the toGrid cell as the final destination of the NPCScheduleEvent we are looking at
+                        toGridX = npcScheduleEvent.toGridCoordinate.x;
+                        toGridY = npcScheduleEvent.toGridCoordinate.y;
+                    }
+                    else
+                    {
+                        // If it's not the final destination, use the specified scenePath to position to move to (i.e. the scene exit position the NPC will move to to transfer to the next scene)
+                        toGridX = scenePath.toGridCell.x;
+                        toGridY = scenePath.toGridCell.y;
+                    }
+
+                    // Check if this current ScenePath is the  starting position (we set it up so starting positions have toGridCells of (999999, 999999), while the maxGridDims are smaller at 99999)
+                    // - when this happens we know to suibstitute the starting position as the one the NPCs current position
+                    if (scenePath.fromGridCell.x >= Settings.maxGridWidth || scenePath.fromGridCell.y >= Settings.maxGridHeight)
+                    {
+                        // If so, set up the NPCs current position cell as the starting location of the first path
+                        fromGridX = npcMovement.npcCurrentGridPosition.x;
+                        fromGridY = npcMovement.npcCurrentGridPosition.y;
+                    }
+                    else
+                    {
+                        // If it's not the starting position, use the specified scenePath to position to move from (i.e. the scene entrance position the NPC will move to to transfer to the next scene)
+                        fromGridX = scenePath.fromGridCell.x;
+                        fromGridY = scenePath.fromGridCell.y;
+                    }
+
+                    // To and From grid positions in THIS current Scene (computed above from the current scene path we're looking at)
+                    Vector2Int fromGridPosition = new Vector2Int(fromGridX, fromGridY);
+                    Vector2Int toGridPosition = new Vector2Int(toGridX, toGridY);
+
+                    // Build the path for this current ScenePath in the sceneRoute, and add the steps to the movementStepStack (not cleared inbetween scenePaths! All of the scenes 
+                    // will get added onto the top of the movementStepStack). So our movementStepStack will have multiple built paths stacked on top of eachother,
+                    // one for each scene we need to traverse. Then the NPCmovement will take all of the steps in turn, from each scene in order to get to the destination 
+                    // scene and grid position
+                    NPCManager.Instance.BuildPath(scenePath.sceneName, fromGridPosition, toGridPosition, npcMovementStepStack);
+
+                    // Then move on to the next ScenePath (for the next scene) in the loop and repeat all of the steps to add more to the Step Stack under a new step name
+                }
             }
+        }
+
+        // If stack count is > 1 (i.e. has steps beyond the starting one), update the times and the pop off the 1st item which is the starting position
+        if (npcMovementStepStack.Count > 1)
+        {
+            // This method will loop through all of the steps in the npcMovementStepStack, and populate the gameTime that the NPC needs to 
+            // be to that step by.
+            UpdateTimesOnPath();
+
+            // discard starting step (we're already on the starting step)
+            //npcMovementStepStack.Pop();  // I removed this line so the NPC doesn't jump a square for the very first step...
+
+            // Set the schedule event details in NPC movement, so it knows how to move the NPC, and what facing direction/animation to play when they get there
+            npcMovement.SetScheduleEventDetails(npcScheduleEvent);
         }
     }
 

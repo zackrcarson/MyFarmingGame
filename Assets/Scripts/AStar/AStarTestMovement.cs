@@ -7,6 +7,7 @@ public class AStarTestMovement : MonoBehaviour
     // Populated in the editor
     [SerializeField] private NPCPath npcPath = null; //NPCPAth component for the NPC we want to control
     [SerializeField] private bool moveNPC = false; // Ticked in editor to say when to move the NPC
+    [SerializeField] private SceneName sceneName = SceneName.Scene1_Farm; // The name of the scene we want the NPC to walk to
     [SerializeField] private Vector2Int finishPosition; // The position we want the NPC to move to
     [SerializeField] private AnimationClip idleDownAnimationClip = null; // The animation clip for idle down, so the NPC will idle down when they arrive
     [SerializeField] private AnimationClip eventAnimationClip = null; // the event animation clip to play when the NPC arrives
@@ -30,7 +31,7 @@ public class AStarTestMovement : MonoBehaviour
             moveNPC = false;
 
             // Now scheduled event with the correct parameters
-            NPCScheduleEvent npcScheduleEvent = new NPCScheduleEvent(0, 0, 0, 0, Weather.none, Season.none, SceneName.Scene1_Farm, new GridCoordinate(finishPosition.x, finishPosition.y), eventAnimationClip);
+            NPCScheduleEvent npcScheduleEvent = new NPCScheduleEvent(0, 0, 0, 0, Weather.none, Season.none, sceneName, new GridCoordinate(finishPosition.x, finishPosition.y), eventAnimationClip);
 
             // Build the path from this npcScheduleEvent
             npcPath.BuildPath(npcScheduleEvent);
