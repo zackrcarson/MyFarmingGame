@@ -109,13 +109,19 @@ public class Crop : MonoBehaviour
             }
 
             if (isUsingToolRight || isUsingToolUp)
-                {
-                    animator.SetTrigger("harvestright");
-                }
-                else
-                {
-                    animator.SetTrigger("harvestleft");
-                }
+            {
+                animator.SetTrigger("harvestright");
+            }
+            else
+            {
+                animator.SetTrigger("harvestleft");
+            }
+        }
+
+        // Check if there is a harvest sound that needs to be played. If so, play the corresponding sound populated in the cropDetails, via the Audio manager!
+        if (cropDetails.harvestSound != SoundName.none)
+        {
+            AudioManager.Instance.PlaySound(cropDetails.harvestSound);
         }
 
         // Delete the crop from the grid properties

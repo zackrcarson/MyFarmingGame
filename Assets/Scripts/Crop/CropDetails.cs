@@ -20,6 +20,7 @@ public class CropDetails
     public bool isHarvestActionEffect = false; // Flag to determine whether there is a harvest action effect (i.e. leaves fall off tree when hit with axe)
     public bool spawnCropProducedAtPlayerPosition; // Determines if a crop should be spawned at the players position, so the player will automatically pick it up
     public HarvestActionEffect harvestActionEffect; // The harvest action effect for the crop that will be played (i.e. leaves fall off tree when hit with axe)
+    public SoundName harvestSound; // The harvest sound that will be played when we harvest a crop
 
     [ItemCodeDescription]
     public int[] harvestToolItemCode; // The array of item codes for the tools that can harvest the crop, or 0 array elements if no tool is required (for example - tree can be cut with axe, brass axe, gold axe)

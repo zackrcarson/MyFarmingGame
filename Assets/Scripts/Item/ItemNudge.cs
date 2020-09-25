@@ -26,6 +26,12 @@ public class ItemNudge : MonoBehaviour
             {
                 StartCoroutine(RotateClock());
             }
+
+            // If it's the player walking through the reapable scenary, play the rustle sound when we enter the collider
+            if (collision.gameObject.tag == "Player")
+            {
+                AudioManager.Instance.PlaySound(SoundName.effectRustle);AudioManager.Instance.PlaySound(SoundName.effectRustle);
+            }
         }
     }
 
@@ -43,6 +49,12 @@ public class ItemNudge : MonoBehaviour
             else
             {
                 StartCoroutine(RotateClock());
+            }
+
+            // If it's the player walking through the reapable scenary, play the rustle sound when we exit the collider
+            if (collision.gameObject.tag == "Player")
+            {
+                AudioManager.Instance.PlaySound(SoundName.effectRustle);
             }
         }
     }

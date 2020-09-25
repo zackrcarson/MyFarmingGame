@@ -181,7 +181,6 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             // Check if the testing keys for advancing game time have been pressed!
             PlayerTestInput();
 
-
             // From above two calls, we have xInput, yInput, movementSpeed, and isRunning, isWalking, and isIdle.
             // Now, send event info to delegate so any listeners will recieve player movement input
             EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect, 
@@ -493,7 +492,10 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
 
             // Remove the item from the inventory
-            EventHandler.CallRemoveSelectedItemFromInventoryEvent();        
+            EventHandler.CallRemoveSelectedItemFromInventoryEvent();
+
+            // Play the planting sound when we plant the seed
+            AudioManager.Instance.PlaySound(SoundName.effectPlantingSound);
         }
     }
 
@@ -579,6 +581,9 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // This method just initiates the coroutine that enables the hoeing coroutine to initiate the animation, and update the GridPropertyDetails to dug at the square
     private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
+        // Play the hoe sound when we hoe the ground
+        AudioManager.Instance.PlaySound(SoundName.effectHoe);
+
         // Trigger the animation as a coroutine to run over several frames
         StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
     }
@@ -649,6 +654,9 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // This method just initiates the coroutine that enables the watering coroutine to initiate the animation, and update the GridPropertyDetails to watered at the square
     private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
+        // Play the watering sound when we water the ground
+        AudioManager.Instance.PlaySound(SoundName.effectWateringCan);
+
         // Trigger the animation as a coroutine to run over several frames
         StartCoroutine(WaterGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
     }
@@ -723,6 +731,10 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // and harvest the tree (wobble it if the number of harvest actions not completed yet, fell it if they are)
     private void ChopInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
+        // Play the chop sound as we chop the tree
+        AudioManager.Instance.PlaySound(SoundName.effectAxe);
+
+        // Initiates the coroutine to play the chop animation in the correct players direction over a few frames
         StartCoroutine(ChopInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }
 
@@ -763,6 +775,10 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // and destroy the fully grown crop, add it to your inventory
     private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
+        // Play the collecting sound when we harvest the crop
+        AudioManager.Instance.PlaySound(SoundName.effectBasket);
+
+        // Start the coroutine that plays the collecting animation in the proper facing direction over a few frames
         StartCoroutine(CollectInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }
 
@@ -794,6 +810,10 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     // and destroy/wobble the stone, and add the harvest resources to your inventory
     private void BreakInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
+        // Play the mining sound when we mine the rock
+        AudioManager.Instance.PlaySound(SoundName.effectPickaxe);
+
+        // Start the coroutine that animates the player mining in the correct direction over a few frames
         StartCoroutine(BreakInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }
 
@@ -934,6 +954,9 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                         // Publish the Harvest Action Event, which will be picked up by the VFXManager to trigger the reaping particle 
                         // effect at the location that the reapable Scenary was found
                         EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
+
+                        // Play the scythe sound when we reap the scenerry
+                        AudioManager.Instance.PlaySound(SoundName.effectScythe);
 
                         Destroy(itemArray[i].gameObject);
 
