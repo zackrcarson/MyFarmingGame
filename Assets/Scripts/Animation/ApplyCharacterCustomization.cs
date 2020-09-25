@@ -107,9 +107,9 @@ public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
     private Color inputSkinColor = new Color32(207, 166, 128, 255);
 
     // The ranges used in the skin sliders, so we can convert to the proper normalized values
-    private int skinRangeR = 223 - 63;
-    private int skinRangeG = 225 - 50;
-    private int skinRangeB = 228 - 39;
+    // private int skinRangeR = 223 - 63;
+    // private int skinRangeG = 225 - 50;
+    // private int skinRangeB = 228 - 39;
 
     // Select the gender (0 - male, 1 - female), populated in the editor (right now both male and female are the same)
     [Header("Select Sex: 0 = Male, 1 = Female")]
@@ -1522,7 +1522,7 @@ public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
 
         // Create a new int dictionary to store the customization parameters
         sceneSave.intDictionary = new Dictionary<string, int>();
-
+        
         // Add values to the int dictionary for the different customization parameters, keyed so we can easily retrieve them in load
         sceneSave.intDictionary.Add("shirtStyleNo", inputShirtStyleNo);
         sceneSave.intDictionary.Add("hairStyleNo", inputHairStyleNo);
@@ -1715,9 +1715,9 @@ public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
                     hairSliders[2].normalizedValue = inputHairColor.b;
 
                     // Skin sliders need extra care because the sliders don't encompass all 255 bytes! need to divide by the slider range rather than 255
-                    skinSliders[0].normalizedValue = (float)(savedSkinColorR / skinRangeR);
-                    skinSliders[1].normalizedValue = (float)(savedSkinColorG / skinRangeG);
-                    skinSliders[2].normalizedValue = (float)(savedSkinColorB / skinRangeB);
+                    skinSliders[0].normalizedValue = (float)(savedSkinColorR / 255f);
+                    skinSliders[1].normalizedValue = (float)(savedSkinColorG / 255f);
+                    skinSliders[2].normalizedValue = (float)(savedSkinColorB / 255f);
 
                     trouserSliders[0].normalizedValue = inputTrouserColor.r;
                     trouserSliders[1].normalizedValue = inputTrouserColor.g;

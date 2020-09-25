@@ -243,7 +243,7 @@ public class NPCMovement : MonoBehaviour
     // This will initiate the NPC's target destination animation (i.e. smokeDirection, digDirection, etc) once they get there,
     // if the movement Event scheduled had a target animation (if not, set the blank animation). This is done with an
     // animation override controller to swap the default blank animation for the target animation
-    private void SetNPCEventAnimation()
+    public void SetNPCEventAnimation()
     {
         // Make sure this scheduled movement event has a target animation.
         if (npcTargetAnimationClip != null)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 // This class will manage the save game components for the NPC, so we can save and load their positions and/or target positions when we save/load the game
@@ -7,6 +8,9 @@ using UnityEngine;
 [RequireComponent(typeof(GenerateGUID))]
 public class NPC : MonoBehaviour, ISaveable
 {
+    [SerializeField] private AnimationClip[] targetAnimations = null; // I added these to populate with a list of all of the NPCs animations, so we can save the target animation as a string, and then load the proper animation clip from that string
+    private Dictionary<string, AnimationClip> targetAnimationsDictionary;
+
     // Unique ID required by the ISaveable interface, will store the GUID attached to the NPC gameObject
     private string _iSaveableUniqueID;
     public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
@@ -37,6 +41,13 @@ public class NPC : MonoBehaviour, ISaveable
     // When the NPC GameObject is Awake (at the beginning of the game), we will cache the GUID attached to the NPC, and initialize the GameObjectSave to save aspects of the NPC
     private void Awake()
     {
+        // I added this to populate our dictionary with <string, AnimationClip>, so when we load the saved string describing the targetAnimation, we can find the corresponding clip and play it!!
+        targetAnimationsDictionary = new Dictionary<string, AnimationClip>();
+        foreach (AnimationClip animationClip in targetAnimations)
+        {
+            targetAnimationsDictionary.Add(animationClip.ToString(), animationClip);
+        }
+
         // Get the unique ID for the GameObject
         ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
 
@@ -87,13 +98,14 @@ public class NPC : MonoBehaviour, ISaveable
 
         // Create a new string dictionary to store the NPCs target scene
         sceneSave.stringDictionary = new Dictionary<string, string>();
-
+        
         // Add values to the vector3 dictionary for the NPCs target grid and world positions, keyed so we can easily retrieve them on load
         sceneSave.vector3Dictionary.Add("npcTargetGridPosition", new Vector3Serializable(npcMovement.npcTargetGridPosition.x, npcMovement.npcTargetGridPosition.y, npcMovement.npcTargetGridPosition.z));
         sceneSave.vector3Dictionary.Add("npcTargetWorldPosition", new Vector3Serializable(npcMovement.npcTargetWorldPosition.x, npcMovement.npcTargetWorldPosition.y, npcMovement.npcTargetWorldPosition.z));
 
         // Add values to the string dictionary for the NPCs target scene, keyed so we can easily retrieve it on load
         sceneSave.stringDictionary.Add("npcTargetScene", npcMovement.npcTargetScene.ToString());
+        sceneSave.stringDictionary.Add("npcTargetAnimation", npcMovement.npcTargetAnimationClip.ToString()); // I added this so we can save a string describing the target animatino clip, so we can play it when the npc is transported to his target
 
         // Add the SceneSave data for the NPC game object to the GameObjectSave, which is a dict storing all the dicts in a scene to be loaded/saved, keyed by the scene name
         // The NPC will get stored in the Persistent Scene
@@ -148,8 +160,23 @@ public class NPC : MonoBehaviour, ISaveable
                         }
                     }
 
-                    // Clear out any current NPC movement on the current game before we load the saved game, so our npc doesn't start animnating or anything
-                    npcMovement.CancelNPCMovement();
+                    // I added this to load the target animatino clip, so we can play it when the npc is transported to his target. This checks the animation dictionary for the <string, Clip> value,
+                    // And uses the corresponding clip to play the npc animaition!
+                    if (sceneSave.stringDictionary.TryGetValue("npcTargetAnimation", out string savedNPCTargetAnimation))
+                    {
+                        if (targetAnimationsDictionary.TryGetValue(savedNPCTargetAnimation, out AnimationClip savedNPCTargetAnimationClip))
+                        {
+                            // Clear out the movement and then set the NPCs animation to the loaded targetAnimation
+                            npcMovement.CancelNPCMovement();
+                            npcMovement.npcTargetAnimationClip = savedNPCTargetAnimationClip;
+                            npcMovement.SetNPCEventAnimation();
+                        }
+                    }
+                    else
+                    {
+                        // Clear out any current NPC movement on the current game before we load the saved game, so our npc doesn't start animnating or anything
+                        npcMovement.CancelNPCMovement();
+                    }
                 }
             }
         }
