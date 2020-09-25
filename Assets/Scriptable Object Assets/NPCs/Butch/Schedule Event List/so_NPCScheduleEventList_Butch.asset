@@ -65,7 +65,20 @@ MonoBehaviour:
     npcFacingDirectionAtDestination: 4
     animationAtDestination: {fileID: 7400000, guid: 1936f787f8c0bc0408e5054dac230c52,
       type: 2}
-  - hour: 17
+  - hour: 6
+    minute: 31
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 2
+    toGridCoordinate:
+      x: 4
+      y: 5
+    npcFacingDirectionAtDestination: 1
+    animationAtDestination: {fileID: 7400000, guid: bc72b54e068840044a4b381c76eec014,
+      type: 2}
+  - hour: 18
     minute: 0
     priority: 3
     day: 0
@@ -76,4 +89,81 @@ MonoBehaviour:
       x: -3
       y: 3
     npcFacingDirectionAtDestination: 1
+    animationAtDestination: {fileID: 0}
+  - hour: 9
+    minute: 31
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 1
+    toGridCoordinate:
+      x: 36
+      y: 1
+    npcFacingDirectionAtDestination: 3
+    animationAtDestination: {fileID: 7400000, guid: bc72b54e068840044a4b381c76eec014,
+      type: 2}
+  - hour: 11
+    minute: 31
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 1
+    toGridCoordinate:
+      x: -17
+      y: -16
+    npcFacingDirectionAtDestination: 1
+    animationAtDestination: {fileID: 7400000, guid: 1936f787f8c0bc0408e5054dac230c52,
+      type: 2}
+  - hour: 13
+    minute: 31
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 1
+    toGridCoordinate:
+      x: 27
+      y: -16
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: f6d19b69b0e15b9438fc33af70dd6359,
+      type: 2}
+  - hour: 15
+    minute: 0
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 0
+    toGridCoordinate:
+      x: -26
+      y: -16
+    npcFacingDirectionAtDestination: 3
+    animationAtDestination: {fileID: 7400000, guid: d78b30f0d628d8a4cab29e8b91e311a8,
+      type: 2}
+  - hour: 17
+    minute: 0
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 0
+    toGridCoordinate:
+      x: 6
+      y: 0
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: d44f949a65086634688b4088ed2e6357,
+      type: 2}
+  - hour: 21
+    minute: 0
+    priority: 10
+    day: 0
+    weather: 3
+    season: 4
+    toSceneName: 2
+    toGridCoordinate:
+      x: 6
+      y: 5
+    npcFacingDirectionAtDestination: 2
     animationAtDestination: {fileID: 0}

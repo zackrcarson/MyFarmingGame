@@ -14,12 +14,12 @@ public class NPCMovement : MonoBehaviour
 {
     // The current/target scenes and gridPositions for the NPC given this Scheduled Movement Event, as well as the target position in the world space, and the direction
     // the NPC needs to face once they reach the destination
-    [HideInInspector] public SceneName npcCurrentScene;
+    public SceneName npcCurrentScene; // Set the initial current scene in the inspector
     [HideInInspector] public SceneName npcTargetScene;
     [HideInInspector] public Vector3Int npcCurrentGridPosition;
     [HideInInspector] public Vector3Int npcTargetGridPosition;
     [HideInInspector] public Vector3 npcTargetWorldPosition;
-    [HideInInspector] public Direction npcFacingDirectionAtDestination;
+    public Direction npcFacingDirectionAtDestination; // Set the initial facing direction scene in the inspector
 
     // The scene that the previous movement step was in, and the grid/world positions of the next step in the new scene (so we can transfer the NPC between scenes!)
     private SceneName npcPreviousMovementStepScene;

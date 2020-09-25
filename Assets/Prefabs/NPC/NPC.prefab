@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0359b16a350af7a4f8222fb6c79aff67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetAnimations: []
 --- !u!114 &8381615691447316884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,7 +213,7 @@ MonoBehaviour:
   npcFacingDirectionAtDestination: 0
   npcNormalSpeed: 2
   npcMinSpeed: 1
-  npcMaxSpeed: 2
+  npcMaxSpeed: 4
   npcTargetAnimationClip: {fileID: 0}
   blankAnimation: {fileID: 7400000, guid: de73329f78eb6d645a9a70faf2bddfce, type: 2}
   npcActiveInScene: 0
