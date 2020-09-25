@@ -19,10 +19,10 @@ public class colorSwap
     }
 }
 
-
+[RequireComponent(typeof(GenerateGUID))]
 public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
 {
-    // Unique ID required by the ISaveable interface, will store the GUID attached to the InventoryManager gameObject
+    // Unique ID required by the ISaveable interface, will store the GUID attached to the CharacterCustomization gameObject
     private string _iSaveableUniqueID;
     public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
 
@@ -190,7 +190,6 @@ public class ApplyCharacterCustomization : MonoBehaviour, ISaveable
 
 
     // On enable, this will just register this gameObject as an ISaveable, so that the SaveLoadManager can save/load the methods set up here
-    // Also subscribe to scene loading/unloading events so we can pause/start the game clock while scenes are unloading/loading
     private void OnEnable()
     {
         // Registers this game object within the iSaveableObjectList, which is looped through in the SaveLoadManager for all objects to save/load the saved items

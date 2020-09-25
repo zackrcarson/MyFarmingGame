@@ -386,6 +386,37 @@ public class NPCMovement : MonoBehaviour
     }
 
 
+    // This method can be called from elsewhere (i.e. when we load the game) to cancel all of the NPCs movement - clear the path, isMoving -> false, stop the walking coroutines,
+    // clear the moving, idle, and event animations, sets the NPC to idle down
+    public void CancelNPCMovement()
+    {
+        // Clear out the build path the NPC may have, set the next Grid positions to 0, and set npcIsMoving to false so other methods can utilize it again
+        npcPath.ClearPath();
+        npcNextGridPosition = Vector3Int.zero;
+        npcNextWorldPosition = Vector3Int.zero;
+        npcIsMoving = false;
+
+        // If we have a walking coroutine going, stop it
+        if (moveToGridPositionRoutine != null)
+        {
+            StopCoroutine(moveToGridPositionRoutine);
+        }
+
+        // Reset the move animation the the NPC stops the moving animations
+        ResetMoveAnimation();
+
+        // Clear the event animation the NPC may be playing at the destination
+        ClearNPCEventAnimation();
+        npcTargetAnimationClip = null;
+
+        // Reset the idle animations to all false
+        ResetIdleAnimation();
+
+        // Set the idle animation to idle down
+        SetIdleAnimation();
+    }
+
+
     // Initializes the NPC if it is in the currently active scene, by activating its SpriteRenderer and BoxCollider, and setting the npcActiveInScene bool.
     // If it's not in the correct scene, disable the same members
     private void InitializeNPC()
