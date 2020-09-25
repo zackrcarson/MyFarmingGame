@@ -175,8 +175,6 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // Only drop the item if it exists, and if it is selected!
         if (itemDetails != null && isSelected)
         {
-
-
             // If we have a valid cursor position, then we can instantiate a new item at the dropped location
             if (gridCursor.CursorPositionIsValid)
             {
@@ -193,6 +191,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
                 // Remove the item from the players inventory
                 InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
+
+                AudioManager.Instance.PlaySound(SoundName.effectPluck); // I added this to play a sound when we drop an item
 
                 // If we are dropping the last item in a stack, clear the selected highlight
                 if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
@@ -285,6 +285,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 if (itemDetails.canBeDropped)
                 {
                     DropSelectedItemAtMousePosition();
+
+                    AudioManager.Instance.PlaySound(SoundName.effectPluck); // I added this to play a sound when we drop an item
                 }
             }
 

@@ -120,7 +120,7 @@ MonoBehaviour:
     soundDescription: Sound effect from Freesound cc0
     soundPitchRandomVariationMin: 1
     soundPitchRandomVariationMax: 1
-    soundVolume: 0.55
+    soundVolume: 0.75
   - soundName: 2000
     soundClip: {fileID: 8300000, guid: 2b541905ca3cd9347a56ffc11193c35a, type: 3}
     soundDescription: From opengameart.org, SubspaceAudio cc0
