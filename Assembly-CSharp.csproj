@@ -118,6 +118,10 @@
      <Compile Include="Assets\Scripts\Scene\SceneRoute.cs" />
      <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
      <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
+     <Compile Include="Assets\Scripts\Sounds\AudioManager.cs" />
+     <Compile Include="Assets\Scripts\Sounds\SO_SoundList.cs" />
+     <Compile Include="Assets\Scripts\Sounds\Sound.cs" />
+     <Compile Include="Assets\Scripts\Sounds\SoundItem.cs" />
      <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
      <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
      <Compile Include="Assets\Scripts\UI\Cursor.cs" />

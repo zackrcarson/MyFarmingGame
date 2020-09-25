@@ -133,6 +133,35 @@ public enum Direction
     none
 }
 
+// Give these Enums specific values rather than the default value of 0, 1, 2..
+// This way we can easily insert enums BETWEEN existing ones, i.e. between hoe and
+// watering can - and then label it as 65. This way other things using the enums (like SO's)
+// aren't messed up
+public enum SoundName
+{
+    none = 0,
+    effectFootStepSoftGround = 10,
+    effectFootStepHardGround = 20,
+    effectAxe = 30,
+    effectPickaxe = 40,
+    effectScythe = 50,
+    effectHoe = 60,
+    effectWateringCan = 70,
+    effectBasket = 80,
+    effectPickupSound = 90,
+    effectRustle = 100,
+    effectTreeFalling = 110,
+    effectPlantingSound = 120,
+    effectPluck = 130,
+    effectStoneShatter = 140,
+    effectWoodSplinters = 150,
+    ambientCountryside1 = 1000,
+    ambientCountryside2 = 1010,
+    ambientIndoors1 = 1020,
+    musicCalm3 = 2000,
+    musicCalm1 = 2010
+}
+
 public enum ItemType
 {
     Seed,

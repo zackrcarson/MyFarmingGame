@@ -84,9 +84,12 @@ public class MovementAnimationParameterControl : MonoBehaviour
             animator.SetTrigger(Settings.idleDown);
     }
 
-    // Triggered within the walking/running animations to play a footstep sound
+    // Triggered within the walking/running animations (directly set up in the animation controllers for the player walking!) to play a footstep sound at certain times during the animation
+    // This one (little white bars on the animation timeline for the body animations) plays every time the foot hits the ground.
+    // Because we are triggering this sound from the animation, it will synchronize very well with the actual footsteps!!
     private void AnimationEventPlayFootstepSound()
     {
-
+        // Use the AudioManager to play the footstep sound everytime this method is triggered from the animation!
+        AudioManager.Instance.PlaySound(SoundName.effectFootStepHardGround);
     }
 }
