@@ -97,7 +97,10 @@
      <Compile Include="Assets\Scripts\NPC\NPCMovement.cs" />
      <Compile Include="Assets\Scripts\NPC\NPCMovementStep.cs" />
      <Compile Include="Assets\Scripts\NPC\NPCPath.cs" />
+     <Compile Include="Assets\Scripts\NPC\NPCSchedule.cs" />
      <Compile Include="Assets\Scripts\NPC\NPCScheduleEvent.cs" />
+     <Compile Include="Assets\Scripts\NPC\NPCScheduleEventSort.cs" />
+     <Compile Include="Assets\Scripts\NPC\SO_NPCScheduleEventList.cs" />
      <Compile Include="Assets\Scripts\Player\ItemPickup.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerAnimationTest.cs" />

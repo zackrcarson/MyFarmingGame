@@ -5224,8 +5224,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: 0, y: 0, z: 0}
-  m_Size: {x: 0, y: 0, z: 1}
+  m_Origin: {x: -40, y: -30, z: 0}
+  m_Size: {x: 81, y: 61, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -13692,6 +13692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63cbb92bebdcf414080ca179d9e4dc34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentWeather: 0
 --- !u!1 &1070712553
 GameObject:
   m_ObjectHideFlags: 0
@@ -22754,6 +22755,12 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 797643902}
     m_Modifications:
+    - target: {fileID: 5160187742429901052, guid: 4260a1a54c31d11409ea46382491ed7b,
+        type: 3}
+      propertyPath: so_NPCScheduleEventList
+      value: 
+      objectReference: {fileID: 11400000, guid: aa8781fcf6f8fb145b28000afbf63d5b,
+        type: 2}
     - target: {fileID: 5401490041598543747, guid: 4260a1a54c31d11409ea46382491ed7b,
         type: 3}
       propertyPath: _gUID
@@ -24347,6 +24354,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcPath: {fileID: 1655014039}
   moveNPC: 0
+  sceneName: 0
   finishPosition: {x: 22, y: 28}
   idleDownAnimationClip: {fileID: 7400000, guid: cb83867c6252b5c4a8e8758697474f88,
     type: 2}
