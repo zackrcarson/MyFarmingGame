@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
+using System.Linq;
+using UnityEngine.UI;
+
 // This singleton class Manages all of our sounds in the game. It creates a sounds Dictionary of all the sounds we can play in the game from the SO containing a SoundItemList,
 // and can Play a given sound (via Sound.cs on a Sound gameObject prefab from the PoolManager) given the SoundName enum of the sound we want to play
 public class AudioManager : SingletonMonobehaviour<AudioManager>
@@ -21,6 +24,7 @@ public class AudioManager : SingletonMonobehaviour<AudioManager>
     // Populated in the editor with the Audio mixer containing all of the audio mixer groups (i.e. master, ambientMaster, ambient, musicMaster, music, each with sliders)
     [Header("Audio Mixers")]
     [SerializeField] private AudioMixer gameAudioMixer = null;
+    [SerializeField] private AudioMixer playerAudioMixer = null;
 
     // Populated in the editor with the music and ambient snapshots created with pre-saved audio mixer group settings
     [Header("Audio Snapshots")]
@@ -226,5 +230,31 @@ public class AudioManager : SingletonMonobehaviour<AudioManager>
         // Yield return this method until the duration of the sound clip has passed. Once that happens, set the sound GameObject to inactive so it'll stop playing
         yield return new WaitForSeconds(soundDuration);
         soundGameObject.SetActive(false);
+    }
+
+
+    // I added the following methods to control the master ambient, music, player, and "all" sounds from sliders in the pause menu
+    public void ChangeAmbientVolume(System.Single newVolume)
+    {
+        gameAudioMixer.SetFloat("AmbientMasterVolume", ConvertSoundVolumeDecimalFractionToDecibels(newVolume));
+    }
+
+
+    public void ChangeMusicVolume(System.Single newVolume)
+    {
+        gameAudioMixer.SetFloat("MusicMasterVolume", ConvertSoundVolumeDecimalFractionToDecibels(newVolume));
+    }
+
+
+    public void ChangeEffectsVolume(System.Single newVolume)
+    {
+        playerAudioMixer.SetFloat("PlayerVolume", ConvertSoundVolumeDecimalFractionToDecibels(newVolume));
+    }
+
+
+    public void ChangeMasterVolume(System.Single newVolume)
+    {
+        gameAudioMixer.SetFloat("MasterVolume", ConvertSoundVolumeDecimalFractionToDecibels(newVolume));
+        playerAudioMixer.SetFloat("PlayerVolume", ConvertSoundVolumeDecimalFractionToDecibels(newVolume));
     }
 }
