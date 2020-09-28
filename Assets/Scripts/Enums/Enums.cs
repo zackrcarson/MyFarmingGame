@@ -185,3 +185,30 @@ public enum Facing
     back,
     right
 }
+
+public enum DayOfWeek
+{
+    none,
+    Mon,
+    Tue,
+    Wed, 
+    Thu,
+    Fri,
+    Sat,
+    Sun
+}
+
+public enum NPCNames
+{
+    Butch,
+    Cora,
+    none
+}
+
+public enum NPCEmotions
+{
+    normal,
+    happy,
+    mad,
+    none
+}

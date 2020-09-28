@@ -14,9 +14,12 @@ public class ItemNudge : MonoBehaviour
     // This is called when the player enters a collision with an item with a trigger
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        CircleCollider2D collider = collision.GetComponent<CircleCollider2D>();
+
         // Only start animating it if it's currently not animating - just in case we get duplicate instances before animation ends
         if (isAnimating == false)
-        {   
+        {
+            
             // If the collision location (where the player hit the item) is to the right of the objects center, rotate it anti-clockwise. Else, do it clockwise
             if (gameObject.transform.position.x < collision.gameObject.transform.position.x)
             {
@@ -27,10 +30,10 @@ public class ItemNudge : MonoBehaviour
                 StartCoroutine(RotateClock());
             }
 
-            // If it's the player walking through the reapable scenary, play the rustle sound when we enter the collider
             if (collision.gameObject.tag == "Player")
             {
-                AudioManager.Instance.PlaySound(SoundName.effectRustle);AudioManager.Instance.PlaySound(SoundName.effectRustle);
+                // If it's the player walking through the reapable scenary, play the rustle sound when we enter the collider
+                AudioManager.Instance.PlaySound(SoundName.effectRustle);
             }
         }
     }

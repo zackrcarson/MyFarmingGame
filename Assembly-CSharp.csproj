@@ -69,6 +69,10 @@
      <Compile Include="Assets\Scripts\Crop\CropDetails.cs" />
      <Compile Include="Assets\Scripts\Crop\CropInstantiator.cs" />
      <Compile Include="Assets\Scripts\Crop\SO_CropDetailsList.cs" />
+     <Compile Include="Assets\Scripts\Dialogue\NPCDialogue.cs" />
+     <Compile Include="Assets\Scripts\Dialogue\NPCDialogueEvent.cs" />
+     <Compile Include="Assets\Scripts\Dialogue\NPCDialogueManager.cs" />
+     <Compile Include="Assets\Scripts\Dialogue\SO_NPCDialogueEventList.cs" />
      <Compile Include="Assets\Scripts\Enums\Enums.cs" />
      <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
      <Compile Include="Assets\Scripts\GameManager\GameManager.cs" />

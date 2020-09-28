@@ -18,9 +18,10 @@ GameObject:
   - component: {fileID: 8381615691447316884}
   - component: {fileID: 6663482925134434457}
   - component: {fileID: 5160187742429901052}
+  - component: {fileID: 3389573599186482586}
   m_Layer: 0
   m_Name: NPC
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -230,3 +231,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   so_NPCScheduleEventList: {fileID: 0}
+--- !u!114 &3389573599186482586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898429673677717470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbddb0fa6161204b9543e8461c14ce2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  so_NPCDialogueEventList: {fileID: 0}
+  NPCName: 
+  NPCPortraitDefault: {fileID: 0}
+  NPCPortraitHappy: {fileID: 0}
+  NPCPortraitMad: {fileID: 0}
+  transparentPortrait: {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344,
+    type: 3}

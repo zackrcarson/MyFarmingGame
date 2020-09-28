@@ -2,6 +2,9 @@
 
 public static class Settings
 {
+    // Dialogue
+    public const float NPCTalkDistance = 1f;
+
     // Scenes
     public const string PersistentScene = "PersistentScene";
 

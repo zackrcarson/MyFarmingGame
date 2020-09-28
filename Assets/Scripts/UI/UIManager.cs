@@ -39,8 +39,8 @@ public class UIManager : SingletonMonobehaviour<UIManager>
     // Checks for player ESC input to pause or unpause the game (depending on if it's currently unpaused or paused)
     private void PauseMenu()
     {
-        // If the player presses ESC, pause the game if it's unpaused. If it's already paused, unpause it
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // If the player presses ESC, pause the game if it's unpaused. If it's already paused, unpause it. Also make sure you aren't currently talking to an NPC
+        if (Input.GetKeyDown(KeyCode.Escape) && !NPCDialogueManager.Instance.DialogueBoxOn)
         {
             if (PauseMenuOn)
             {
