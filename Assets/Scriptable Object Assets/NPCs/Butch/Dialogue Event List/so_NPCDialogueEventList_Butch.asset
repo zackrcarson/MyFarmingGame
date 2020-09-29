@@ -20,9 +20,34 @@ MonoBehaviour:
     daysOfWeek: 01000000020000000300000004000000050000000600000007000000
     weatherTypes: 000000000100000002000000
     seasons: 00000000010000000200000003000000
+    years: 
     sceneNames: 000000000100000002000000
+    dialogue:
+    - Grumble Grumble.
+    emotions: 02000000
+  - dialogueDetail: firstDay
+    hourMin: 0
+    hourMax: 24
+    priority: 1
+    daysOfWeek: 01000000
+    weatherTypes: 000000000100000002000000
+    seasons: 00000000
+    years: 01000000
+    sceneNames: 020000000000000001000000
     dialogue:
     - Hi! My name is Butch.
     - I'm the local farmer running this ranch, I'll be your boss.
     - Let me know when you're ready, and then we'll get started!
     emotions: 010000000200000000000000
+  - dialogueDetail: cabin
+    hourMin: 6
+    hourMax: 7
+    priority: 5
+    daysOfWeek: 01000000020000000300000004000000050000000600000007000000
+    weatherTypes: 000000000100000002000000
+    seasons: 00000000010000000200000003000000
+    years: 
+    sceneNames: 02000000
+    dialogue:
+    - Such a cozy cabin..
+    emotions: 01000000

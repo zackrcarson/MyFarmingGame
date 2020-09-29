@@ -4,11 +4,14 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 
 public class NPCDialogue : MonoBehaviour
 {
     [SerializeField] private SO_NPCDialogueEventList so_NPCDialogueEventList = null;
-    private Dictionary<string, NPCDialogueEvent> DialogueEventDictionary;
+    //private Dictionary<string, NPCDialogueEvent> DialogueEventDictionary;
+    private List<NPCDialogueEvent> DialogueEventList;
+    private NPCDialogueEvent defaultDialogue;
 
     public string NPCName;
 
@@ -29,21 +32,22 @@ public class NPCDialogue : MonoBehaviour
     {
         npcMovement = GetComponent<NPCMovement>();
 
-        DialogueEventDictionary = new Dictionary<string, NPCDialogueEvent>();
-
+        DialogueEventList = new List<NPCDialogueEvent>();
         if (so_NPCDialogueEventList.npcDialogueEventList.Count > 0)
         {
             foreach (NPCDialogueEvent npcDialogueEvent in so_NPCDialogueEventList.npcDialogueEventList)
             {
-                if (DialogueEventDictionary.ContainsKey(npcDialogueEvent.dialogueDetail))
+                if (npcDialogueEvent.dialogueDetail == "default")
                 {
-                    Debug.Log("** Duplicate Dialogue Key Found ** Check for duplicate dialogues in the scriptable object dialogue list");
-                    continue;
+                    defaultDialogue = npcDialogueEvent;
                 }
-
-                DialogueEventDictionary.Add(npcDialogueEvent.dialogueDetail, npcDialogueEvent);
+                else
+                {
+                    DialogueEventList.Add(npcDialogueEvent);
+                }
             }
         }
+
     }
 
 
@@ -161,9 +165,78 @@ public class NPCDialogue : MonoBehaviour
 
     private NPCDialogueEvent FindDialogue()
     {
-        NPCDialogueEvent foundDialogue;
+        NPCDialogueEvent foundDialogue = new NPCDialogueEvent();
+        int foundDialoguePriority = 999999;
+        bool isDialogueFound = false;
 
-        DialogueEventDictionary.TryGetValue("default", out foundDialogue);
+        Enum.TryParse(TimeManager.Instance.GetDayOfWeek(), out DayOfWeek currentDay);
+        Enum.TryParse(SceneManager.GetActiveScene().name, out SceneName currentScene);
+
+        int currentHour = TimeManager.Instance.GetGameTime().Hours;
+        Weather currentWeather = GameManager.Instance.currentWeather;
+        Season currentSeason = TimeManager.Instance.GetGameSeason();
+        int currentYear = TimeManager.Instance.GetGameYear();
+
+        for (int i = 0; i < DialogueEventList.Count; i ++)
+        {
+            if (DialogueEventList[i].sceneNames.Contains(currentScene))
+            {
+                if (DialogueEventList[i].daysOfWeek.Contains(currentDay))
+                {
+                    if (DialogueEventList[i].weatherTypes.Contains(currentWeather))
+                    {
+                        if (DialogueEventList[i].seasons.Contains(currentSeason))
+                        {
+                            if (DialogueEventList[i].years.Count == 0 || DialogueEventList[i].years.Contains(currentYear))
+                            {
+                                if (currentHour >= DialogueEventList[i].hourMin && currentHour <= DialogueEventList[i].hourMax)
+                                {
+                                    if (DialogueEventList[i].priority < foundDialoguePriority)
+                                    {
+                                        foundDialogue = DialogueEventList[i];
+                                        foundDialoguePriority = DialogueEventList[i].priority;
+                                        isDialogueFound = true;
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+
+        if (!isDialogueFound)
+        {
+            foundDialogue = defaultDialogue;
+        }
 
         return foundDialogue;
     }

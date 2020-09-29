@@ -13,6 +13,32 @@ MonoBehaviour:
   m_Name: so_NPCDialogueEventList_Cora
   m_EditorClassIdentifier: 
   npcDialogueEventList:
+  - dialogueDetail: firstDay
+    hourMin: 0
+    hourMax: 24
+    priority: 10
+    daysOfWeek: 01000000
+    weatherTypes: 000000000100000002000000
+    seasons: 00000000
+    years: 01000000
+    sceneNames: 000000000100000002000000
+    dialogue:
+    - Hi sweetie! My name is Cora, and I'm Butch's wife.
+    - Let me know if you need anything at all.
+    - Good luck on your first day of work!
+    emotions: 000000000200000001000000
+  - dialogueDetail: field
+    hourMin: 0
+    hourMax: 24
+    priority: 5
+    daysOfWeek: 01000000020000000300000004000000050000000600000007000000
+    weatherTypes: 000000000100000002000000
+    seasons: 00000000010000000200000003000000
+    years: 
+    sceneNames: 01000000
+    dialogue:
+    - Isn't it just great to roam this big empty field?
+    emotions: 01000000
   - dialogueDetail: default
     hourMin: 0
     hourMax: 24
@@ -20,9 +46,9 @@ MonoBehaviour:
     daysOfWeek: 01000000020000000300000004000000050000000600000007000000
     weatherTypes: 000000000100000002000000
     seasons: 00000000010000000200000003000000
+    years: 
     sceneNames: 000000000100000002000000
     dialogue:
-    - Hi sweetie! My name is Cora, and I'm Butch's wife.
-    - Let me know if you need anything at all.
-    - Good luck on your first day of work!
-    emotions: 010000000200000000000000
+    - I love living out here on the farm.
+    - It fills me with joy every day!
+    emotions: 0000000001000000

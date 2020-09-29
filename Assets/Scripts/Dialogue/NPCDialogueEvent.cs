@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 [System.Serializable]
 public class NPCDialogueEvent
@@ -10,18 +12,19 @@ public class NPCDialogueEvent
 
     public int priority; 
 
-    public DayOfWeek[] daysOfWeek;
-    public Weather[] weatherTypes;
-    public Season[] seasons;
+    public List<DayOfWeek> daysOfWeek;
+    public List<Weather> weatherTypes;
+    public List<Season> seasons;
+    public List<int> years;
 
-    public SceneName[] sceneNames;
+    public List<SceneName> sceneNames;
 
     public string[] dialogue;
     public NPCEmotions[] emotions;
 
 
-    public NPCDialogueEvent(int hourMin, int hourMax, int priority, DayOfWeek[] daysOfWeek, Weather[] weatherTypes, Season[] seasons, 
-                            SceneName[] sceneNames)
+    public NPCDialogueEvent(int hourMin, int hourMax, int priority, List<DayOfWeek> daysOfWeek, List<Weather> weatherTypes, List<Season> seasons, List<int> years,
+                            List<SceneName> sceneNames, string[] dialogue, NPCEmotions[] emotions)
     {
         this.hourMin = hourMin;
         this.hourMax = hourMax;
@@ -29,7 +32,10 @@ public class NPCDialogueEvent
         this.daysOfWeek = daysOfWeek;
         this.weatherTypes = weatherTypes;
         this.seasons = seasons;
+        this.years = years;
         this.sceneNames = sceneNames;
+        this.dialogue = dialogue;
+        this.emotions = emotions;
     }
 
 

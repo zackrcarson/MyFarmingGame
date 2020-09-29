@@ -180,7 +180,7 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 
 
     // This method will calculate the day of the week from the game season and game day
-    private string GetDayOfWeek()
+    public string GetDayOfWeek()
     {
         // Multiply the current season (int) by 30 and add the current game day to get the total number of days since the Spring 1 in this game year
         int totalDays = (((int)gameSeason) * 30) + gameDay;
@@ -225,6 +225,20 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
         TimeSpan gameTime = new TimeSpan(gameHour, gameMinute, gameSecond);
 
         return gameTime;
+    }
+
+
+    // This method returns the current game year, so the NPCs know the time, for dialogue purposes
+    public int GetGameYear()
+    {
+        return gameYear;
+    }
+
+
+    // This method returns the current game season, so the NPCs know the time, for dialogue purposes
+    public Season GetGameSeason()
+    {
+        return gameSeason;
     }
 
 
