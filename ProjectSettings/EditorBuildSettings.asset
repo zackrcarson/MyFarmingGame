@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Scene3_Cabin.unity
     guid: 5151cf3adc79fa3278baa50e343ee030
+  - enabled: 1
+    path: Assets/Scenes/Scene4_Desert.unity
+    guid: f09be86868cee474cb20b2cea0220407
   m_configObjects: {}

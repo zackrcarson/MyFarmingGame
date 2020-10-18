@@ -1659,7 +1659,7 @@ MonoBehaviour:
   fadeDuration: 0.25
   faderCanvasGroup: {fileID: 1754120483}
   faderImage: {fileID: 1754120484}
-  startingSceneName: 0
+  startingSceneName: 3
 --- !u!1 &94911713
 GameObject:
   m_ObjectHideFlags: 0
@@ -6213,8 +6213,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -40, y: -39, z: 0}
-  m_Size: {x: 117, y: 71, z: 1}
+  m_Origin: {x: -40, y: -42, z: 0}
+  m_Size: {x: 205, y: 83, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:

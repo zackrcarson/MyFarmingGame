@@ -52,7 +52,7 @@ SpriteAtlas:
     - {fileID: 102900000, guid: 76b67f58cf2a792438dacf663689a3c0, type: 3}
     - {fileID: 102900000, guid: 0192443a29c27e747a3eb28596eddb21, type: 3}
     - {fileID: 102900000, guid: 15ae8b62ae9660f4f87a9f2d47eacc97, type: 3}
-    totalSpriteSurfaceArea: 338750
+    totalSpriteSurfaceArea: 342846
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
@@ -93,6 +93,10 @@ SpriteAtlas:
   - {fileID: 4005202913230342895, guid: 2d0dfd935517f7049a9ec156af517511, type: 3}
   - {fileID: 5613540868099651934, guid: 2d0dfd935517f7049a9ec156af517511, type: 3}
   - {fileID: -2514537956183521370, guid: 2d0dfd935517f7049a9ec156af517511, type: 3}
+  - {fileID: -4998578701570821773, guid: 61d294c3afb21944983dd041835e3deb, type: 3}
+  - {fileID: -6557750669681928476, guid: 61d294c3afb21944983dd041835e3deb, type: 3}
+  - {fileID: 2822730541293313887, guid: 61d294c3afb21944983dd041835e3deb, type: 3}
+  - {fileID: -7261803254839868861, guid: 61d294c3afb21944983dd041835e3deb, type: 3}
   - {fileID: -6853649311568494795, guid: fec47794c20ce834da941a7b4e8caa07, type: 3}
   - {fileID: 1549225131909812281, guid: fec47794c20ce834da941a7b4e8caa07, type: 3}
   - {fileID: -2634811762275802146, guid: fec47794c20ce834da941a7b4e8caa07, type: 3}
@@ -927,6 +931,10 @@ SpriteAtlas:
   - Butch_Portrait_0
   - Butch_Portrait_1
   - Butch_Portrait_2
+  - DesertTileset_1
+  - DesertTileset_0
+  - DesertTileset_3
+  - DesertTileset_2
   - effects_8
   - effects_9
   - effects_6
